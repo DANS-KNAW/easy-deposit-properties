@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.easy.properties.app.repository
 
+import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.contentType.DepositContentTypeFilter
 import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
 import nl.knaw.dans.easy.properties.app.model.ingestStep.DepositIngestStepFilter
@@ -32,6 +33,7 @@ case class DepositFilters(depositorId: Option[DepositorId] = Option.empty,
                           curationRequiredFilter: Option[DepositCurationRequiredFilter] = Option.empty,
                           curationPerformedFilter: Option[DepositCurationPerformedFilter] = Option.empty,
                           contentTypeFilter: Option[DepositContentTypeFilter] = Option.empty,
+                          originFilter: Option[Origin] = Option.empty,
                          ) {
   override def toString: String = {
     Seq(
@@ -46,6 +48,7 @@ case class DepositFilters(depositorId: Option[DepositorId] = Option.empty,
       curationRequiredFilter,
       curationPerformedFilter,
       contentTypeFilter,
+      originFilter,
     )
       .collect { case Some(x) => x }
       .mkString("DepositFilter(", ", ", ")")

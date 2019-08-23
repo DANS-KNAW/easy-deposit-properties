@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.ordering
 
+import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, Timestamp, timestampOrdering }
 import sangria.macros.derive.GraphQLDescription
 
@@ -29,6 +30,8 @@ object DepositOrderField extends Enumeration {
   val BAG_NAME          : DepositOrderField = Value("BAG_NAME")
   @GraphQLDescription("Order deposits by creation timestamp")
   val CREATION_TIMESTAMP: DepositOrderField = Value("CREATION_TIMESTAMP")
+  @GraphQLDescription("Order deposits by origin")
+  val ORIGIN: DepositOrderField = Value("ORIGIN")
   // @formatter:on
 }
 
@@ -42,6 +45,8 @@ case class DepositOrder(field: DepositOrderField.DepositOrderField,
         Ordering[Option[String]].on(_.bagName)
       case DepositOrderField.CREATION_TIMESTAMP =>
         Ordering[Timestamp].on(_.creationTimestamp)
+      case DepositOrderField.ORIGIN =>
+        Ordering[Origin].on(_.origin)
     }
 
     direction.withOrder(orderByField).compare(x, y)

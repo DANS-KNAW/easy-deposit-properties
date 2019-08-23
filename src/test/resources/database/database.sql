@@ -7,7 +7,9 @@ CREATE TABLE Deposit (
     depositId CHAR(36) NOT NULL PRIMARY KEY,
     bagName VARCHAR(10000),
     creationTimestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-    depositorId VARCHAR(64) NOT NULL
+    depositorId VARCHAR(64) NOT NULL,
+    origin VARCHAR(6) NOT NULL,
+    CHECK (origin in ('SWORD2', 'API', 'SMD'))
 );
 
 CREATE TABLE State (

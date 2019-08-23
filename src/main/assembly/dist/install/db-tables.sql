@@ -1,8 +1,11 @@
+CREATE TYPE Origin AS ENUM ('SWORD2', 'API', 'SMD');
+
 CREATE TABLE Deposit (
     depositId CHAR(36) NOT NULL PRIMARY KEY,
     bagName TEXT,
     creationTimestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-    depositorId VARCHAR(64) NOT NULL
+    depositorId VARCHAR(64) NOT NULL,
+    origin Origin NOT NULL
 );
 
 CREATE TABLE State (

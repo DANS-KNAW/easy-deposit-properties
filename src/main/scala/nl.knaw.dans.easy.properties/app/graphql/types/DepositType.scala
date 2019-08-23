@@ -19,17 +19,18 @@ import nl.knaw.dans.easy.properties.app.graphql.DataContext
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ ContentTypeResolver, CurationResolver, DepositResolver, DoiEventResolver, IdentifierResolver, IngestStepResolver, SpringfieldResolver, StateResolver, executionContext }
 import nl.knaw.dans.easy.properties.app.model.DoiAction.DoiAction
+import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.contentType.ContentType
 import nl.knaw.dans.easy.properties.app.model.curator.Curator
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.IngestStep
 import nl.knaw.dans.easy.properties.app.model.springfield.Springfield
 import nl.knaw.dans.easy.properties.app.model.state.State
-import nl.knaw.dans.easy.properties.app.model.{ CurationPerformedEvent, CurationRequiredEvent, Deposit, DepositorId, DoiActionEvent, DoiRegisteredEvent, IsNewVersionEvent, Timestamp, timestampOrdering }
+import nl.knaw.dans.easy.properties.app.model.{ CurationPerformedEvent, CurationRequiredEvent, Deposit, DepositorId, DoiAction, DoiActionEvent, DoiRegisteredEvent, IsNewVersionEvent, Origin, Timestamp, timestampOrdering }
 import sangria.macros.derive._
 import sangria.marshalling.FromInput.coercedScalaInput
 import sangria.relay._
-import sangria.schema.{ Argument, BooleanType, Context, DeferredValue, Field, ListType, ObjectType, OptionInputType, OptionType, StringType }
+import sangria.schema.{ Argument, BooleanType, Context, DeferredValue, EnumType, Field, ListType, ObjectType, OptionInputType, OptionType, StringType }
 
 trait DepositType {
   this: DepositorType
@@ -66,13 +67,30 @@ trait DepositType {
     astDirectives = Vector.empty,
     astNodes = Vector.empty,
   )
-
   private val bagNameField: Field[DataContext, Deposit] = Field(
     name = "bagName",
     fieldType = OptionType(StringType),
     description = Option("The name of the deposited bag."),
     resolve = _.value.bagName,
   )
+
+  implicit val OriginType: EnumType[Origin.Value] = Origin.deriveType
+  lazy val depositOriginFilterArgument: Argument[Option[Origin]] = Argument(
+    name = "origin",
+    argumentType = OptionInputType(OriginType),
+    description = Some("Find only those deposits that have this specified origin."),
+    defaultValue = None,
+    fromInput = coercedScalaInput,
+    astDirectives = Vector.empty,
+    astNodes = Vector.empty,
+  )
+  private val originField: Field[DataContext, Deposit] = Field(
+    name = "origin",
+    fieldType = OptionType(OriginType),
+    description = Option("The origin of the deposit."),
+    resolve = _.value.origin,
+  )
+
   private val lastModifiedField: Field[DataContext, Deposit] = Field(
     name = "lastModified",
     fieldType = OptionType(DateTimeType),
@@ -366,6 +384,7 @@ trait DepositType {
       contentTypesField,
     ),
     ReplaceField("bagName", bagNameField),
+    ReplaceField("origin", originField),
     ReplaceField("depositorId", depositorField),
   )
 

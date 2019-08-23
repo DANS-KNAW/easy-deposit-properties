@@ -45,6 +45,7 @@ trait DepositorType {
     description = Some("List all deposits originating from the same depositor."),
     arguments = List(
       depositBagNameFilterArgument,
+      depositOriginFilterArgument,
       depositStateFilterArgument,
       depositIngestStepFilterArgument,
       depositDoiRegisteredFilterArgument,
@@ -64,6 +65,7 @@ trait DepositorType {
     DepositResolver.findDeposit(DepositFilters(
       depositorId = Some(context.value),
       bagName = context.arg(depositBagNameFilterArgument),
+      originFilter = context.arg(depositOriginFilterArgument),
       stateFilter = context.arg(depositStateFilterArgument),
       ingestStepFilter = context.arg(depositIngestStepFilterArgument),
       doiRegisteredFilter = context.arg(depositDoiRegisteredFilterArgument),
