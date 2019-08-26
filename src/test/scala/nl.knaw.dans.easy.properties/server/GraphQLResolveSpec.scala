@@ -38,6 +38,7 @@ import org.json4s.JsonDSL._
 import org.json4s.native.JsonMethods._
 import org.json4s.native.Serialization._
 import org.json4s.{ DefaultFormats, Formats }
+import org.scalamock.function.FunctionAdapter1
 import org.scalamock.scalatest.MockFactory
 import org.scalatra.test.EmbeddedJettyContainer
 import org.scalatra.test.scalatest.ScalatraSuite
@@ -1530,6 +1531,8 @@ class GraphQLResolveSpec extends TestSupportFixture
     runQuery(input)
   }
 
+
+
   it should "resolve 'deposits/nestedDeposits/deposits/viaIngestStep.graphql' with 3 calls to the repository" in {
     val input = graphqlExamplesDir / "deposits" / "nestedDeposits" / "deposits" / "viaIngestStep.graphql"
 
@@ -1541,12 +1544,12 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters1) once() returning Seq(
         filters1 -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      ingestStepDao.getCurrent _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+      ingestStepDao.getCurrent _ expects inAnyOrder(Seq(depositId1, depositId2, depositId3)) once() returning Seq(
         depositId1 -> Some(step1),
         depositId2 -> Some(step2),
         depositId3 -> Some(step3),
       ).asRight
-      depositDao.search _ expects Seq(filters2, filters3, filters4) once() returning Seq(
+      depositDao.search _ expects inAnyOrder(Seq(filters2, filters3, filters4)) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
         filters4 -> Seq(deposit1, deposit3),
@@ -1554,6 +1557,11 @@ class GraphQLResolveSpec extends TestSupportFixture
     }
 
     runQuery(input)
+  }
+
+  private def inAnyOrder[T](expected: Seq[T]): FunctionAdapter1[Seq[T], Boolean] = {
+    // TODO vararch? To some package or find in library.
+    where { input: Seq[T] => expected.forall(filters => input contains filters) }
   }
 
   it should "resolve 'deposits/nestedDeposits/deposits/viaIngestSteps.graphql' with 3 calls to the repository" in {
@@ -1567,12 +1575,12 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters1) once() returning Seq(
         filters1 -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      ingestStepDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+      ingestStepDao.getAll _ expects inAnyOrder(Seq(depositId1, depositId2, depositId3)) once() returning Seq(
         depositId1 -> Seq(step1, step2),
         depositId2 -> Seq(step3, step1),
         depositId3 -> Seq.empty,
       ).asRight
-      depositDao.search _ expects Seq(filters2, filters3, filters4) once() returning Seq(
+      depositDao.search _ expects inAnyOrder(Seq(filters2, filters3, filters4)) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
         filters4 -> Seq(deposit1, deposit3),
