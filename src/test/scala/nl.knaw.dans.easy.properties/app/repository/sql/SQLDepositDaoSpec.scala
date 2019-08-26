@@ -20,7 +20,7 @@ import java.util.UUID
 import cats.scalatest.EitherValues
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStepLabel }
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, SeriesFilter }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, Origin, SeriesFilter }
 import nl.knaw.dans.easy.properties.app.repository.{ BagNameAlreadySetError, DepositAlreadyExistsError, DepositFilters, InvalidValueError, NoSuchDepositError }
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
 import org.joda.time.DateTime
@@ -191,7 +191,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
   "store" should "insert a deposit into the database" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
-    val deposit6 = Deposit(depositId6, Option("bag1"), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
+    val deposit6 = Deposit(depositId6, Option("bag1"), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003", Origin.API)
 
     deposits.store(deposit6).value shouldBe deposit6
     deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
@@ -207,7 +207,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
   it should "correctly store and retrieve a 'creationTimestamp' from a different timezone" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
-    val deposit6 = Deposit(depositId6, Option("bag6"), DateTime.parse("2019-06-06T00:00:00.000+12:00"), "user003")
+    val deposit6 = Deposit(depositId6, Option("bag6"), DateTime.parse("2019-06-06T00:00:00.000+12:00"), "user003", Origin.API)
     val expectedCreationTimestamp = new DateTime(2019, 6, 5, 12, 0, timeZone)
 
     deposits.store(deposit6).value shouldBe deposit6
@@ -217,7 +217,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
   it should "correctly store and retrieve a deposit without bagName" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
-    val deposit6 = Deposit(depositId6, None, new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
+    val deposit6 = Deposit(depositId6, None, new DateTime(2019, 6, 6, 0, 0, timeZone), "user003", Origin.API)
 
     deposits.store(deposit6).value shouldBe deposit6
     deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
@@ -226,7 +226,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
   "storeBagName" should "set the bagName if it wasn't already set" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
-    val deposit6 = Deposit(depositId6, None, new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
+    val deposit6 = Deposit(depositId6, None, new DateTime(2019, 6, 6, 0, 0, timeZone), "user003", Origin.API)
 
     deposits.store(deposit6).value shouldBe deposit6
     deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
@@ -237,7 +237,8 @@ class SQLDepositDaoSpec extends TestSupportFixture
   it should "set the bagName if its value in the database currently is an empty string" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
-    val deposit6 = Deposit(depositId6, Some(""), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
+    val deposit6 = Deposit(depositId6, Some(""), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003", Origin.API
+    )
 
     deposits.store(deposit6).value shouldBe deposit6
     deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
@@ -255,7 +256,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
   it should "fail to set the bagName when the deposit exists and the bagName is already set" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
-    val deposit6 = Deposit(depositId6, Some("bag6"), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
+    val deposit6 = Deposit(depositId6, Some("bag6"), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003", Origin.API)
 
     deposits.store(deposit6).value shouldBe deposit6
     deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))

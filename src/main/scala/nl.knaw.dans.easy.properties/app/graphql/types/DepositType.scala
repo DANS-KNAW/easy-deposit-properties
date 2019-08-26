@@ -26,7 +26,7 @@ import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, Identifie
 import nl.knaw.dans.easy.properties.app.model.ingestStep.IngestStep
 import nl.knaw.dans.easy.properties.app.model.springfield.Springfield
 import nl.knaw.dans.easy.properties.app.model.state.State
-import nl.knaw.dans.easy.properties.app.model.{ CurationPerformedEvent, CurationRequiredEvent, Deposit, DepositorId, DoiAction, DoiActionEvent, DoiRegisteredEvent, IsNewVersionEvent, Origin, Timestamp, timestampOrdering }
+import nl.knaw.dans.easy.properties.app.model.{ CurationPerformedEvent, CurationRequiredEvent, Deposit, DepositorId, DoiActionEvent, DoiRegisteredEvent, IsNewVersionEvent, Origin, Timestamp, timestampOrdering }
 import sangria.macros.derive._
 import sangria.marshalling.FromInput.coercedScalaInput
 import sangria.relay._
@@ -74,7 +74,12 @@ trait DepositType {
     resolve = _.value.bagName,
   )
 
-  implicit val OriginType: EnumType[Origin.Value] = Origin.deriveType
+  implicit lazy val OriginType: EnumType[Origin.Value] = deriveEnumType(
+    EnumTypeDescription("The origin of the deposit."),
+    DocumentValue("SWORD2", "The DANS-DOI must be created in the DataCite resolver."),
+    DocumentValue("API", "The DANS-DOI must be updated in the DataCite resolver."),
+    DocumentValue("SMD", "None action must be taken for this DANS-DOI in the DataCite resolver."),
+  )
   lazy val depositOriginFilterArgument: Argument[Option[Origin]] = Argument(
     name = "origin",
     argumentType = OptionInputType(OriginType),

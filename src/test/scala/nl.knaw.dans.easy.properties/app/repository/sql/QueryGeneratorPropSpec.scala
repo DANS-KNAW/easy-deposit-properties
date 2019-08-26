@@ -23,7 +23,7 @@ import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStepLabel }
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, DoiAction, SeriesFilter }
+import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, DoiAction, Origin, SeriesFilter }
 import nl.knaw.dans.easy.properties.app.repository.DepositFilters
 import org.scalacheck.Arbitrary._
 import org.scalacheck.{ Arbitrary, Gen }
@@ -49,6 +49,7 @@ class QueryGeneratorPropSpec extends PropSpec with GeneratorDrivenPropertyChecks
 
   implicit val arbitrarySeriesFilter: Arbitrary[SeriesFilter] = genFromEnum(SeriesFilter)
   implicit val arbitraryIdentifierType: Arbitrary[IdentifierType] = genFromEnum(IdentifierType)
+  implicit val arbitraryOrigin: Arbitrary[Origin.Value] = genFromEnum(Origin)
 
   implicit val arbitraryStateFilter: Arbitrary[DepositStateFilter] = genDepositFilter(StateLabel)(DepositStateFilter)
   implicit val arbitraryIngestStepFilter: Arbitrary[DepositIngestStepFilter] = genDepositFilter(IngestStepLabel)(DepositIngestStepFilter)
@@ -72,7 +73,8 @@ class QueryGeneratorPropSpec extends PropSpec with GeneratorDrivenPropertyChecks
         Option[DepositIsNewVersionFilter],
         Option[DepositCurationRequiredFilter],
         Option[DepositCurationPerformedFilter],
-        Option[DepositContentTypeFilter]
+        Option[DepositContentTypeFilter],
+        Option[Origin.Origin],
       )]
       .map(DepositFilters.tupled)
   }

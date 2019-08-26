@@ -29,7 +29,7 @@ import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, Identifie
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStep, IngestStepLabel }
 import nl.knaw.dans.easy.properties.app.model.springfield.{ Springfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, State, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositId, DepositIsNewVersionFilter, DoiAction, DoiActionEvent, DoiRegisteredEvent, SeriesFilter }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositId, DepositIsNewVersionFilter, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin, SeriesFilter }
 import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DepositFilters, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, Repository, SpringfieldDao, StateDao }
 import nl.knaw.dans.easy.properties.fixture.{ FileSystemSupport, TestSupportFixture }
 import org.joda.time.DateTime
@@ -54,18 +54,21 @@ trait GraphQLResolveSpecTestObjects {
     bagName = Some("bag1"),
     creationTimestamp = DateTime.now(),
     depositorId = "user001",
+    Origin.API,
   )
   val deposit2 = Deposit(
     id = depositId2,
     bagName = Some("bag2"),
     creationTimestamp = DateTime.now(),
     depositorId = "user002",
+    Origin.API,
   )
   val deposit3 = Deposit(
     id = depositId3,
     bagName = Some("bag3"),
     creationTimestamp = DateTime.now(),
     depositorId = "user002",
+    Origin.API,
   )
   val state1 = State(
     id = "1",
