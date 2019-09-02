@@ -59,7 +59,7 @@ class GraphiQLServlet(backendPath: String) extends ScalatraServlet {
           |        overflow: hidden;
           |      }
           |      #graphiql {
-          |        height: 100vh;
+          |        height: calc(100vh - 72px); /* 72px is the height of the `authentication` div */
           |      }
           |      .authentication {
           |        background: linear-gradient(#f7f7f7, #e2e2e2);
