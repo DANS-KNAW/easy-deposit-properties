@@ -63,7 +63,7 @@ CREATE TABLE SimpleProperties (
     UNIQUE (depositId, key, timestamp)
 );
 
-GRANT INSERT, SELECT ON Deposit TO easy_deposit_properties;
+GRANT INSERT, UPDATE, SELECT ON Deposit TO easy_deposit_properties;
 GRANT INSERT, SELECT ON State TO easy_deposit_properties;
 GRANT INSERT, SELECT ON Identifier TO easy_deposit_properties;
 GRANT INSERT, SELECT ON Curation TO easy_deposit_properties;
