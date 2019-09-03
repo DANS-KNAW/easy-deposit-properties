@@ -219,7 +219,7 @@ object QueryGenerator {
   }
 
   def getSimplePropsDepositsById(key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT propertyId, depositId, bagName, creationTimestamp, depositorId FROM Deposit INNER JOIN SimpleProperties ON Deposit.depositId = SimpleProperties.depositId WHERE key = ? AND propertyId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+    val query = s"SELECT propertyId, Deposit.depositId, bagName, creationTimestamp, depositorId FROM Deposit INNER JOIN SimpleProperties ON Deposit.depositId = SimpleProperties.depositId WHERE key = ? AND propertyId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
     val values = setString(key) :: ids.map(setInt)
 
     query -> values.toList
