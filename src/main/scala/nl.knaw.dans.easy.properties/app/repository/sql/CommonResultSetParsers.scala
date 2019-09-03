@@ -89,7 +89,7 @@ private[sql] trait CommonResultSetParsers {
     resultSet.map(extractResults(parseResult)(collectResults))
       .either
       .either
-      .leftMap(InvalidValueError(_))
+      .leftMap(InvalidValueError(_, query))
       .flatMap(identity)
   }
 

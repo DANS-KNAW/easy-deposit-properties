@@ -455,12 +455,12 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     }
   }
 
-  "getDepositsById" should "generate a query that, given a table name and id column name, finds deposits corresponing to the given ids" in {
+  "getDepositsById" should "generate a query that, given a table name and id column name, finds deposits corresponding to the given ids" in {
     val ids = NonEmptyList.fromListUnsafe((1 to 5).map(_.toString).toList)
     val (query, values) = QueryGenerator.getDepositsById("State", "stateId")(ids)
 
     val expectedQuery =
-      """SELECT stateId, depositId, bagName, creationTimestamp, depositorId
+      """SELECT stateId, depositId, bagName, creationTimestamp, depositorId, origin
         |FROM Deposit
         |INNER JOIN State
         |ON Deposit.depositId = State.depositId

@@ -155,7 +155,7 @@ object QueryGenerator {
   }
 
   def getDepositsById(tableName: String, idColumnName: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT $idColumnName, depositId, bagName, creationTimestamp, depositorId FROM Deposit INNER JOIN $tableName ON Deposit.depositId = $tableName.depositId WHERE $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+    val query = s"SELECT $idColumnName, depositId, bagName, creationTimestamp, depositorId, origin FROM Deposit INNER JOIN $tableName ON Deposit.depositId = $tableName.depositId WHERE $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
 
     query -> ids.map(setInt).toList
   }
@@ -219,7 +219,7 @@ object QueryGenerator {
   }
 
   def getSimplePropsDepositsById(tableName: String, idColumnName: String, key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT $idColumnName, depositId, bagName, creationTimestamp, depositorId FROM Deposit INNER JOIN $tableName ON Deposit.depositId = $tableName.depositId WHERE key = ? AND $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+    val query = s"SELECT $idColumnName, depositId, bagName, creationTimestamp, depositorId, origin FROM Deposit INNER JOIN $tableName ON Deposit.depositId = $tableName.depositId WHERE key = ? AND $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
     val values = setString(key) :: ids.map(setInt)
 
     query -> values.toList
