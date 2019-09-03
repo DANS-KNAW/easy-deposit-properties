@@ -125,18 +125,18 @@ class QueryGeneratorPropSpec extends PropSpec with GeneratorDrivenPropertyChecks
   }
 
   property("getSimplePropsElementsById") {
-    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsElementsById("table", "idColumn", "key"))
+    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsElementsById("idColumn", "key"))
   }
 
   property("getSimplePropsCurrentElementByDepositId") {
-    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsCurrentElementByDepositId("table", "key"))
+    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsCurrentElementByDepositId("key"))
   }
 
   property("getSimplePropsAllElementsByDepositId") {
-    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsAllElementsByDepositId("table", "key"))
+    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsAllElementsByDepositId("key"))
   }
 
   property("getSimplePropsDepositsById") {
-    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsDepositsById("table", "idColumn", "key"))
+    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsDepositsById("key"))
   }
 }
