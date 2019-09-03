@@ -188,9 +188,9 @@ object QueryGenerator {
 
   def getSimplePropsElementsById(tableName: String, idColumnName: String, key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
     val query = s"SELECT * FROM $tableName WHERE key = ? AND $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
-    val values = key :: ids
+    val values = setString(key) :: ids.map(setInt)
 
-    query -> values.map(setString).toList
+    query -> values.toList
   }
 
   def getSimplePropsCurrentElementByDepositId(tableName: String, key: String)(ids: NonEmptyList[DepositId]): (String, Seq[PrepStatementResolver]) = {
