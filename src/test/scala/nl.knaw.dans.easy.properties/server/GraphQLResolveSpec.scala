@@ -1531,8 +1531,6 @@ class GraphQLResolveSpec extends TestSupportFixture
     runQuery(input)
   }
 
-
-
   it should "resolve 'deposits/nestedDeposits/deposits/viaIngestStep.graphql' with 3 calls to the repository" in {
     val input = graphqlExamplesDir / "deposits" / "nestedDeposits" / "deposits" / "viaIngestStep.graphql"
 

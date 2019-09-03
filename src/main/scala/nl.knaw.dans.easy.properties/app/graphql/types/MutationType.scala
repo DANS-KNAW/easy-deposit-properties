@@ -67,11 +67,11 @@ trait MutationType {
     astDirectives = Vector.empty,
     astNodes = Vector.empty,
   )
-  private val originOptionInputField: InputField[Option[Origin.Value]] = InputField(
+  private val originInputField: InputField[Origin.Value] = InputField(
     name = "origin",
     description = Some("The origin of the deposited bag."),
     defaultValue = None,
-    fieldType = OptionInputType(OriginType),
+    fieldType = OriginType,
     astDirectives = Vector.empty,
     astNodes = Vector.empty,
   )
@@ -538,7 +538,7 @@ trait MutationType {
         bagName = input.get(bagNameOptionInputField.name).flatMap(_.asInstanceOf[Option[String]]),
         creationTimestamp = input(creationTimestampInputField.name).asInstanceOf[Timestamp],
         depositorId = input(depositorIdInputField.name).asInstanceOf[String],
-        origin = input(originOptionInputField.name).asInstanceOf[Origin]
+        origin = input(originInputField.name).asInstanceOf[Origin]
       ))
       .map(deposit => AddDepositPayload(
         clientMutationId = input.get(Mutation.ClientMutationIdFieldName).flatMap(_.asInstanceOf[Option[String]]),

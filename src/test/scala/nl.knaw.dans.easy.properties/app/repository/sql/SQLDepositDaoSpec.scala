@@ -237,8 +237,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
   it should "set the bagName if its value in the database currently is an empty string" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
-    val deposit6 = Deposit(depositId6, Some(""), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003", Origin.API
-    )
+    val deposit6 = Deposit(depositId6, Some(""), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003", Origin.API)
 
     deposits.store(deposit6).value shouldBe deposit6
     deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
