@@ -34,7 +34,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
   "getAll" should "return all deposits that are in the database" in {
     val deposits = new SQLDepositDao
 
-    deposits.getAll.value should contain inOrderOnly(
+    deposits.getAll.value shouldBe List(
       deposit1,
       deposit2,
       deposit3,
@@ -46,7 +46,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
   it should "fail when the depositId column doesn't contain a UUID" in {
     prepareTest {
       """INSERT INTO Deposit
-        |VALUES ('abcdefgh-ijkl-mnop-qrst-uvwxyzabcdef', 'bag1', '2019-01-01 00:00:00.000000+1:00', 'user001');""".stripMargin
+        |VALUES ('abcdefgh-ijkl-mnop-qrst-uvwxyzabcdef', 'bag1', '2019-01-01 00:00:00.000000+1:00', 'user001', 'API');""".stripMargin
     }
 
     val deposits = new SQLDepositDao

@@ -43,9 +43,9 @@ trait DatabaseDataFixture extends BeforeAndAfterEach {
 
   val deposit1 = Deposit(depositId1, Option("bag1"), new DateTime(2019, 1, 1, 0, 0, timeZone), "user001", Origin.API)
   val deposit2 = Deposit(depositId2, Option.empty, new DateTime(2019, 2, 2, 0, 0, timeZone), "user001", Origin.API)
-  val deposit3 = Deposit(depositId3, Option("bag3"), new DateTime(2019, 3, 3, 0, 0, timeZone), "user002", Origin.API)
-  val deposit4 = Deposit(depositId4, Option("bag4"), new DateTime(2019, 4, 4, 0, 0, timeZone), "user001", Origin.API)
-  val deposit5 = Deposit(depositId5, Option("bag5"), new DateTime(2019, 5, 5, 0, 0, timeZone), "user002", Origin.API)
+  val deposit3 = Deposit(depositId3, Option("bag3"), new DateTime(2019, 3, 3, 0, 0, timeZone), "user002", Origin.SWORD2)
+  val deposit4 = Deposit(depositId4, Option("bag4"), new DateTime(2019, 4, 4, 0, 0, timeZone), "user001", Origin.SMD)
+  val deposit5 = Deposit(depositId5, Option("bag5"), new DateTime(2019, 5, 5, 0, 0, timeZone), "user002", Origin.SWORD2)
 
   val state10 = State("0", StateLabel.DRAFT, "draft with continued deposit", new DateTime(2019, 1, 1, 0, 0, timeZone))
   val state11 = State("1", StateLabel.DRAFT, "draft with continued deposit", new DateTime(2019, 1, 1, 1, 1, timeZone))
