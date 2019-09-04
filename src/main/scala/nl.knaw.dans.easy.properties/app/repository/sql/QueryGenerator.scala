@@ -186,8 +186,8 @@ object QueryGenerator {
     s"SELECT identifierId, identifierSchema, identifierValue, timestamp FROM Identifier WHERE $queryWherePart;" -> valuesWherePart
   }
 
-  def getSimplePropsElementsById(idColumnName: String, key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT * FROM SimpleProperties WHERE key = ? AND $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+  def getSimplePropsElementsById(key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
+    val query = s"SELECT * FROM SimpleProperties WHERE key = ? AND propertyId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
     val values = setString(key) :: ids.map(setInt)
 
     query -> values.toList

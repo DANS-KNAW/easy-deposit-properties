@@ -52,7 +52,7 @@ class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[IngestStep])]] = {
     trace(ids)
 
-    executeGetById(parseIngestStep)(QueryGenerator.getSimplePropsElementsById("propertyId", "ingest-step"))(ids)
+    executeGetById(parseIngestStep)(QueryGenerator.getSimplePropsElementsById("ingest-step"))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[IngestStep])]] = {

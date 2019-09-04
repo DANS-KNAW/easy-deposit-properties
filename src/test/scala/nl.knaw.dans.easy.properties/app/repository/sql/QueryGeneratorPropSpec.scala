@@ -125,7 +125,7 @@ class QueryGeneratorPropSpec extends PropSpec with GeneratorDrivenPropertyChecks
   }
 
   property("getSimplePropsElementsById") {
-    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsElementsById("idColumn", "key"))
+    testNumberOfQuestionMarks(QueryGenerator.getSimplePropsElementsById("key"))
   }
 
   property("getSimplePropsCurrentElementByDepositId") {
