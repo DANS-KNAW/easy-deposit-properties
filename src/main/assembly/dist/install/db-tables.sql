@@ -15,12 +15,10 @@ CREATE TABLE State (
     UNIQUE (depositId, timestamp)
 );
 
-CREATE TYPE IdentifierSchema AS ENUM ('doi', 'urn', 'fedora', 'bag-store');
-
 CREATE TABLE Identifier (
     identifierId SERIAL NOT NULL PRIMARY KEY,
     depositId CHAR(36) NOT NULL,
-    identifierSchema IdentifierSchema NOT NULL,
+    identifierSchema VARCHAR(64) NOT NULL,
     identifierValue VARCHAR(64) NOT NULL,
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (depositId) REFERENCES Deposit (depositId),

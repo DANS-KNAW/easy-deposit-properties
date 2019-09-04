@@ -582,7 +582,7 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
   }
 
   "storeIdentifier" should "yield the query for inserting an Identifier into the database" in {
-    QueryGenerator.storeIdentifier shouldBe "INSERT INTO Identifier (depositId, identifierSchema, identifierValue, timestamp) VALUES (?, ?::IdentifierSchema, ?, ?);"
+    QueryGenerator.storeIdentifier shouldBe "INSERT INTO Identifier (depositId, identifierSchema, identifierValue, timestamp) VALUES (?, ?, ?, ?);"
   }
 
   "storeSpringfield" should "yield the query for inserting a Springfield configuration into the database" in {
