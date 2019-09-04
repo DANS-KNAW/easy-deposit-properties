@@ -561,6 +561,101 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     }
   }
 
+  "getSimplePropsElementsById" should "produce a query that selects simple properties by their ID for the given key" in {
+    val ids = NonEmptyList.fromListUnsafe((1 to 5).map(_.toString).toList)
+    val (query, keyValue :: values) = QueryGenerator.getSimplePropsElementsById("my-key")(ids)
+    
+    val expectedQuery =
+      """SELECT *
+        |FROM SimpleProperties
+        |WHERE key = ?
+        |AND propertyId IN (?, ?, ?, ?, ?);""".stripMargin
+    
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size ids.size
+    
+    inSequence {
+      setStringMock(keyValue, "my-key")
+      forEvery(values zip ids.map(_.toInt).toList) { case (value, expectedValue) =>
+        setIntMock(value, expectedValue)
+      }
+    }
+  }
+
+  "getSimplePropsCurrentElementByDepositId" should "produce a query that selects simple properties by their depositId for the given key" in {
+    val depositIds = NonEmptyList.fromListUnsafe((1 to 5).map(_ => UUID.randomUUID()).toList)
+    val (query, key1Value :: vs) = QueryGenerator.getSimplePropsCurrentElementByDepositId("my-key")(depositIds)
+    val values = vs.init
+    val key2Value = vs.last
+    
+    val expectedQuery =
+      """SELECT *
+        |FROM SimpleProperties
+        |INNER JOIN (
+        |  SELECT depositId, max(timestamp) AS max_timestamp
+        |  FROM SimpleProperties
+        |  WHERE key = ?
+        |  AND depositId IN (?, ?, ?, ?, ?)
+        |  GROUP BY depositId
+        |) AS deposit_with_max_timestamp USING (depositId)
+        |WHERE timestamp = max_timestamp
+        |AND key = ?;""".stripMargin
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size depositIds.size
+    
+    inSequence {
+      setStringMock(key1Value, "my-key")
+      forEvery(values zip depositIds.map(_.toString).toList) { case (value, expectedValue) =>
+        setStringMock(value, expectedValue)
+      }
+      setStringMock(key2Value, "my-key")
+    }
+  }
+
+  "getSimplePropsAllElementsByDepositId" should "produce a query that selects all simple properties by their depositId for the given key" in {
+    val depositIds = NonEmptyList.fromListUnsafe((1 to 5).map(_ => UUID.randomUUID()).toList)
+    val (query, keyValue :: values) = QueryGenerator.getSimplePropsAllElementsByDepositId("my-key")(depositIds)
+
+    val expectedQuery =
+      """SELECT *
+        |FROM SimpleProperties
+        |WHERE key = ?
+        |AND depositId IN (?, ?, ?, ?, ?);""".stripMargin
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size depositIds.size
+
+    inSequence {
+      setStringMock(keyValue, "my-key")
+      forEvery(values zip depositIds.map(_.toString).toList) { case (value, expectedValue) =>
+        setStringMock(value, expectedValue)
+      }
+    }
+  }
+
+  "getSimplePropsDepositsById" should "produce a query that selects deposits based on the simple properties id for the given key" in {
+    val ids = NonEmptyList.fromListUnsafe((1 to 5).map(_.toString).toList)
+    val (query, keyValue :: values) = QueryGenerator.getSimplePropsDepositsById("my-key")(ids)
+
+    val expectedQuery =
+      """SELECT propertyId, Deposit.depositId, bagName, creationTimestamp, depositorId
+        |FROM Deposit
+        |INNER JOIN SimpleProperties ON Deposit.depositId = SimpleProperties.depositId 
+        |WHERE key = ?
+        |AND propertyId IN (?, ?, ?, ?, ?);""".stripMargin
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size ids.size
+
+    inSequence {
+      setStringMock(keyValue, "my-key")
+      forEvery(values zip ids.map(_.toInt).toList) { case (value, expectedValue) =>
+        setIntMock(value, expectedValue)
+      }
+    }
+  }
+
   "storeDeposit" should "yield the query for inserting a deposit into the database" in {
     QueryGenerator.storeDeposit shouldBe "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId) VALUES (?, ?, ?, ?);"
   }
