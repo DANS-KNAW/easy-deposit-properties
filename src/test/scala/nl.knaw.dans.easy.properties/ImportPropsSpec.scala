@@ -151,6 +151,7 @@ class ImportPropsSpec extends TestSupportFixture
 
     inSequence {
       expectInteractString("user001")
+      expectInteractEnum(Origin)(_.API)
       depositDao.store _ expects where(isDeposit(Deposit(depositId, none, creationTime, "user001", Origin.API))) returning Deposit(depositId, none, creationTime, "user001", Origin.API).asRight
       expectInteractEnum(StateLabel)(_.SUBMITTED)
       expectInteractString("my description")
