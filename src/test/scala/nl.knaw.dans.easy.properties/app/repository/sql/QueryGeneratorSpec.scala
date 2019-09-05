@@ -639,7 +639,7 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     val (query, keyValue :: values) = QueryGenerator.getSimplePropsDepositsById("my-key")(ids)
 
     val expectedQuery =
-      """SELECT propertyId, Deposit.depositId, bagName, creationTimestamp, depositorId
+      """SELECT propertyId, Deposit.depositId, bagName, creationTimestamp, depositorId, origin
         |FROM Deposit
         |INNER JOIN SimpleProperties ON Deposit.depositId = SimpleProperties.depositId 
         |WHERE key = ?
