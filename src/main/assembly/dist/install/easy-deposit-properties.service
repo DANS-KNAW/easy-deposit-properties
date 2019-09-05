@@ -3,6 +3,7 @@ Description=EASY Deposit Properties Service
 
 [Service]
 ExecStart=/bin/java \
+   $INITIAL_HEAP_SIZE \
    -Dlogback.configurationFile=/etc/opt/dans.knaw.nl/easy-deposit-properties/logback-service.xml \
    -Dapp.home=/opt/dans.knaw.nl/easy-deposit-properties \
    -Dorg.scalatra.environment="production" \

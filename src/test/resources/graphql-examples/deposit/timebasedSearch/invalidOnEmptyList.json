@@ -1,0 +1,22 @@
+{
+  "data": {
+    "deposit": {
+      "curators": null
+    }
+  },
+  "errors": [
+    {
+      "message": "argument 'atTimestamp' cannot be used in conjunction with arguments 'earlierThan' or 'laterThan'",
+      "path": [
+        "deposit",
+        "curators"
+      ],
+      "locations": [
+        {
+          "line": 3,
+          "column": 9
+        }
+      ]
+    }
+  ]
+}

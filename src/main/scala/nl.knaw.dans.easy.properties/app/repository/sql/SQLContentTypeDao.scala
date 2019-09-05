@@ -52,19 +52,19 @@ class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorH
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[ContentType])]] = {
     trace(ids)
 
-    executeGetById(parseContentType)(QueryGenerator.getSimplePropsElementsById("SimpleProperties", "propertyId", "content-type"))(ids)
+    executeGetById(parseContentType)(QueryGenerator.getSimplePropsElementsById("content-type"))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[ContentType])]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndContentType)(QueryGenerator.getSimplePropsCurrentElementByDepositId("SimpleProperties", "content-type"))(ids)
+    executeGetCurrent(parseDepositIdAndContentType)(QueryGenerator.getSimplePropsCurrentElementByDepositId("content-type"))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[ContentType])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndContentType)(QueryGenerator.getSimplePropsAllElementsByDepositId("SimpleProperties", "content-type"))(ids)
+    executeGetAll(parseDepositIdAndContentType)(QueryGenerator.getSimplePropsAllElementsByDepositId("content-type"))(ids)
   }
 
   override def store(id: DepositId, contentType: InputContentType): MutationErrorOr[ContentType] = {
@@ -103,6 +103,6 @@ class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorH
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]] = {
     trace(ids)
 
-    executeGetDepositById(parseContentTypeIdAndDeposit)(QueryGenerator.getSimplePropsDepositsById("SimpleProperties", "propertyId", "content-type"))(ids)
+    executeGetDepositById(parseContentTypeIdAndDeposit)(QueryGenerator.getSimplePropsDepositsById("content-type"))(ids)
   }
 }

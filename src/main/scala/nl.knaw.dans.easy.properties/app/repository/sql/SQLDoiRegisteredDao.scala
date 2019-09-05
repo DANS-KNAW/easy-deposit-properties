@@ -43,13 +43,13 @@ class SQLDoiRegisteredDao(implicit connection: Connection, errorHandler: SQLErro
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[DoiRegisteredEvent])]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsCurrentElementByDepositId("SimpleProperties", "doi-registered"))(ids)
+    executeGetCurrent(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsCurrentElementByDepositId("doi-registered"))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[DoiRegisteredEvent])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsAllElementsByDepositId("SimpleProperties", "doi-registered"))(ids)
+    executeGetAll(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsAllElementsByDepositId("doi-registered"))(ids)
   }
 
   override def store(id: DepositId, registered: DoiRegisteredEvent): MutationErrorOr[DoiRegisteredEvent] = {

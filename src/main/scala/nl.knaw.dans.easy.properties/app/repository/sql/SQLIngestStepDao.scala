@@ -52,19 +52,19 @@ class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[IngestStep])]] = {
     trace(ids)
 
-    executeGetById(parseIngestStep)(QueryGenerator.getSimplePropsElementsById("SimpleProperties", "propertyId", "ingest-step"))(ids)
+    executeGetById(parseIngestStep)(QueryGenerator.getSimplePropsElementsById("ingest-step"))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[IngestStep])]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndIngestStep)(QueryGenerator.getSimplePropsCurrentElementByDepositId("SimpleProperties", "ingest-step"))(ids)
+    executeGetCurrent(parseDepositIdAndIngestStep)(QueryGenerator.getSimplePropsCurrentElementByDepositId("ingest-step"))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[IngestStep])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndIngestStep)(QueryGenerator.getSimplePropsAllElementsByDepositId("SimpleProperties", "ingest-step"))(ids)
+    executeGetAll(parseDepositIdAndIngestStep)(QueryGenerator.getSimplePropsAllElementsByDepositId("ingest-step"))(ids)
   }
 
   override def store(id: DepositId, step: InputIngestStep): MutationErrorOr[IngestStep] = {
@@ -103,6 +103,6 @@ class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]] = {
     trace(ids)
 
-    executeGetDepositById(parseIngestStepIdAndDeposit)(QueryGenerator.getSimplePropsDepositsById("SimpleProperties", "propertyId", "ingest-step"))(ids)
+    executeGetDepositById(parseIngestStepIdAndDeposit)(QueryGenerator.getSimplePropsDepositsById("ingest-step"))(ids)
   }
 }

@@ -186,20 +186,20 @@ object QueryGenerator {
     s"SELECT identifierId, identifierSchema, identifierValue, timestamp FROM Identifier WHERE $queryWherePart;" -> valuesWherePart
   }
 
-  def getSimplePropsElementsById(tableName: String, idColumnName: String, key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT * FROM $tableName WHERE key = ? AND $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
-    val values = key :: ids
+  def getSimplePropsElementsById(key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
+    val query = s"SELECT * FROM SimpleProperties WHERE key = ? AND propertyId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+    val values = setString(key) :: ids.map(setInt)
 
-    query -> values.map(setString).toList
+    query -> values.toList
   }
 
-  def getSimplePropsCurrentElementByDepositId(tableName: String, key: String)(ids: NonEmptyList[DepositId]): (String, Seq[PrepStatementResolver]) = {
+  def getSimplePropsCurrentElementByDepositId(key: String)(ids: NonEmptyList[DepositId]): (String, Seq[PrepStatementResolver]) = {
     val query =
       s"""SELECT *
-         |FROM $tableName
+         |FROM SimpleProperties
          |INNER JOIN (
          |  SELECT depositId, max(timestamp) AS max_timestamp
-         |  FROM $tableName
+         |  FROM SimpleProperties
          |  WHERE key = ?
          |  AND depositId IN (${ ids.toList.map(_ => "?").mkString(", ") })
          |  GROUP BY depositId
@@ -211,15 +211,15 @@ object QueryGenerator {
     query -> values.map(setString).toList
   }
 
-  def getSimplePropsAllElementsByDepositId(tableName: String, key: String)(ids: NonEmptyList[DepositId]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT * FROM $tableName WHERE key = ? AND depositId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+  def getSimplePropsAllElementsByDepositId(key: String)(ids: NonEmptyList[DepositId]): (String, Seq[PrepStatementResolver]) = {
+    val query = s"SELECT * FROM SimpleProperties WHERE key = ? AND depositId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
     val values = key :: ids.map(_.toString)
 
     query -> values.map(setString).toList
   }
 
-  def getSimplePropsDepositsById(tableName: String, idColumnName: String, key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT $idColumnName, depositId, bagName, creationTimestamp, depositorId, origin FROM Deposit INNER JOIN $tableName ON Deposit.depositId = $tableName.depositId WHERE key = ? AND $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+  def getSimplePropsDepositsById(key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
+    val query = s"SELECT propertyId, Deposit.depositId, bagName, creationTimestamp, depositorId, origin FROM Deposit INNER JOIN SimpleProperties ON Deposit.depositId = SimpleProperties.depositId WHERE key = ? AND propertyId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
     val values = setString(key) :: ids.map(setInt)
 
     query -> values.toList

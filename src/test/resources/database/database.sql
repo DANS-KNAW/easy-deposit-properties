@@ -1,7 +1,6 @@
 -- differences with src/main/assembly/dist/install/db-tables.sql in order to support HSQLDB syntax
 -- * SERIAL --> INTEGER IDENTITY
 -- * TEXT --> VARCHAR(10000)
--- * IdentifierSchema ENUM --> table with foreign key constraint
 
 CREATE TABLE Deposit (
     depositId CHAR(36) NOT NULL PRIMARY KEY,
@@ -29,7 +28,6 @@ CREATE TABLE Identifier (
     identifierValue VARCHAR(64) NOT NULL,
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (depositId) REFERENCES Deposit (depositId),
-    CHECK (identifierSchema in ('doi', 'urn', 'fedora', 'bag-store')),
     UNIQUE (depositId, identifierSchema),
     UNIQUE (depositId, timestamp)
 );
