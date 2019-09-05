@@ -562,7 +562,7 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
   }
 
   "storeDeposit" should "yield the query for inserting a deposit into the database" in {
-    QueryGenerator.storeDeposit shouldBe "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId) VALUES (?, ?, ?, ?);"
+    QueryGenerator.storeDeposit shouldBe "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId, origin) VALUES (?, ?, ?, ?, ?);"
   }
 
   "storeBagName" should "yield the query for inserting a deposit's bagName into the database" in {
