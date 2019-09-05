@@ -24,6 +24,9 @@ input AddDepositInput {
 
   """The depositor that submits this deposit."""
   depositorId: String!
+
+  """The origin of the deposited bag."""
+  origin: Origin!
   clientMutationId: String
 }
 
@@ -1032,7 +1035,9 @@ type IsNewVersionEvent {
 
 """The root query for implementing GraphQL mutations."""
 type Mutation {
-  """Register a new deposit with 'id', 'creationTimestamp' and 'depositId'."""
+  """
+  Register a new deposit with 'id', 'creationTimestamp', 'depositId' and 'origin'.
+  """
   addDeposit(input: AddDepositInput!): AddDepositPayload
 
   """Register the bag's name for the deposit identified by 'id'."""

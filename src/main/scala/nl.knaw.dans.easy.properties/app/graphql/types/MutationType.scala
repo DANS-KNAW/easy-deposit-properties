@@ -357,12 +357,13 @@ trait MutationType {
     tags = List(
       RequiresAuthentication,
     ),
-    fieldDescription = Some("Register a new deposit with 'id', 'creationTimestamp' and 'depositId'."),
+    fieldDescription = Some("Register a new deposit with 'id', 'creationTimestamp', 'depositId' and 'origin'."),
     inputFields = List(
       depositIdInputField,
       bagNameOptionInputField,
       creationTimestampInputField,
       depositorIdInputField,
+      originInputField,
     ),
     outputFields = fields(
       depositField,

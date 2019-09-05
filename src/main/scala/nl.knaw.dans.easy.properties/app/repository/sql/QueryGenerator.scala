@@ -225,7 +225,7 @@ object QueryGenerator {
     query -> values.toList
   }
 
-  lazy val storeDeposit: String = "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId) VALUES (?, ?, ?, ?);"
+  lazy val storeDeposit: String = "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId, origin) VALUES (?, ?, ?, ?, ?);"
 
   lazy val storeBagName: String = "UPDATE Deposit SET bagName = ? WHERE depositId = ? AND (bagName IS NULL OR bagName='');"
 
