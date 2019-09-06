@@ -3,7 +3,7 @@ CREATE TABLE Deposit (
     bagName TEXT,
     creationTimestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     depositorId VARCHAR(64) NOT NULL,
-    origin VARCHAR(64) NOT NULL
+    origin VARCHAR(6) NOT NULL
 );
 
 CREATE TABLE State (

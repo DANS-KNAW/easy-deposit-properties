@@ -32,9 +32,9 @@ package object repository extends DebugEnhancedLogging {
   case class DepositDoesNotExistError(depositId: DepositId) extends QueryError(s"Deposit $depositId does not exist.")
   case class InvalidValueError(override val msg: String) extends QueryError(msg)
   object InvalidValueError {
-    def apply(ts: Seq[Throwable], query: String =""): InvalidValueError = {
+    def apply(ts: Seq[Throwable], debugContext: String = ""): InvalidValueError = {
       val msg = ts.map(_.getMessage).mkString("\n")
-      logger.debug(s"$msg [$query]")
+      logger.debug(s"$msg [$debugContext]")
       InvalidValueError(msg)
     }
   }
