@@ -1089,13 +1089,13 @@ enum OrderDirection {
 
 """The origin of the deposit."""
 enum Origin {
-  """None action must be taken for this DANS-DOI in the DataCite resolver."""
+  """easy-split-multi-deposit"""
   SMD
 
-  """The DANS-DOI must be updated in the DataCite resolver."""
+  """easy-deposit-api"""
   API
 
-  """The DANS-DOI must be created in the DataCite resolver."""
+  """easy-sword2"""
   SWORD2
 }
 

@@ -76,9 +76,9 @@ trait DepositType {
 
   implicit lazy val OriginType: EnumType[Origin.Value] = deriveEnumType(
     EnumTypeDescription("The origin of the deposit."),
-    DocumentValue("SWORD2", "The DANS-DOI must be created in the DataCite resolver."),
-    DocumentValue("API", "The DANS-DOI must be updated in the DataCite resolver."),
-    DocumentValue("SMD", "None action must be taken for this DANS-DOI in the DataCite resolver."),
+    DocumentValue("SWORD2", "easy-sword2"),
+    DocumentValue("API", "easy-deposit-api"),
+    DocumentValue("SMD", "easy-split-multi-deposit"),
   )
   lazy val depositOriginFilterArgument: Argument[Option[Origin]] = Argument(
     name = "origin",
