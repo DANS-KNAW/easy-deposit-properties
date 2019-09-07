@@ -23,7 +23,7 @@
     <parent>
         <groupId>nl.knaw.dans.shared</groupId>
         <artifactId>dans-scala-app-project</artifactId>
-        <version>4.0.0</version>
+        <version>5.0.0</version>
     </parent>
 
     <groupId>nl.knaw.dans.easy</groupId>
@@ -103,10 +103,6 @@
         <dependency>
             <groupId>commons-configuration</groupId>
             <artifactId>commons-configuration</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>commons-daemon</groupId>
-            <artifactId>commons-daemon</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
