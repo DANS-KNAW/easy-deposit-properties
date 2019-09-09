@@ -5,6 +5,7 @@ mutation {
             id
             depositId
             bagName
+            origin
             creationTimestamp
             depositor {
                 depositorId

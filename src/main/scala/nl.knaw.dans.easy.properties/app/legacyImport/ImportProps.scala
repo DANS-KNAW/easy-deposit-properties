@@ -25,7 +25,6 @@ import cats.syntax.option._
 import cats.syntax.traverse._
 import nl.knaw.dans.easy.properties.ApplicationErrorOr
 import nl.knaw.dans.easy.properties.Command.FeedBackMessage
-import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue, InputContentType }
 import nl.knaw.dans.easy.properties.app.model.curation.{ Curation, InputCuration }
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType, InputIdentifier }

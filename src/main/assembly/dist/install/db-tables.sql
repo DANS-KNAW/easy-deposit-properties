@@ -23,8 +23,7 @@ CREATE TABLE Identifier (
     identifierValue VARCHAR(64) NOT NULL,
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (depositId) REFERENCES Deposit (depositId),
-    UNIQUE (depositId, identifierSchema),
-    UNIQUE (depositId, timestamp)
+    UNIQUE (depositId, identifierSchema, timestamp)
 );
 
 CREATE TABLE Curation (

@@ -33,9 +33,7 @@ package object repository extends DebugEnhancedLogging {
   case class InvalidValueError(override val msg: String) extends QueryError(msg)
   object InvalidValueError {
     def apply(ts: Seq[Throwable], debugContext: String = ""): InvalidValueError = {
-      val msg = ts.map(_.getMessage).mkString("\n")
-      logger.debug(s"$msg [$debugContext]")
-      InvalidValueError(msg)
+      InvalidValueError(ts.map(_.getMessage).mkString("\n"))
     }
   }
 
