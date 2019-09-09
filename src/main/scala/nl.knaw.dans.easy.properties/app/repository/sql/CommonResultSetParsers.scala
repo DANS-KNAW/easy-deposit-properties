@@ -95,22 +95,12 @@ private[sql] trait CommonResultSetParsers {
   private[sql] def executeGetById[T <: Node](extract: ResultSet => Either[InvalidValueError, T])
                                             (queryGen: NonEmptyList[String] => (String, Seq[PrepStatementResolver]))
                                             (ids: Seq[String])
-                                            (implicit connection: Connection): QueryErrorOr[Seq[(String, Option[T])]] = {
-    def collectResults(stream: Stream[T]): Seq[(String, Option[T])] = {
-      val results = stream.toList
-        .groupBy(_.id)
-        .flatMap { case (id, ss) =>
-          assert(ss.size == 1)
-          ss.headOption.tupleLeft(id)
-        }
-      ids.map(id => id -> results.get(id))
-    }
-
+                                            (implicit connection: Connection): QueryErrorOr[Seq[T]] = {
     NonEmptyList.fromList(ids.toList)
       .map(_
         .traverse[Either[InvalidValueError, ?], String](validateId)
         .map(queryGen)
-        .flatMap(executeQuery(extract)(collectResults))
+        .flatMap(executeQuery(extract)(identity))
       )
       .getOrElse(Seq.empty.asRight)
   }

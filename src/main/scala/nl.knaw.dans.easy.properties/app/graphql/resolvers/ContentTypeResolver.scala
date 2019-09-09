@@ -28,8 +28,7 @@ object ContentTypeResolver {
   val depositByContentTypeIdFetcher: DepositByIdFetcher = fetchDepositsById(_.repo.contentType.getDepositsById)
 
   def contentTypeById(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[ContentType]] = {
-    DeferredValue(byIdFetcher.defer(id))
-      .map { case (_, optContentType) => optContentType }
+    DeferredValue(byIdFetcher.deferOpt(id))
   }
 
   def currentById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[ContentType]] = {

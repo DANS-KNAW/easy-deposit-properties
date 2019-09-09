@@ -49,7 +49,7 @@ class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorH
     } yield contentTypeId -> deposit
   }
 
-  override def getById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[ContentType])]] = {
+  override def getById(ids: Seq[String]): QueryErrorOr[Seq[ContentType]] = {
     trace(ids)
 
     executeGetById(parseContentType)(QueryGenerator.getSimplePropsElementsById("content-type"))(ids)

@@ -28,8 +28,7 @@ object IngestStepResolver {
   val depositByIngestStepIdFetcher: DepositByIdFetcher = fetchDepositsById(_.repo.ingestSteps.getDepositsById)
 
   def ingestStepById(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[IngestStep]] = {
-    DeferredValue(byIdFetcher.defer(id))
-      .map { case (_, optIngestStep) => optIngestStep }
+    DeferredValue(byIdFetcher.deferOpt(id))
   }
 
   def currentById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[IngestStep]] = {

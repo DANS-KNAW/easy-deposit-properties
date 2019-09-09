@@ -50,7 +50,7 @@ class SQLStateDao(implicit connection: Connection, errorHandler: SQLErrorHandler
     } yield stateId -> deposit
   }
 
-  override def getById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[State])]] = {
+  override def getById(ids: Seq[String]): QueryErrorOr[Seq[State]] = {
     trace(ids)
 
     executeGetById(parseState)(QueryGenerator.getElementsById("State", "stateId"))(ids)

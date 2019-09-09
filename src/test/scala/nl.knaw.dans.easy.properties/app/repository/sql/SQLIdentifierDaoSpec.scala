@@ -33,18 +33,14 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
   "getById" should "find identifiers identified by their identifierId" in {
     val identifiers = new SQLIdentifierDao
 
-    identifiers.getById(Seq("7", "9", "13")).value should contain only(
-      "7" -> Some(identifier7),
-      "9" -> Some(identifier9),
-      "13" -> Some(identifier13),
-    )
+    identifiers.getById(Seq("7", "9", "13")).value should contain inOrderOnly(identifier7, identifier9, identifier13)
   }
 
   it should "return a None if the identifierId is unknown" in {
     val identifiers = new SQLIdentifierDao
     val unknownIdentifierId = "102"
 
-    identifiers.getById(Seq(unknownIdentifierId)).value should contain only (unknownIdentifierId -> Option.empty)
+    identifiers.getById(Seq(unknownIdentifierId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -139,7 +135,7 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
     val expectedIdentifier = Identifier("14", IdentifierType.FEDORA, "easy-dataset:12345", timestamp)
 
     identifiers.store(depositId5, inputIdentifier).value shouldBe expectedIdentifier
-    identifiers.getById(Seq("14")).value should contain only ("14" -> Some(expectedIdentifier))
+    identifiers.getById(Seq("14")).value should contain only expectedIdentifier
     identifiers.getByTypesAndValues(Seq(IdentifierType.FEDORA -> "easy-dataset:12345")).value should contain only ((IdentifierType.FEDORA -> "easy-dataset:12345") -> Some(expectedIdentifier))
     identifiers.getAll(Seq(depositId5)).value.toMap.apply(depositId5) should contain(expectedIdentifier)
   }

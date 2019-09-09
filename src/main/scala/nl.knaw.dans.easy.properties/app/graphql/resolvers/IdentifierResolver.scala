@@ -34,8 +34,7 @@ object IdentifierResolver {
   val depositByIdentifierIdFetcher: DepositByIdFetcher = fetchDepositsById(_.repo.identifiers.getDepositsById)
 
   def identifierById(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Identifier]] = {
-    DeferredValue(byIdFetcher.defer(id))
-      .map { case (_, optIdentifier) => optIdentifier }
+    DeferredValue(byIdFetcher.deferOpt(id))
   }
 
   def identifierByType(depositId: DepositId, idType: IdentifierType.Value)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Identifier]] = {

@@ -33,18 +33,14 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
   "getById" should "find content types identified by their id" in {
     val contentTypes = new SQLContentTypeDao
 
-    contentTypes.getById(Seq("27", "29", "31")).value should contain only(
-      "27" -> Some(contentType1),
-      "29" -> Some(contentType3),
-      "31" -> Some(contentType5),
-    )
+    contentTypes.getById(Seq("27", "29", "31")).value should contain inOrderOnly(contentType1, contentType3, contentType5)
   }
 
   it should "return a None if the id is unknown" in {
     val contentTypes = new SQLContentTypeDao
     val unknownId = "102"
 
-    contentTypes.getById(Seq(unknownId)).value should contain only (unknownId -> Option.empty)
+    contentTypes.getById(Seq(unknownId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -110,7 +106,7 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
     val expectedContentType = ContentType("32", ContentTypeValue.OCTET, timestamp)
 
     contentTypes.store(depositId4, inputContentType).value shouldBe expectedContentType
-    contentTypes.getById(Seq("32")).value should contain only ("32" -> Some(expectedContentType))
+    contentTypes.getById(Seq("32")).value should contain only expectedContentType
     contentTypes.getCurrent(Seq(depositId4)).value should contain only (depositId4 -> Some(expectedContentType))
     contentTypes.getAll(Seq(depositId4)).value.toMap.apply(depositId4) should contain(expectedContentType)
   }

@@ -28,8 +28,7 @@ object StateResolver {
   val depositByStateIdFetcher: DepositByIdFetcher = fetchDepositsById(_.repo.states.getDepositsById)
 
   def stateById(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[State]] = {
-    DeferredValue(byIdFetcher.defer(id))
-      .map { case (_, optState) => optState }
+    DeferredValue(byIdFetcher.deferOpt(id))
   }
 
   def currentById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[State]] = {

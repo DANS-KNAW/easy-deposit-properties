@@ -29,8 +29,7 @@ object CurationResolver {
   val depositByCurationIdFetcher: DepositByIdFetcher = fetchDepositsById(_.repo.curation.getDepositsById)
 
   def curationById(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Curation]] = {
-    DeferredValue(byIdFetcher.defer(id))
-      .map { case (_, optCuration) => optCuration }
+    DeferredValue(byIdFetcher.deferOpt(id))
   }
 
   def currentCuratorsById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Curator]] = {

@@ -54,7 +54,7 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
     } yield identifierId -> deposit
   }
 
-  override def getById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Identifier])]] = {
+  override def getById(ids: Seq[String]): QueryErrorOr[Seq[Identifier]] = {
     trace(ids)
 
     executeGetById(parseIdentifier)(QueryGenerator.getElementsById("Identifier", "identifierId"))(ids)

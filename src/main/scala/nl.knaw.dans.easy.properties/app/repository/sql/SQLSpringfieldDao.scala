@@ -52,7 +52,7 @@ class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorH
     } yield springfieldId -> deposit
   }
 
-  override def getById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Springfield])]] = {
+  override def getById(ids: Seq[String]): QueryErrorOr[Seq[Springfield]] = {
     trace(ids)
 
     executeGetById(parseSpringfield)(QueryGenerator.getElementsById("Springfield", "springfieldId"))(ids)

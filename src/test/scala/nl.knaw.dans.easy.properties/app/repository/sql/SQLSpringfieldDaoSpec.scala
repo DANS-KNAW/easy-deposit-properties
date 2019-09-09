@@ -33,18 +33,14 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
   "getById" should "find springfield configurations identified by their springfieldId" in {
     val springfields = new SQLSpringfieldDao
 
-    springfields.getById(Seq("0", "2", "1")).value should contain only(
-      "0" -> Some(springfield0),
-      "2" -> Some(springfield2),
-      "1" -> Some(springfield1),
-    )
+    springfields.getById(Seq("0", "1", "2")).value should contain inOrderOnly(springfield0, springfield1, springfield2)
   }
 
   it should "return a None if the springfieldId is unknown" in {
     val springfields = new SQLSpringfieldDao
     val unknownspringfieldId = "102"
 
-    springfields.getById(Seq(unknownspringfieldId)).value should contain only (unknownspringfieldId -> Option.empty)
+    springfields.getById(Seq(unknownspringfieldId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -110,7 +106,7 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
     val expectedSpringfield = Springfield("3", "ddd", "uuu", "ccc", SpringfieldPlayMode.MENU, timestamp)
 
     springfields.store(depositId1, inputSpringfield).value shouldBe expectedSpringfield
-    springfields.getById(Seq("3")).value should contain only ("3" -> Some(expectedSpringfield))
+    springfields.getById(Seq("3")).value should contain only expectedSpringfield
     springfields.getCurrent(Seq(depositId1)).value should contain only (depositId1 -> Some(expectedSpringfield))
     springfields.getAll(Seq(depositId1)).value.toMap.apply(depositId1) should contain(expectedSpringfield)
   }

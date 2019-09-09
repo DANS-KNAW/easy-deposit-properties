@@ -60,7 +60,7 @@ class SQLCurationDao(implicit connection: Connection, errorHandler: SQLErrorHand
     } yield curationId -> deposit
   }
 
-  override def getById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Curation])]] = {
+  override def getById(ids: Seq[String]): QueryErrorOr[Seq[Curation]] = {
     trace(ids)
 
     executeGetById(parseCuration)(QueryGenerator.getElementsById("Curation", "curationId"))(ids)

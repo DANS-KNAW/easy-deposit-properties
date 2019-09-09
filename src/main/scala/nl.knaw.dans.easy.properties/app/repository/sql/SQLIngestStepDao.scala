@@ -49,7 +49,7 @@ class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHa
     } yield ingestStepId -> deposit
   }
 
-  override def getById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[IngestStep])]] = {
+  override def getById(ids: Seq[String]): QueryErrorOr[Seq[IngestStep]] = {
     trace(ids)
 
     executeGetById(parseIngestStep)(QueryGenerator.getSimplePropsElementsById("ingest-step"))(ids)

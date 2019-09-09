@@ -34,18 +34,14 @@ class SQLCurationDaoSpec extends TestSupportFixture
   "getById" should "find curation configurations identified by their curationId" in {
     val curations = new SQLCurationDao
 
-    curations.getById(Seq("2", "4", "9")).value should contain only(
-      "2" -> Some(curation2),
-      "4" -> Some(curation4),
-      "9" -> Some(curation9),
-    )
+    curations.getById(Seq("2", "4", "9")).value should contain inOrderOnly(curation2, curation4, curation9)
   }
 
   it should "return a None if the curationId is unknown" in {
     val curations = new SQLCurationDao
     val unknowncurationId = "102"
 
-    curations.getById(Seq(unknowncurationId)).value should contain only (unknowncurationId -> Option.empty)
+    curations.getById(Seq(unknowncurationId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -111,7 +107,7 @@ class SQLCurationDaoSpec extends TestSupportFixture
     val expectedCuration = Curation("10", isNewVersion = true.some, isRequired = true, isPerformed = false, "my-username", "foo@bar.com", timestamp)
 
     curations.store(depositId1, inputCuration).value shouldBe expectedCuration
-    curations.getById(Seq("10")).value should contain only ("10" -> Some(expectedCuration))
+    curations.getById(Seq("10")).value should contain only expectedCuration
     curations.getCurrent(Seq(depositId1)).value should contain only (depositId1 -> Some(expectedCuration))
     curations.getAll(Seq(depositId1)).value.toMap.apply(depositId1) should contain(expectedCuration)
   }
@@ -123,7 +119,7 @@ class SQLCurationDaoSpec extends TestSupportFixture
     val expectedCuration = Curation("10", isNewVersion = none, isRequired = true, isPerformed = false, "my-username", "foo@bar.com", timestamp)
 
     curations.store(depositId1, inputCuration).value shouldBe expectedCuration
-    curations.getById(Seq("10")).value should contain only ("10" -> Some(expectedCuration))
+    curations.getById(Seq("10")).value should contain only expectedCuration
     curations.getCurrent(Seq(depositId1)).value should contain only (depositId1 -> Some(expectedCuration))
     curations.getAll(Seq(depositId1)).value.toMap.apply(depositId1) should contain(expectedCuration)
   }

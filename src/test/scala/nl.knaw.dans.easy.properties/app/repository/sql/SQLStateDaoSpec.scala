@@ -33,18 +33,14 @@ class SQLStateDaoSpec extends TestSupportFixture
   "getById" should "find states identified by their stateId" in {
     val states = new SQLStateDao
 
-    states.getById(Seq("7", "8", "15")).value should contain only(
-      "7" -> Some(state21),
-      "8" -> Some(state22),
-      "15" -> Some(state42),
-    )
+    states.getById(Seq("7", "8", "15")).value should contain inOrderOnly(state21, state22, state42)
   }
 
   it should "return a None if the stateId is unknown" in {
     val states = new SQLStateDao
     val unknownStateId = "102"
 
-    states.getById(Seq(unknownStateId)).value should contain only (unknownStateId -> Option.empty)
+    states.getById(Seq(unknownStateId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -110,7 +106,7 @@ class SQLStateDaoSpec extends TestSupportFixture
     val expectedState = State("20", StateLabel.FEDORA_ARCHIVED, "blablabla", timestamp)
 
     states.store(depositId1, inputState).value shouldBe expectedState
-    states.getById(Seq("20")).value should contain only ("20" -> Some(expectedState))
+    states.getById(Seq("20")).value should contain only expectedState
     states.getCurrent(Seq(depositId1)).value should contain only (depositId1 -> Some(expectedState))
     states.getAll(Seq(depositId1)).value.toMap.apply(depositId1) should contain(expectedState)
   }

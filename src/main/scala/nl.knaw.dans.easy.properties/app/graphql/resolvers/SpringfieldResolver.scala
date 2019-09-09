@@ -28,8 +28,7 @@ object SpringfieldResolver {
   val depositBySpringfieldIdFetcher: DepositByIdFetcher = fetchDepositsById(_.repo.springfield.getDepositsById)
 
   def springfieldById(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Springfield]] = {
-    DeferredValue(byIdFetcher.defer(id))
-      .map { case (_, optSpringfield) => optSpringfield }
+    DeferredValue(byIdFetcher.deferOpt(id))
   }
 
   def currentById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Springfield]] = {
