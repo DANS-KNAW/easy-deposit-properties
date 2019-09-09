@@ -44,21 +44,12 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
     executeQuery(parseDeposit)(_.toList)(QueryGenerator.getAllDeposits -> List.empty)
   }
 
-  override def find(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[Deposit])]] = {
+  override def find(ids: Seq[DepositId]): QueryErrorOr[Seq[Deposit]] = {
     trace(ids)
-
-    def collectResults(stream: Stream[Deposit]): Seq[(DepositId, Option[Deposit])] = {
-      val results = stream.toList
-        .groupBy(_.id)
-        .flatMap {
-          case (id, ds) => ds.headOption.tupleLeft(id)
-        }
-      ids.map(id => id -> results.get(id))
-    }
 
     NonEmptyList.fromList(ids.toList)
       .map(QueryGenerator.findDeposits)
-      .map(executeQuery(parseDeposit)(collectResults))
+      .map(executeQuery(parseDeposit)(identity))
       .getOrElse(Seq.empty.asRight)
   }
 
@@ -95,7 +86,7 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
   override def storeBagName(depositId: DepositId, bagName: String): MutationErrorOr[DepositId] = {
     trace(depositId, bagName)
     val query = QueryGenerator.storeBagName
-    
+
     managed(connection.prepareStatement(query))
       .map(prepStatement => {
         prepStatement.setString(1, bagName)
@@ -109,7 +100,7 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
         case 0 =>
           for {
             deposits <- find(Seq(depositId)).leftMap(error => MutationError(error.msg)) // not expected to have an error here, but just to be sure
-            depId <- deposits.toMap.get(depositId).flatten
+            depId <- deposits.find(deposit => deposit.id == depositId)
               .map(_ => BagNameAlreadySetError(depositId)) // deposit was found, this means the bagName was already set for this deposit
               .getOrElse(NoSuchDepositError(depositId)) // deposit did not occur in search results; cannot set bagName for not-existing deposit
               .asLeft[DepositId]

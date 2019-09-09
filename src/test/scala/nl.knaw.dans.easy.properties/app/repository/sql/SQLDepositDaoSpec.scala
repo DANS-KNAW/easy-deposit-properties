@@ -57,8 +57,8 @@ class SQLDepositDaoSpec extends TestSupportFixture
     val deposits = new SQLDepositDao
 
     deposits.find(Seq(depositId1, depositId4)).value should contain inOrderOnly(
-      depositId1 -> Some(deposit1),
-      depositId4 -> Some(deposit4),
+      deposit1,
+      deposit4,
     )
   }
 
@@ -66,17 +66,14 @@ class SQLDepositDaoSpec extends TestSupportFixture
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    deposits.find(Seq(depositId1, depositId6)).value should contain inOrderOnly(
-      depositId1 -> Some(deposit1),
-      depositId6 -> Option.empty,
-    )
+    deposits.find(Seq(depositId1, depositId6)).value should contain only deposit1
   }
 
   it should "return a None if the depositId is unknown" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Option.empty)
+    deposits.find(Seq(depositId6)).value shouldBe empty
   }
   
   it should "return an empty collection when the input collection is empty" in {
@@ -194,13 +191,13 @@ class SQLDepositDaoSpec extends TestSupportFixture
     val deposit6 = Deposit(depositId6, Option("bag1"), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
 
     deposits.store(deposit6).value shouldBe deposit6
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
+    deposits.find(Seq(depositId6)).value should contain only deposit6
   }
 
   it should "fail to insert a deposit when the depositId is already present" in {
     val deposits = new SQLDepositDao
 
-    deposits.find(Seq(depositId1)).value should contain only (depositId1 -> Some(deposit1))
+    deposits.find(Seq(depositId1)).value should contain only deposit1
     deposits.store(deposit1).leftValue shouldBe DepositAlreadyExistsError(depositId1)
   }
 
@@ -211,7 +208,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
     val expectedCreationTimestamp = new DateTime(2019, 6, 5, 12, 0, timeZone)
 
     deposits.store(deposit6).value shouldBe deposit6
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6.copy(creationTimestamp = expectedCreationTimestamp)))
+    deposits.find(Seq(depositId6)).value should contain only deposit6.copy(creationTimestamp = expectedCreationTimestamp)
   }
 
   it should "correctly store and retrieve a deposit without bagName" in {
@@ -220,7 +217,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
     val deposit6 = Deposit(depositId6, None, new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
 
     deposits.store(deposit6).value shouldBe deposit6
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
+    deposits.find(Seq(depositId6)).value should contain only deposit6
   }
 
   "storeBagName" should "set the bagName if it wasn't already set" in {
@@ -229,9 +226,9 @@ class SQLDepositDaoSpec extends TestSupportFixture
     val deposit6 = Deposit(depositId6, None, new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
 
     deposits.store(deposit6).value shouldBe deposit6
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
+    deposits.find(Seq(depositId6)).value should contain only deposit6
     deposits.storeBagName(depositId6, "bag6").value shouldBe depositId6
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6.copy(bagName = Some("bag6"))))
+    deposits.find(Seq(depositId6)).value should contain only deposit6.copy(bagName = Some("bag6"))
   }
 
   it should "set the bagName if its value in the database currently is an empty string" in {
@@ -240,9 +237,9 @@ class SQLDepositDaoSpec extends TestSupportFixture
     val deposit6 = Deposit(depositId6, Some(""), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
 
     deposits.store(deposit6).value shouldBe deposit6
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
+    deposits.find(Seq(depositId6)).value should contain only deposit6
     deposits.storeBagName(depositId6, "bag6").value shouldBe depositId6
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6.copy(bagName = Some("bag6"))))
+    deposits.find(Seq(depositId6)).value should contain only deposit6.copy(bagName = Some("bag6"))
   }
 
   it should "fail to set the bagName when the deposit doesn't exist" in {
@@ -258,9 +255,9 @@ class SQLDepositDaoSpec extends TestSupportFixture
     val deposit6 = Deposit(depositId6, Some("bag6"), new DateTime(2019, 6, 6, 0, 0, timeZone), "user003")
 
     deposits.store(deposit6).value shouldBe deposit6
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
+    deposits.find(Seq(depositId6)).value should contain only deposit6
     deposits.storeBagName(depositId6, "another name").leftValue shouldBe BagNameAlreadySetError(depositId6)
-    deposits.find(Seq(depositId6)).value should contain only (depositId6 -> Some(deposit6))
+    deposits.find(Seq(depositId6)).value should contain only deposit6
   }
   
   "lastModified" should "find the 'last modified' timestamp for each of the given depositIds" in {

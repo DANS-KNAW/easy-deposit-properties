@@ -21,7 +21,7 @@ trait DepositDao {
 
   def getAll: QueryErrorOr[Seq[Deposit]]
 
-  def find(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[Deposit])]]
+  def find(ids: Seq[DepositId]): QueryErrorOr[Seq[Deposit]]
 
   def search(filters: Seq[DepositFilters]): QueryErrorOr[Seq[(DepositFilters, Seq[Deposit])]]
 

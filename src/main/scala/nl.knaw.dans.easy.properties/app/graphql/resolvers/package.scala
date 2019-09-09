@@ -26,6 +26,7 @@ package object resolvers {
   implicit def executionContext(implicit ctx: DataContext): ExecutionContext = ctx.executionContext
 
   private[resolvers] implicit def keyBasedHasId[K, V]: HasId[(K, V), K] = HasId { case (id, _) => id }
+  private[resolvers] implicit val depositHasId: HasId[Deposit, DepositId] = HasId[Deposit, DepositId](_.id)
 
   type ByIdFetcher[T] = Fetcher[DataContext, (String, Option[T]), (String, Option[T]), String]
 
