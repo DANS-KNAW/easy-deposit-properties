@@ -9,6 +9,7 @@
               "depositorId": "user001"
             },
             "bagName": "bag1",
+            "origin": "API",
             "creationTimestamp": "2019-01-01T00:00:00.000Z",
             "lastModified": "2019-01-01T05:05:00.000Z",
             "state": {
@@ -155,6 +156,7 @@
               "depositorId": "user001"
             },
             "bagName": null,
+            "origin": "API",
             "creationTimestamp": "2019-02-02T00:00:00.000Z",
             "lastModified": "2019-02-02T03:03:00.000Z",
             "state": {
@@ -266,6 +268,7 @@
               "depositorId": "user002"
             },
             "bagName": "bag3",
+            "origin": "SWORD2",
             "creationTimestamp": "2019-03-03T00:00:00.000Z",
             "lastModified": "2019-03-03T06:06:00.000Z",
             "state": {
@@ -366,6 +369,7 @@
               "depositorId": "user001"
             },
             "bagName": "bag4",
+            "origin": "SMD",
             "creationTimestamp": "2019-04-04T00:00:00.000Z",
             "lastModified": "2019-04-04T04:04:00.000Z",
             "state": {
@@ -473,6 +477,7 @@
               "depositorId": "user002"
             },
             "bagName": "bag5",
+            "origin": "SWORD2",
             "creationTimestamp": "2019-05-05T00:00:00.000Z",
             "lastModified": "2019-05-05T04:05:00.000Z",
             "state": {
