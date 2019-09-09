@@ -18,6 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 import java.sql.{ Connection, ResultSet, Statement }
 
 import cats.syntax.either._
+import cats.syntax.option._
 import nl.knaw.dans.easy.properties.app.database.SQLErrorHandler
 import nl.knaw.dans.easy.properties.app.model.curation.{ Curation, InputCuration }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
@@ -31,7 +32,13 @@ class SQLCurationDao(implicit connection: Connection, errorHandler: SQLErrorHand
     for {
       timestamp <- parseDateTime(resultSet.getTimestamp("timestamp", timeZone), timeZone)
       curationId = resultSet.getString("curationId")
-      isNewVersion = Option(resultSet.getString("isNewVersion")).map(_.toBoolean)
+      isNewVersion = {
+        // `getBoolean` returns `true` or `false` and does not allow for nullable values
+        // https://stackoverflow.com/a/39561156/2389405 provides a solution to this by using `wasNull`
+        val isNewVersion = resultSet.getBoolean("isNewVersion")
+        if (resultSet.wasNull()) none
+        else isNewVersion.some
+      }
       isRequired = resultSet.getBoolean("isRequired")
       isPerformed = resultSet.getBoolean("isPerformed")
       userId = resultSet.getString("datamanagerUserId")

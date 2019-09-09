@@ -40,6 +40,7 @@ class GraphQLServlet[Ctx, Conn](schema: Schema[Ctx, Unit],
                                 deferredResolver: DeferredResolver[Ctx] = DeferredResolver.empty,
                                 exceptionHandler: ExceptionHandler = defaultExceptionHandler,
                                 middlewares: List[Middleware[Ctx]] = List.empty)
+                               (implicit protected val executor: ExecutionContext)
   extends ScalatraServlet
     with CorsSupport
     with FutureSupport
@@ -47,8 +48,6 @@ class GraphQLServlet[Ctx, Conn](schema: Schema[Ctx, Unit],
     with MaskedLogFormatter
     with LogResponseBodyOnError
     with DebugEnhancedLogging {
-
-  override implicit protected def executor: ExecutionContext = ExecutionContext.global
 
   private implicit val jsonFormats: Formats = new DefaultFormats {} + UUIDSerializer
 
