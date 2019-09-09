@@ -460,7 +460,7 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     val (query, values) = QueryGenerator.getDepositsById("State", "stateId")(ids)
 
     val expectedQuery =
-      """SELECT stateId, depositId, bagName, creationTimestamp, depositorId
+      """SELECT stateId, Deposit.depositId, bagName, creationTimestamp, depositorId
         |FROM Deposit
         |INNER JOIN State
         |ON Deposit.depositId = State.depositId
