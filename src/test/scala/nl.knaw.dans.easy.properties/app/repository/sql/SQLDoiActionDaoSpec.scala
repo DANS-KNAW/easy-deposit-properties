@@ -34,8 +34,8 @@ class SQLDoiActionDaoSpec extends TestSupportFixture
     val doiActions = new SQLDoiActionDao
 
     doiActions.getCurrent(Seq(depositId1, depositId5)).value should contain only(
-      depositId1 -> Some(doiAction1),
-      depositId5 -> Some(doiAction5),
+      depositId1 -> doiAction1,
+      depositId5 -> doiAction5,
     )
   }
 
@@ -43,7 +43,7 @@ class SQLDoiActionDaoSpec extends TestSupportFixture
     val doiActions = new SQLDoiActionDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    doiActions.getCurrent(Seq(depositId6)).value should contain only (depositId6 -> Option.empty)
+    doiActions.getCurrent(Seq(depositId6)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -80,7 +80,7 @@ class SQLDoiActionDaoSpec extends TestSupportFixture
     val doiActionEvent = DoiActionEvent(DoiAction.UPDATE, timestamp)
 
     doiActions.store(depositId5, doiActionEvent).value shouldBe doiActionEvent
-    doiActions.getCurrent(Seq(depositId5)).value should contain only (depositId5 -> Some(doiActionEvent))
+    doiActions.getCurrent(Seq(depositId5)).value should contain only (depositId5 -> doiActionEvent)
     doiActions.getAll(Seq(depositId5)).value.toMap.apply(depositId5) should contain only(doiAction5, doiActionEvent)
   }
 

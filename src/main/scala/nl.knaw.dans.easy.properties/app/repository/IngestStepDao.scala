@@ -22,7 +22,7 @@ trait IngestStepDao {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[IngestStep]]
 
-  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[IngestStep])]]
+  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, IngestStep)]]
 
   def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[IngestStep])]]
 

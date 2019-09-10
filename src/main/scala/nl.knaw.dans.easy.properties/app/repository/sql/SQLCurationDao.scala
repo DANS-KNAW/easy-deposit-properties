@@ -66,7 +66,7 @@ class SQLCurationDao(implicit connection: Connection, errorHandler: SQLErrorHand
     executeGetById(parseCuration)(QueryGenerator.getElementsById("Curation", "curationId"))(ids)
   }
 
-  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[Curation])]] = {
+  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Curation)]] = {
     trace(ids)
 
     executeGetCurrent(parseDepositIdAndCuration)(QueryGenerator.getCurrentElementByDepositId("Curation"))(ids)

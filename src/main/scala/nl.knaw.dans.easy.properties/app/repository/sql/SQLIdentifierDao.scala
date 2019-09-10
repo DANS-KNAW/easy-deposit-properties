@@ -18,9 +18,8 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 import java.sql.{ Connection, ResultSet, Statement }
 
 import cats.data.NonEmptyList
-import cats.instances.option._
 import cats.syntax.either._
-import cats.syntax.functor._
+import cats.syntax.option._
 import nl.knaw.dans.easy.properties.app.database.SQLErrorHandler
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType, InputIdentifier }
@@ -60,16 +59,20 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
     executeGetById(parseIdentifier)(QueryGenerator.getElementsById("Identifier", "identifierId"))(ids)
   }
 
-  override def getByType(ids: Seq[(DepositId, IdentifierType)]): QueryErrorOr[Seq[((DepositId, IdentifierType), Option[Identifier])]] = {
+  override def getByType(ids: Seq[(DepositId, IdentifierType)]): QueryErrorOr[Seq[((DepositId, IdentifierType), Identifier)]] = {
     trace(ids)
 
-    def collectResults(stream: Stream[(DepositId, Identifier)]): Seq[((DepositId, IdentifierType), Option[Identifier])] = {
-      val results = stream.toList
+    def collectResults(stream: Stream[(DepositId, Identifier)]): Seq[((DepositId, IdentifierType), Identifier)] = {
+      stream.toList
         .groupBy { case (depositId, identifier) => (depositId, identifier.idType) }
         .flatMap {
-          case (key, values) => values.headOption.map { case (_, identifier) => identifier }.tupleLeft(key)
+          case (key, (_, identifier) :: Nil) => (key -> identifier).some
+          case (_, Nil) => None // should not occur due to the nature of `groupBy`
+          case ((depositId, identifierType), _) =>
+            assert(assertion = false, s"a unique result was expected for combination ($depositId, $identifierType); but found multiple results")
+            None // should not occur, as `(depositId, identifierType)` is a unique combination (see SQL schema)
         }
-      ids.map(key => key -> results.get(key))
+        .toSeq
     }
 
     NonEmptyList.fromList(ids.toList)
@@ -78,16 +81,20 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
       .getOrElse(Seq.empty.asRight)
   }
 
-  override def getByTypesAndValues(ids: Seq[(IdentifierType, String)]): QueryErrorOr[Seq[((IdentifierType, String), Option[Identifier])]] = {
+  override def getByTypesAndValues(ids: Seq[(IdentifierType, String)]): QueryErrorOr[Seq[((IdentifierType, String), Identifier)]] = {
     trace(ids)
 
-    def collectResults(stream: Stream[Identifier]): Seq[((IdentifierType, String), Option[Identifier])] = {
-      val results = stream.toList
+    def collectResults(stream: Stream[Identifier]): Seq[((IdentifierType, String), Identifier)] = {
+      stream.toList
         .groupBy(identifier => (identifier.idType, identifier.idValue))
         .flatMap {
-          case (key, values) => values.headOption.tupleLeft(key)
+          case (key, value :: Nil) => (key -> value).some
+          case (_, Nil) => None // should not occur due to the nature of `groupBy`
+          case ((identifierType, identifierValue), _) =>
+            assert(assertion = false, s"a unique result was expected for combination ($identifierType, $identifierValue); but found multiple results")
+            None // should not occur
         }
-      ids.map(key => key -> results.get(key))
+        .toSeq
     }
 
     NonEmptyList.fromList(ids.toList)

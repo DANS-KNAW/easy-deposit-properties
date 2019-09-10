@@ -40,7 +40,7 @@ class SQLDoiRegisteredDao(implicit connection: Connection, errorHandler: SQLErro
     } yield depositId -> doiRegisteredEvent
   }
 
-  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[DoiRegisteredEvent])]] = {
+  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, DoiRegisteredEvent)]] = {
     trace(ids)
 
     executeGetCurrent(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsCurrentElementByDepositId("doi-registered"))(ids)

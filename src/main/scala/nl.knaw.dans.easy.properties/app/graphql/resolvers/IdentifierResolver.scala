@@ -24,8 +24,8 @@ import sangria.schema.DeferredValue
 
 object IdentifierResolver {
 
-  type IdentifiersByTypeFetcher = Fetcher[DataContext, ((DepositId, IdentifierType), Option[Identifier]), ((DepositId, IdentifierType), Option[Identifier]), (DepositId, IdentifierType.Value)]
-  type IdentifiersByTypeAndValueFetcher = Fetcher[DataContext, ((IdentifierType, String), Option[Identifier]), ((IdentifierType, String), Option[Identifier]), (IdentifierType, String)]
+  type IdentifiersByTypeFetcher = Fetcher[DataContext, ((DepositId, IdentifierType), Identifier), ((DepositId, IdentifierType), Identifier), (DepositId, IdentifierType.Value)]
+  type IdentifiersByTypeAndValueFetcher = Fetcher[DataContext, ((IdentifierType, String), Identifier), ((IdentifierType, String), Identifier), (IdentifierType, String)]
 
   val byIdFetcher: ByIdFetcher[Identifier] = fetchById(_.repo.identifiers.getById)
   val identifiersByTypeFetcher: IdentifiersByTypeFetcher = Fetcher.caching(_.repo.identifiers.getByType(_).toFuture)
@@ -38,13 +38,13 @@ object IdentifierResolver {
   }
 
   def identifierByType(depositId: DepositId, idType: IdentifierType.Value)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Identifier]] = {
-    DeferredValue(identifiersByTypeFetcher.defer(depositId -> idType))
-      .map { case (_, optIdentifier) => optIdentifier }
+    DeferredValue(identifiersByTypeFetcher.deferOpt(depositId -> idType))
+      .map(_.map { case (_, identifier) => identifier })
   }
   
   def identifierByTypeAndValue(idType: IdentifierType, idValue: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Identifier]] = {
-    DeferredValue(identifierTypesAndValuesFetcher.defer(idType -> idValue))
-      .map { case (_, optIdentifier) => optIdentifier }
+    DeferredValue(identifierTypesAndValuesFetcher.deferOpt(idType -> idValue))
+      .map(_.map { case (_, identifier) => identifier })
   }
 
   def allById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Seq[Identifier]] = {

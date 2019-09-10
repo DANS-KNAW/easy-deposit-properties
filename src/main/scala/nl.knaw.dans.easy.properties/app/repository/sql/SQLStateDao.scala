@@ -56,7 +56,7 @@ class SQLStateDao(implicit connection: Connection, errorHandler: SQLErrorHandler
     executeGetById(parseState)(QueryGenerator.getElementsById("State", "stateId"))(ids)
   }
 
-  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[State])]] = {
+  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, State)]] = {
     trace(ids)
 
     executeGetCurrent(parseDepositIdAndState)(QueryGenerator.getCurrentElementByDepositId("State"))(ids)

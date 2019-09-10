@@ -58,7 +58,7 @@ class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorH
     executeGetById(parseSpringfield)(QueryGenerator.getElementsById("Springfield", "springfieldId"))(ids)
   }
 
-  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[Springfield])]] = {
+  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Springfield)]] = {
     trace(ids)
 
     executeGetCurrent(parseDepositIdAndSpringfield)(QueryGenerator.getCurrentElementByDepositId("Springfield"))(ids)

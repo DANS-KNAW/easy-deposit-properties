@@ -59,16 +59,15 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
     val springfields = new SQLSpringfieldDao
 
     springfields.getCurrent(Seq(depositId1, depositId5)).value should contain only(
-      depositId1 -> Some(springfield0),
-      depositId5 -> None,
+      depositId1 -> springfield0,
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val springfields = new SQLSpringfieldDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    springfields.getCurrent(Seq(depositId6)).value should contain only (depositId6 -> Option.empty)
+    springfields.getCurrent(Seq(depositId6)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -107,7 +106,7 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
 
     springfields.store(depositId1, inputSpringfield).value shouldBe expectedSpringfield
     springfields.getById(Seq("3")).value should contain only expectedSpringfield
-    springfields.getCurrent(Seq(depositId1)).value should contain only (depositId1 -> Some(expectedSpringfield))
+    springfields.getCurrent(Seq(depositId1)).value should contain only (depositId1 -> expectedSpringfield)
     springfields.getAll(Seq(depositId1)).value.toMap.apply(depositId1) should contain(expectedSpringfield)
   }
 

@@ -59,16 +59,15 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
     val ingestSteps = new SQLIngestStepDao
 
     ingestSteps.getCurrent(Seq(depositId4, depositId5)).value should contain only(
-      depositId5 -> Some(step14),
-      depositId4 -> None,
+      depositId5 -> step14,
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val ingestSteps = new SQLIngestStepDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    ingestSteps.getCurrent(Seq(depositId6)).value should contain only (depositId6 -> Option.empty)
+    ingestSteps.getCurrent(Seq(depositId6)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -107,7 +106,7 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
 
     ingestSteps.store(depositId4, inputIngestStep).value shouldBe expectedIngestStep
     ingestSteps.getById(Seq("32")).value should contain only expectedIngestStep
-    ingestSteps.getCurrent(Seq(depositId4)).value should contain only (depositId4 -> Some(expectedIngestStep))
+    ingestSteps.getCurrent(Seq(depositId4)).value should contain only (depositId4 -> expectedIngestStep)
     ingestSteps.getAll(Seq(depositId4)).value.toMap.apply(depositId4) should contain(expectedIngestStep)
   }
 

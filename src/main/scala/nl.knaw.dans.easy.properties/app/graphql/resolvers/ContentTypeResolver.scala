@@ -32,8 +32,8 @@ object ContentTypeResolver {
   }
 
   def currentById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[ContentType]] = {
-    DeferredValue(currentContentTypesFetcher.defer(depositId))
-      .map { case (_, optContentType) => optContentType }
+    DeferredValue(currentContentTypesFetcher.deferOpt(depositId))
+      .map(_.map { case (_, contentType) => contentType })
   }
 
   def allById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Seq[ContentType]] = {

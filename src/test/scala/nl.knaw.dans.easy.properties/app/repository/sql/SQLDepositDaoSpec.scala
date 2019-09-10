@@ -264,8 +264,8 @@ class SQLDepositDaoSpec extends TestSupportFixture
     val deposits = new SQLDepositDao
 
     deposits.lastModified(Seq(depositId1, depositId5)).value should contain only(
-      depositId1 -> Some(new DateTime(2019, 1, 1, 5, 5, timeZone)),
-      depositId5 -> Some(new DateTime(2019, 5, 5, 4, 5, timeZone)),
+      depositId1 -> new DateTime(2019, 1, 1, 5, 5, timeZone),
+      depositId5 -> new DateTime(2019, 5, 5, 4, 5, timeZone),
     )
   }
 
@@ -275,13 +275,10 @@ class SQLDepositDaoSpec extends TestSupportFixture
     deposits.lastModified(Seq.empty).value shouldBe empty
   }
 
-  it should "return a None for an unknown depositId" in {
+  it should "return an empty collection for an unknown depositId" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    deposits.lastModified(Seq(depositId1, depositId6)).value should contain only(
-      depositId1 -> Some(new DateTime(2019, 1, 1, 5, 5, timeZone)),
-      depositId6 -> None,
-    )
+    deposits.lastModified(Seq(depositId6)).value shouldBe empty
   }
 }

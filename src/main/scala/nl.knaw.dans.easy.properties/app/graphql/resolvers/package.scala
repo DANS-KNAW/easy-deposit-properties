@@ -36,9 +36,9 @@ package object resolvers {
     Fetcher.caching(f(_)(_).toFuture)
   }
 
-  type CurrentFetcher[T] = Fetcher[DataContext, (DepositId, Option[T]), (DepositId, Option[T]), DepositId]
+  type CurrentFetcher[T] = Fetcher[DataContext, (DepositId, T), (DepositId, T), DepositId]
 
-  private[resolvers] def fetchCurrent[T](f: DataContext => Seq[DepositId] => QueryErrorOr[Seq[(DepositId, Option[T])]]): CurrentFetcher[T] = {
+  private[resolvers] def fetchCurrent[T](f: DataContext => Seq[DepositId] => QueryErrorOr[Seq[(DepositId, T)]]): CurrentFetcher[T] = {
     Fetcher.caching(f(_)(_).toFuture)
   }
 

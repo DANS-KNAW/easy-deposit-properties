@@ -59,16 +59,16 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
     val contentTypes = new SQLContentTypeDao
 
     contentTypes.getCurrent(Seq(depositId4, depositId5)).value should contain only(
-      depositId5 -> Some(contentType5),
-      depositId4 -> Some(contentType4),
+      depositId5 -> contentType5,
+      depositId4 -> contentType4,
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val contentTypes = new SQLContentTypeDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    contentTypes.getCurrent(Seq(depositId6)).value should contain only (depositId6 -> Option.empty)
+    contentTypes.getCurrent(Seq(depositId6)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -107,7 +107,7 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
 
     contentTypes.store(depositId4, inputContentType).value shouldBe expectedContentType
     contentTypes.getById(Seq("32")).value should contain only expectedContentType
-    contentTypes.getCurrent(Seq(depositId4)).value should contain only (depositId4 -> Some(expectedContentType))
+    contentTypes.getCurrent(Seq(depositId4)).value should contain only (depositId4 -> expectedContentType)
     contentTypes.getAll(Seq(depositId4)).value.toMap.apply(depositId4) should contain(expectedContentType)
   }
 

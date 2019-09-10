@@ -111,21 +111,12 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
       }
   }
 
-  override def lastModified(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[Timestamp])]] = {
+  override def lastModified(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Timestamp)]] = {
     trace(ids)
-
-    def collectResults(stream: Stream[(DepositId, Timestamp)]): Seq[(DepositId, Option[Timestamp])] = {
-      val results = stream.toList
-        .groupBy { case (depositId, _) => depositId }
-        .flatMap {
-          case (id, rs) => rs.headOption.map { case (_, timestamp) => timestamp }.tupleLeft(id)
-        }
-      ids.map(id => id -> results.get(id))
-    }
 
     NonEmptyList.fromList(ids.toList)
       .map(QueryGenerator.getLastModifiedDate)
-      .map(executeQuery(parseLastModifiedResponse)(collectResults))
+      .map(executeQuery(parseLastModifiedResponse)(identity))
       .getOrElse(Seq.empty.asRight)
   }
 }

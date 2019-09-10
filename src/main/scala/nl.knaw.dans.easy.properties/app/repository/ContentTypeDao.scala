@@ -22,7 +22,7 @@ trait ContentTypeDao {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[ContentType]]
 
-  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[ContentType])]]
+  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, ContentType)]]
 
   def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[ContentType])]]
 

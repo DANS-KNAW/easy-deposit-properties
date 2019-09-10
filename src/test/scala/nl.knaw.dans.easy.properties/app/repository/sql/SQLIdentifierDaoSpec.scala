@@ -60,22 +60,22 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
     val input = Seq(depositId2 -> IdentifierType.FEDORA, depositId5 -> IdentifierType.BAG_STORE)
 
     identifiers.getByType(input).value should contain only(
-      (depositId2 -> IdentifierType.FEDORA) -> Some(identifier7),
-      (depositId5 -> IdentifierType.BAG_STORE) -> Some(identifier13),
+      (depositId2 -> IdentifierType.FEDORA) -> identifier7,
+      (depositId5 -> IdentifierType.BAG_STORE) -> identifier13,
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val identifiers = new SQLIdentifierDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    identifiers.getByType(Seq(depositId6 -> IdentifierType.BAG_STORE)).value should contain only ((depositId6 -> IdentifierType.BAG_STORE) -> None)
+    identifiers.getByType(Seq(depositId6 -> IdentifierType.BAG_STORE)).value shouldBe empty
   }
 
-  it should "return a None if there is no identifier with the given type for this deposit" in {
+  it should "return an empty collection if there is no identifier with the given type for this deposit" in {
     val identifiers = new SQLIdentifierDao
 
-    identifiers.getByType(Seq(depositId5 -> IdentifierType.FEDORA)).value should contain only ((depositId5 -> IdentifierType.FEDORA) -> None)
+    identifiers.getByType(Seq(depositId5 -> IdentifierType.FEDORA)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -89,15 +89,15 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
     val input = Seq(IdentifierType.FEDORA -> "easy-dataset:1", IdentifierType.DOI -> "10.5072/dans-p7q-rst8")
 
     identifiers.getByTypesAndValues(input).value should contain only(
-      (IdentifierType.FEDORA -> "easy-dataset:1") -> Some(identifier3),
-      (IdentifierType.DOI -> "10.5072/dans-p7q-rst8") -> Some(identifier10),
+      (IdentifierType.FEDORA -> "easy-dataset:1") -> identifier3,
+      (IdentifierType.DOI -> "10.5072/dans-p7q-rst8") -> identifier10,
     )
   }
 
-  it should "return a None if there is no identifier with the given value for this type" in {
+  it should "return an empty collection if there is no identifier with the given value for this type" in {
     val identifiers = new SQLIdentifierDao
 
-    identifiers.getByTypesAndValues(Seq(IdentifierType.URN -> "easy-dataset:1")).value should contain only ((IdentifierType.URN -> "easy-dataset:1") -> None)
+    identifiers.getByTypesAndValues(Seq(IdentifierType.URN -> "easy-dataset:1")).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -136,7 +136,7 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
 
     identifiers.store(depositId5, inputIdentifier).value shouldBe expectedIdentifier
     identifiers.getById(Seq("14")).value should contain only expectedIdentifier
-    identifiers.getByTypesAndValues(Seq(IdentifierType.FEDORA -> "easy-dataset:12345")).value should contain only ((IdentifierType.FEDORA -> "easy-dataset:12345") -> Some(expectedIdentifier))
+    identifiers.getByTypesAndValues(Seq(IdentifierType.FEDORA -> "easy-dataset:12345")).value should contain only ((IdentifierType.FEDORA -> "easy-dataset:12345") -> expectedIdentifier)
     identifiers.getAll(Seq(depositId5)).value.toMap.apply(depositId5) should contain(expectedIdentifier)
   }
 

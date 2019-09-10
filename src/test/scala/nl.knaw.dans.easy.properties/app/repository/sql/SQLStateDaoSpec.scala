@@ -58,17 +58,17 @@ class SQLStateDaoSpec extends TestSupportFixture
   "getCurrent" should "return the current states of the given deposits" in {
     val states = new SQLStateDao
 
-    states.getCurrent(Seq(depositId2, depositId5)).value should contain only(
-      depositId2 -> Some(state23),
-      depositId5 -> Some(state53),
+    states.getCurrent(Seq(depositId2, depositId5)).value should contain inOrderOnly(
+      depositId2 -> state23,
+      depositId5 -> state53,
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val states = new SQLStateDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    states.getCurrent(Seq(depositId6)).value should contain only (depositId6 -> Option.empty)
+    states.getCurrent(Seq(depositId6)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -107,7 +107,7 @@ class SQLStateDaoSpec extends TestSupportFixture
 
     states.store(depositId1, inputState).value shouldBe expectedState
     states.getById(Seq("20")).value should contain only expectedState
-    states.getCurrent(Seq(depositId1)).value should contain only (depositId1 -> Some(expectedState))
+    states.getCurrent(Seq(depositId1)).value should contain only (depositId1 -> expectedState)
     states.getAll(Seq(depositId1)).value.toMap.apply(depositId1) should contain(expectedState)
   }
 

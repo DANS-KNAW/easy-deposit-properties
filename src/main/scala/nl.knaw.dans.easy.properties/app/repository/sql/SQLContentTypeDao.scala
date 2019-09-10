@@ -55,7 +55,7 @@ class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorH
     executeGetById(parseContentType)(QueryGenerator.getSimplePropsElementsById("content-type"))(ids)
   }
 
-  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[ContentType])]] = {
+  override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, ContentType)]] = {
     trace(ids)
 
     executeGetCurrent(parseDepositIdAndContentType)(QueryGenerator.getSimplePropsCurrentElementByDepositId("content-type"))(ids)

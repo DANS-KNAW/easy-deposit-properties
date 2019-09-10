@@ -33,17 +33,14 @@ class SQLDoiRegisteredDaoSpec extends TestSupportFixture
   "getCurrent" should "return the current doi registered event of the given deposits" in {
     val doiRegistereds = new SQLDoiRegisteredDao
 
-    doiRegistereds.getCurrent(Seq(depositId4, depositId5)).value should contain only(
-      depositId5 -> Some(doiRegistered4),
-      depositId4 -> None,
-    )
+    doiRegistereds.getCurrent(Seq(depositId4, depositId5)).value should contain only(depositId5 -> doiRegistered4)
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val doiRegistereds = new SQLDoiRegisteredDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
-    doiRegistereds.getCurrent(Seq(depositId6)).value should contain only (depositId6 -> Option.empty)
+    doiRegistereds.getCurrent(Seq(depositId6)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {
@@ -80,7 +77,7 @@ class SQLDoiRegisteredDaoSpec extends TestSupportFixture
     val doiRegisteredEvent = DoiRegisteredEvent(value = true, timestamp)
 
     doiRegistereds.store(depositId5, doiRegisteredEvent).value shouldBe doiRegisteredEvent
-    doiRegistereds.getCurrent(Seq(depositId5)).value should contain only (depositId5 -> Some(doiRegisteredEvent))
+    doiRegistereds.getCurrent(Seq(depositId5)).value should contain only (depositId5 -> doiRegisteredEvent)
     doiRegistereds.getAll(Seq(depositId5)).value.toMap.apply(depositId5) should contain only(doiRegistered4, doiRegisteredEvent)
   }
 

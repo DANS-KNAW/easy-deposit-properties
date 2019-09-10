@@ -19,7 +19,7 @@ import nl.knaw.dans.easy.properties.app.model.{ DepositId, DoiRegisteredEvent }
 
 trait DoiRegisteredDao {
 
-  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[DoiRegisteredEvent])]]
+  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, DoiRegisteredEvent)]]
 
   def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[DoiRegisteredEvent])]]
 

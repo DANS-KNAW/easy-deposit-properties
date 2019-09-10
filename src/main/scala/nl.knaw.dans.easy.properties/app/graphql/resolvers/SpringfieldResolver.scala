@@ -32,8 +32,8 @@ object SpringfieldResolver {
   }
 
   def currentById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Springfield]] = {
-    DeferredValue(currentSpringfieldsFetcher.defer(depositId))
-      .map { case (_, optSpringfield) => optSpringfield }
+    DeferredValue(currentSpringfieldsFetcher.deferOpt(depositId))
+      .map(_.map { case (_, springfield) => springfield })
   }
 
   def allById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Seq[Springfield]] = {

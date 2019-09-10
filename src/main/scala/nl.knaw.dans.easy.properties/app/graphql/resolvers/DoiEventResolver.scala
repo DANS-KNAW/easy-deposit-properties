@@ -28,8 +28,8 @@ object DoiEventResolver {
   val allDoisActionFetcher: AllFetcher[DoiActionEvent] = fetchAll(_.repo.doiAction.getAll)
 
   def isDoiRegistered(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Boolean]] = {
-    DeferredValue(currentDoisRegisteredFetcher.defer(depositId))
-      .map { case (_, optDoiRegisteredEvent) => optDoiRegisteredEvent.map(_.value) }
+    DeferredValue(currentDoisRegisteredFetcher.deferOpt(depositId))
+      .map(_.map { case (_, doiRegisteredEvent) => doiRegisteredEvent.value })
   }
 
   def allDoiRegisteredById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Seq[DoiRegisteredEvent]] = {
@@ -38,8 +38,8 @@ object DoiEventResolver {
   }
 
   def currentDoiActionById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[DoiAction]] = {
-    DeferredValue(currentDoisActionFetcher.defer(depositId))
-      .map { case (_, optDoiActionEvent) => optDoiActionEvent.map(_.value) }
+    DeferredValue(currentDoisActionFetcher.deferOpt(depositId))
+      .map(_.map { case (_, doiActionEvent) => doiActionEvent.value })
   }
 
   def allDoiActionsById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Seq[DoiActionEvent]] = {

@@ -22,7 +22,7 @@ trait CurationDao {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[Curation]]
 
-  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[Curation])]]
+  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Curation)]]
 
   def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[Curation])]]
 

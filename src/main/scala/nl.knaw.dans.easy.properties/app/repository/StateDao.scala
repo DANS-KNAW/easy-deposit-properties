@@ -22,7 +22,7 @@ trait StateDao {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[State]]
 
-  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Option[State])]]
+  def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, State)]]
 
   def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[State])]]
 
