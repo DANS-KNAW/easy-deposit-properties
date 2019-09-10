@@ -20,10 +20,8 @@ import java.util.UUID
 
 import cats.data.NonEmptyList
 import cats.instances.either._
-import cats.instances.option._
 import cats.instances.stream._
 import cats.syntax.either._
-import cats.syntax.functor._
 import cats.syntax.traverse._
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, Timestamp }
 import nl.knaw.dans.easy.properties.app.repository.{ InvalidValueError, QueryErrorOr }

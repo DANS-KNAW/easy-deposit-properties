@@ -26,7 +26,7 @@ import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, Sp
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, StateLabel }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DepositorId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Timestamp }
 import sangria.relay.Mutation
-import sangria.schema.{ OptionInputType, Action, BooleanType, Context, Field, InputField, InputObjectType, ObjectType, OptionType, StringType, fields }
+import sangria.schema.{ Action, BooleanType, Context, Field, InputField, InputObjectType, ObjectType, OptionInputType, OptionType, StringType, fields }
 
 trait MutationType {
   this: DepositType
