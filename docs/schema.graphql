@@ -24,6 +24,9 @@ input AddDepositInput {
 
   """The depositor that submits this deposit."""
   depositorId: String!
+
+  """The origin of the deposited bag."""
+  origin: Origin!
   clientMutationId: String
 }
 
@@ -172,6 +175,9 @@ type Curation implements Node {
     """Find only those deposits that have this specified bag name."""
     bagName: String
 
+    """Find only those deposits that have this specified origin."""
+    origin: Origin
+
     """List only those deposits that have this specified state label."""
     state: DepositStateFilter
 
@@ -279,6 +285,9 @@ type Curator implements Node {
 
     """Find only those deposits that have this specified bag name."""
     bagName: String
+
+    """Find only those deposits that have this specified origin."""
+    origin: Origin
 
     """List only those deposits that have this specified state label."""
     state: DepositStateFilter
@@ -582,6 +591,9 @@ type Deposit implements Node {
   """The name of the deposited bag."""
   bagName: String
 
+  """The origin of the deposit."""
+  origin: Origin
+
   """Information about the depositor that submitted this deposit."""
   depositor: Depositor!
 }
@@ -727,6 +739,9 @@ type Depositor {
     """Find only those deposits that have this specified bag name."""
     bagName: String
 
+    """Find only those deposits that have this specified origin."""
+    origin: Origin
+
     """List only those deposits that have this specified state label."""
     state: DepositStateFilter
 
@@ -799,6 +814,9 @@ input DepositOrder {
 
 """Properties by which deposits can be ordered"""
 enum DepositOrderField {
+  """Order deposits by origin"""
+  ORIGIN
+
   """Order deposits by creation timestamp"""
   CREATION_TIMESTAMP
 
@@ -1017,7 +1035,9 @@ type IsNewVersionEvent {
 
 """The root query for implementing GraphQL mutations."""
 type Mutation {
-  """Register a new deposit with 'id', 'creationTimestamp' and 'depositId'."""
+  """
+  Register a new deposit with 'id', 'creationTimestamp', 'depositId' and 'origin'.
+  """
   addDeposit(input: AddDepositInput!): AddDepositPayload
 
   """Register the bag's name for the deposit identified by 'id'."""
@@ -1067,6 +1087,18 @@ enum OrderDirection {
   ASC
 }
 
+"""The origin of the deposit."""
+enum Origin {
+  """easy-split-multi-deposit"""
+  SMD
+
+  """easy-deposit-api"""
+  API
+
+  """easy-sword2"""
+  SWORD2
+}
+
 """Information about pagination in a connection."""
 type PageInfo {
   """When paginating forwards, are there more items?"""
@@ -1094,6 +1126,9 @@ type Query {
   deposits(
     """Find only those deposits that have this specified bag name."""
     bagName: String
+
+    """Find only those deposits that have this specified origin."""
+    origin: Origin
 
     """List only those deposits that have this specified state label."""
     state: DepositStateFilter

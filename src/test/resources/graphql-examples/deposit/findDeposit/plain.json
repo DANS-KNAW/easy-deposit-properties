@@ -5,6 +5,7 @@
         "depositorId": "user001"
       },
       "bagName": "bag1",
+      "origin": "API",
       "creationTimestamp": "2019-01-01T00:00:00.000Z",
       "lastModified": "2019-01-01T05:05:00.000Z",
       "state": {

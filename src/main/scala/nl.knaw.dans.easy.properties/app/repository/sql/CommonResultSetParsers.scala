@@ -23,7 +23,7 @@ import cats.instances.either._
 import cats.instances.stream._
 import cats.syntax.either._
 import cats.syntax.traverse._
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, Timestamp }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, Origin, Timestamp }
 import nl.knaw.dans.easy.properties.app.repository.{ InvalidValueError, QueryErrorOr }
 import org.joda.time.{ DateTime, DateTimeZone }
 import resource.managed
@@ -60,7 +60,8 @@ private[sql] trait CommonResultSetParsers {
       bagName = Option(resultSet.getString("bagName"))
       creationTimestamp <- parseDateTime(resultSet.getTimestamp("creationTimestamp", timeZone), timeZone)
       depositorId = resultSet.getString("depositorId")
-    } yield Deposit(depositId, bagName, creationTimestamp, depositorId)
+      origin = Origin.withName(resultSet.getString("origin"))
+    } yield Deposit(depositId, bagName, creationTimestamp, depositorId, origin)
   }
 
   private def extractResults[T, X](parseResult: ResultSet => Either[InvalidValueError, T])
@@ -86,7 +87,7 @@ private[sql] trait CommonResultSetParsers {
     resultSet.map(extractResults(parseResult)(collectResults))
       .either
       .either
-      .leftMap(InvalidValueError(_))
+      .leftMap(InvalidValueError(_, query))
       .flatMap(identity)
   }
 

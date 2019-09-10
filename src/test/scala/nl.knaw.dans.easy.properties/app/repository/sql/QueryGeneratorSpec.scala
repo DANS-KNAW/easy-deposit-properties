@@ -455,12 +455,12 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     }
   }
 
-  "getDepositsById" should "generate a query that, given a table name and id column name, finds deposits corresponing to the given ids" in {
+  "getDepositsById" should "generate a query that, given a table name and id column name, finds deposits corresponding to the given ids" in {
     val ids = NonEmptyList.fromListUnsafe((1 to 5).map(_.toString).toList)
     val (query, values) = QueryGenerator.getDepositsById("State", "stateId")(ids)
 
     val expectedQuery =
-      """SELECT stateId, Deposit.depositId, bagName, creationTimestamp, depositorId
+      """SELECT stateId, Deposit.depositId, bagName, creationTimestamp, depositorId, origin
         |FROM Deposit
         |INNER JOIN State
         |ON Deposit.depositId = State.depositId
@@ -639,7 +639,7 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     val (query, keyValue :: values) = QueryGenerator.getSimplePropsDepositsById("my-key")(ids)
 
     val expectedQuery =
-      """SELECT propertyId, Deposit.depositId, bagName, creationTimestamp, depositorId
+      """SELECT propertyId, Deposit.depositId, bagName, creationTimestamp, depositorId, origin
         |FROM Deposit
         |INNER JOIN SimpleProperties ON Deposit.depositId = SimpleProperties.depositId 
         |WHERE key = ?
@@ -657,7 +657,7 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
   }
 
   "storeDeposit" should "yield the query for inserting a deposit into the database" in {
-    QueryGenerator.storeDeposit shouldBe "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId) VALUES (?, ?, ?, ?);"
+    QueryGenerator.storeDeposit shouldBe "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId, origin) VALUES (?, ?, ?, ?, ?);"
   }
 
   "storeBagName" should "yield the query for inserting a deposit's bagName into the database" in {

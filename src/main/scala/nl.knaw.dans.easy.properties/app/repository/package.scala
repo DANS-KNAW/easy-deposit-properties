@@ -18,11 +18,12 @@ package nl.knaw.dans.easy.properties.app
 import nl.knaw.dans.easy.properties.ApplicationError
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.{ DepositId, Timestamp }
+import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import sangria.execution.UserFacingError
 
 import scala.concurrent.Future
 
-package object repository {
+package object repository extends DebugEnhancedLogging {
 
   type QueryErrorOr[T] = Either[QueryError, T]
   type MutationErrorOr[T] = Either[MutationError, T]
@@ -31,7 +32,9 @@ package object repository {
   case class DepositDoesNotExistError(depositId: DepositId) extends QueryError(s"Deposit $depositId does not exist.")
   case class InvalidValueError(override val msg: String) extends QueryError(msg)
   object InvalidValueError {
-    def apply(ts: Seq[Throwable]): InvalidValueError = InvalidValueError(ts.map(_.getMessage).mkString("\n"))
+    def apply(ts: Seq[Throwable], debugContext: String = ""): InvalidValueError = {
+      InvalidValueError(ts.map(_.getMessage).mkString("\n"))
+    }
   }
 
   sealed abstract class MutationError(val msg: String) extends Exception(msg) with ApplicationError with UserFacingError

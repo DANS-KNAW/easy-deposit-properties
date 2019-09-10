@@ -89,6 +89,7 @@ trait QueryType {
     description = Some("List all registered deposits."),
     arguments = List(
       depositBagNameFilterArgument,
+      depositOriginFilterArgument,
       depositStateFilterArgument,
       depositIngestStepFilterArgument,
       depositDoiRegisteredFilterArgument,
@@ -130,6 +131,7 @@ trait QueryType {
   private def getDeposits(implicit context: Context[DataContext, Unit]): DeferredValue[DataContext, ExtendedConnection[Deposit]] = {
     DepositResolver.findDeposit(DepositFilters(
       bagName = context.arg(depositBagNameFilterArgument),
+      originFilter = context.arg(depositOriginFilterArgument),
       stateFilter = context.arg(depositStateFilterArgument),
       ingestStepFilter = context.arg(depositIngestStepFilterArgument),
       doiRegisteredFilter = context.arg(depositDoiRegisteredFilterArgument),

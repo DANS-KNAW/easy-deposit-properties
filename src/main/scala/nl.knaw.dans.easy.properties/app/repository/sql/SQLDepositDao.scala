@@ -74,6 +74,7 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
         prepStatement.setString(2, deposit.bagName.orNull)
         prepStatement.setTimestamp(3, deposit.creationTimestamp, timeZone)
         prepStatement.setString(4, deposit.depositorId)
+        prepStatement.setString(5, deposit.origin.toString)
         prepStatement.executeUpdate()
       })
       .either

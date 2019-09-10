@@ -18,13 +18,14 @@ package nl.knaw.dans.easy.properties.app.graphql.types
 import nl.knaw.dans.easy.properties.app.graphql.DataContext
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.RequiresAuthentication
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ ContentTypeResolver, CurationResolver, DepositResolver, IdentifierResolver, IngestStepResolver, SpringfieldResolver, StateResolver }
+import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, InputContentType }
 import nl.knaw.dans.easy.properties.app.model.curation.InputCuration
 import nl.knaw.dans.easy.properties.app.model.identifier.{ IdentifierType, InputIdentifier }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStepLabel, InputIngestStep }
 import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DepositorId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Timestamp }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DepositorId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin, Timestamp }
 import sangria.relay.Mutation
 import sangria.schema.{ Action, BooleanType, Context, Field, InputField, InputObjectType, ObjectType, OptionInputType, OptionType, StringType, fields }
 
@@ -63,6 +64,14 @@ trait MutationType {
     description = Some("The name of the deposited bag."),
     defaultValue = None,
     fieldType = OptionInputType(StringType),
+    astDirectives = Vector.empty,
+    astNodes = Vector.empty,
+  )
+  private val originInputField: InputField[Origin.Value] = InputField(
+    name = "origin",
+    description = Some("The origin of the deposited bag."),
+    defaultValue = None,
+    fieldType = OriginType,
     astDirectives = Vector.empty,
     astNodes = Vector.empty,
   )
@@ -348,12 +357,13 @@ trait MutationType {
     tags = List(
       RequiresAuthentication,
     ),
-    fieldDescription = Some("Register a new deposit with 'id', 'creationTimestamp' and 'depositId'."),
+    fieldDescription = Some("Register a new deposit with 'id', 'creationTimestamp', 'depositId' and 'origin'."),
     inputFields = List(
       depositIdInputField,
       bagNameOptionInputField,
       creationTimestampInputField,
       depositorIdInputField,
+      originInputField,
     ),
     outputFields = fields(
       depositField,
@@ -529,6 +539,7 @@ trait MutationType {
         bagName = input.get(bagNameOptionInputField.name).flatMap(_.asInstanceOf[Option[String]]),
         creationTimestamp = input(creationTimestampInputField.name).asInstanceOf[Timestamp],
         depositorId = input(depositorIdInputField.name).asInstanceOf[String],
+        origin = input(originInputField.name).asInstanceOf[Origin]
       ))
       .map(deposit => AddDepositPayload(
         clientMutationId = input.get(Mutation.ClientMutationIdFieldName).flatMap(_.asInstanceOf[Option[String]]),

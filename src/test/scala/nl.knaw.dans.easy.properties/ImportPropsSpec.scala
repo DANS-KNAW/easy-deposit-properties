@@ -31,7 +31,7 @@ import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, Identifie
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestStepLabel, InputIngestStep }
 import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, Springfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, State, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Timestamp }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin, Timestamp }
 import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, Repository, SpringfieldDao, StateDao }
 import nl.knaw.dans.easy.properties.fixture.{ FileSystemSupport, TestSupportFixture }
 import nl.knaw.dans.easy.{ DataciteService, DataciteServiceConfiguration, DataciteServiceException }
@@ -77,7 +77,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
@@ -99,7 +99,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "my-bag".some, time, "user001"))) returning Deposit(depositId, "my-bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "my-bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "my-bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
@@ -125,7 +125,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, none, time, "user001"))) returning Deposit(depositId, none, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, none, time, "user001", Origin.API))) returning Deposit(depositId, none, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
@@ -151,7 +151,8 @@ class ImportPropsSpec extends TestSupportFixture
 
     inSequence {
       expectInteractString("user001")
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, none, creationTime, "user001"))) returning Deposit(depositId, none, creationTime, "user001").asRight
+      expectInteractEnum(Origin)(_.API)
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, none, creationTime, "user001", Origin.API))) returning Deposit(depositId, none, creationTime, "user001", Origin.API).asRight
       expectInteractEnum(StateLabel)(_.SUBMITTED)
       expectInteractString("my description")
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my-description", lastModified).asRight
@@ -191,7 +192,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       expectInteractEnum(StateLabel)(_.SUBMITTED)
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
@@ -219,7 +220,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.ARCHIVED, "my description", lastModified)) returning State("my-id", StateLabel.ARCHIVED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.COMPLETED, lastModified)) returning IngestStep("my-id", IngestStepLabel.COMPLETED, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
@@ -246,7 +247,7 @@ class ImportPropsSpec extends TestSupportFixture
 
     inSequence {
       expectInteractFunc(time)
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.COMPLETED, lastModified)) returning IngestStep("my-id", IngestStepLabel.COMPLETED, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
@@ -272,7 +273,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       expectInteractEnum(IngestStepLabel)(_.VALIDATE)
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.VALIDATE, lastModified)) returning IngestStep("my-id", IngestStepLabel.VALIDATE, lastModified).asRight
@@ -300,7 +301,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
@@ -328,7 +329,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
@@ -356,7 +357,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
@@ -384,7 +385,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
@@ -412,7 +413,7 @@ class ImportPropsSpec extends TestSupportFixture
     val (depositId, _, lastModified) = fileProps(file)
 
     inSequence {
-      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001"))) returning Deposit(depositId, "bag".some, time, "user001").asRight
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
       stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
       ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight

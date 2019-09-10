@@ -1,5 +1,5 @@
 mutation {
-    addDeposit(input: {clientMutationId: "my-mutation-id", depositId: "00000000-0000-0000-0000-000000000004", bagName: "bag4", creationTimestamp: "2019-05-15T23:36:00.000Z", depositorId: "archie001"}) {
+    addDeposit(input: {clientMutationId: "my-mutation-id", depositId: "00000000-0000-0000-0000-000000000004", bagName: "bag4", creationTimestamp: "2019-05-15T23:36:00.000Z", depositorId: "archie001", origin: API}) {
         clientMutationId
         deposit {
             id
@@ -9,6 +9,7 @@ mutation {
             depositor {
                 depositorId
             }
+            origin
             state {
                 label
                 description

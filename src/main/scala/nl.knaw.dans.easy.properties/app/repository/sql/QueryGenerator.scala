@@ -155,7 +155,7 @@ object QueryGenerator {
   }
 
   def getDepositsById(tableName: String, idColumnName: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT $idColumnName, Deposit.depositId, bagName, creationTimestamp, depositorId FROM Deposit INNER JOIN $tableName ON Deposit.depositId = $tableName.depositId WHERE $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+    val query = s"SELECT $idColumnName, Deposit.depositId, bagName, creationTimestamp, depositorId, origin FROM Deposit INNER JOIN $tableName ON Deposit.depositId = $tableName.depositId WHERE $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
 
     query -> ids.map(setInt).toList
   }
@@ -219,13 +219,13 @@ object QueryGenerator {
   }
 
   def getSimplePropsDepositsById(key: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT propertyId, Deposit.depositId, bagName, creationTimestamp, depositorId FROM Deposit INNER JOIN SimpleProperties ON Deposit.depositId = SimpleProperties.depositId WHERE key = ? AND propertyId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+    val query = s"SELECT propertyId, Deposit.depositId, bagName, creationTimestamp, depositorId, origin FROM Deposit INNER JOIN SimpleProperties ON Deposit.depositId = SimpleProperties.depositId WHERE key = ? AND propertyId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
     val values = setString(key) :: ids.map(setInt)
 
     query -> values.toList
   }
 
-  lazy val storeDeposit: String = "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId) VALUES (?, ?, ?, ?);"
+  lazy val storeDeposit: String = "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId, origin) VALUES (?, ?, ?, ?, ?);"
 
   lazy val storeBagName: String = "UPDATE Deposit SET bagName = ? WHERE depositId = ? AND (bagName IS NULL OR bagName='');"
 

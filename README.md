@@ -70,7 +70,7 @@ To generate the latest version of the GraphQL schema for `easy-deposit-propertie
     #install get-graphql-schema
     npm install -g get-graphql-schema
     
-    # start the service
+    # (re)start the service (after: mvn clean install -DskipTests=true): see GRAPHQL INTERFACE above
     
     get-graphql-schema http://<base-url>/graphql > docs/schema.graphql
 

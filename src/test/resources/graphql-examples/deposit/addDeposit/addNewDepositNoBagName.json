@@ -6,6 +6,7 @@
         "id": "RGVwb3NpdDowMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDY=",
         "depositId": "00000000-0000-0000-0000-000000000006",
         "bagName": null,
+        "origin": "SMD",
         "creationTimestamp": "2019-05-15T23:36:00.000Z",
         "depositor": {
           "depositorId": "archie001"

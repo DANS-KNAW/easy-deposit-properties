@@ -32,7 +32,7 @@ import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestSte
 import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, Springfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.StateLabel.StateLabel
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, State, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Timestamp }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin, Timestamp }
 import nl.knaw.dans.easy.properties.app.repository.{ MutationErrorOr, Repository }
 import nl.knaw.dans.easy.{ DataciteService, DataciteServiceException }
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
@@ -137,8 +137,9 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
           interactor.ask(s"Could not find the depositor for deposit $depositId. What value should this be?")
         }
       }
+    val origin = getOrAskEnumProp(Origin, "deposit.origin", "origin", props, depositId)
 
-    Deposit(depositId, bagName, creationTimestamp, depositorId)
+    Deposit(depositId, bagName, creationTimestamp, depositorId, origin)
   }
 
   private def retrieveBagNameFromFilesystem(deposit: File): Option[String] = {
@@ -150,17 +151,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
   }
 
   private def loadState(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): InputState = {
-    val label = getEnumProp("state.label")(StateLabel)(props)
-      .getOrElse {
-        storeProp(props, "state.label") {
-          interactor.ask(StateLabel)(s"Invalid state label found for deposit $depositId. What value should this be?")
-        }.some
-      }
-      .getOrElse {
-        storeProp(props, "state.label") {
-          interactor.ask(StateLabel)(s"Could not find the state label for deposit $depositId. What value should this be?")
-        }
-      }
+    val label = getOrAskEnumProp(StateLabel, "state.label", "state label", props, depositId)
     val description = Option(props.getString("state.description"))
       .getOrElse {
         storeProp(props, "state.description") {
@@ -169,6 +160,20 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
       }
 
     InputState(label, description, timestamp)
+  }
+
+  private def getOrAskEnumProp(enum: Enumeration, propertyKey: FeedBackMessage, propertyDescription: FeedBackMessage, props: PropertiesConfiguration, depositId: DepositId): enum.Value = {
+    getEnumProp(propertyKey)(enum)(props)
+      .getOrElse {
+        storeProp(props, propertyKey) {
+          interactor.ask(enum)(s"Invalid $propertyDescription found for deposit $depositId. What value should this be?")
+        }.some
+      }
+      .getOrElse {
+        storeProp(props, propertyKey) {
+          interactor.ask(enum)(s"Could not find the $propertyDescription for deposit $depositId. What value should this be?")
+        }
+      }
   }
 
   private def loadIngestStep(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration, stateLabel: StateLabel): Option[InputIngestStep] = {

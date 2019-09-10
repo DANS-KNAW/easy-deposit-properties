@@ -15,13 +15,12 @@
  */
 package nl.knaw.dans.easy.properties.app.model
 
-import nl.knaw.dans.easy.properties.app.model.Origin.Origin
+object Origin extends Enumeration {
+  type Origin = Value
 
-case class Deposit(id: DepositId,
-                   bagName: Option[String],
-                   creationTimestamp: Timestamp,
-                   depositorId: DepositorId,
-                   origin: Origin,
-                  ) extends Timestamped {
-  def timestamp: Timestamp = creationTimestamp
+  // @formatter:off
+  val SWORD2: Origin = Value("SWORD2")
+  val API   : Origin = Value("API")
+  val SMD   : Origin = Value("SMD")
+  // @formatter:on
 }

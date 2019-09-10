@@ -2,7 +2,8 @@ CREATE TABLE Deposit (
     depositId CHAR(36) NOT NULL PRIMARY KEY,
     bagName TEXT,
     creationTimestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-    depositorId VARCHAR(64) NOT NULL
+    depositorId VARCHAR(64) NOT NULL,
+    origin VARCHAR(6) NOT NULL
 );
 
 CREATE TABLE State (
@@ -22,8 +23,7 @@ CREATE TABLE Identifier (
     identifierValue VARCHAR(64) NOT NULL,
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (depositId) REFERENCES Deposit (depositId),
-    UNIQUE (depositId, identifierSchema),
-    UNIQUE (depositId, timestamp)
+    UNIQUE (depositId, identifierSchema, timestamp)
 );
 
 CREATE TABLE Curation (

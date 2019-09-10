@@ -7,6 +7,7 @@ query ListAllDepositsOrderedByBagNameDescending {
                     depositorId
                 }
                 bagName
+                origin
                 creationTimestamp
                 lastModified
                 state {

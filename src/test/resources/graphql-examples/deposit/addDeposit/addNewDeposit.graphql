@@ -1,10 +1,11 @@
 mutation {
-    addDeposit(input: {clientMutationId: "my-mutation-id", depositId: "00000000-0000-0000-0000-000000000006", bagName: "bag6", creationTimestamp: "2019-05-15T23:36:00.000Z", depositorId: "archie001"}) {
+    addDeposit(input: {clientMutationId: "my-mutation-id", depositId: "00000000-0000-0000-0000-000000000006", bagName: "bag6", creationTimestamp: "2019-05-15T23:36:00.000Z", depositorId: "archie001", origin: SWORD2}) {
         clientMutationId
         deposit {
             id
             depositId
             bagName
+            origin
             creationTimestamp
             depositor {
                 depositorId
