@@ -36,7 +36,7 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
     identifiers.getById(Seq("7", "9", "13")).value should contain inOrderOnly(identifier7, identifier9, identifier13)
   }
 
-  it should "return a None if the identifierId is unknown" in {
+  it should "return an empty collection if the identifierId is unknown" in {
     val identifiers = new SQLIdentifierDao
     val unknownIdentifierId = "102"
 

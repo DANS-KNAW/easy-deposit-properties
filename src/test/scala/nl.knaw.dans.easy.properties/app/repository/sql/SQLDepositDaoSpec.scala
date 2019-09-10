@@ -69,7 +69,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
     deposits.find(Seq(depositId1, depositId6)).value should contain only deposit1
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 

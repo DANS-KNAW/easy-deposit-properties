@@ -36,7 +36,7 @@ class SQLStateDaoSpec extends TestSupportFixture
     states.getById(Seq("7", "8", "15")).value should contain inOrderOnly(state21, state22, state42)
   }
 
-  it should "return a None if the stateId is unknown" in {
+  it should "return an empty collection if the stateId is unknown" in {
     val states = new SQLStateDao
     val unknownStateId = "102"
 

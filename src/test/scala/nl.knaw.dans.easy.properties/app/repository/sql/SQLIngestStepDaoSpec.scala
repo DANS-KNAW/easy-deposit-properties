@@ -36,7 +36,7 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
     ingestSteps.getById(Seq("4", "10", "14")).value should contain inOrderOnly(step4, step10, step14)
   }
 
-  it should "return a None if the id is unknown" in {
+  it should "return an empty collection if the id is unknown" in {
     val ingestSteps = new SQLIngestStepDao
     val unknownId = "102"
 

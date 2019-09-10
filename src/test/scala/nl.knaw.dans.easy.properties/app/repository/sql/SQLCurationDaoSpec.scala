@@ -37,7 +37,7 @@ class SQLCurationDaoSpec extends TestSupportFixture
     curations.getById(Seq("2", "4", "9")).value should contain inOrderOnly(curation2, curation4, curation9)
   }
 
-  it should "return a None if the curationId is unknown" in {
+  it should "return an empty collection if the curationId is unknown" in {
     val curations = new SQLCurationDao
     val unknowncurationId = "102"
 

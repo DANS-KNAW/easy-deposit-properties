@@ -36,7 +36,7 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
     springfields.getById(Seq("0", "1", "2")).value should contain inOrderOnly(springfield0, springfield1, springfield2)
   }
 
-  it should "return a None if the springfieldId is unknown" in {
+  it should "return an empty collection if the springfieldId is unknown" in {
     val springfields = new SQLSpringfieldDao
     val unknownspringfieldId = "102"
 

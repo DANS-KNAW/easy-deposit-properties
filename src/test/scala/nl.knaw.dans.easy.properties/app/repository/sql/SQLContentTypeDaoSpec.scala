@@ -36,7 +36,7 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
     contentTypes.getById(Seq("27", "29", "31")).value should contain inOrderOnly(contentType1, contentType3, contentType5)
   }
 
-  it should "return a None if the id is unknown" in {
+  it should "return an empty collection if the id is unknown" in {
     val contentTypes = new SQLContentTypeDao
     val unknownId = "102"
 

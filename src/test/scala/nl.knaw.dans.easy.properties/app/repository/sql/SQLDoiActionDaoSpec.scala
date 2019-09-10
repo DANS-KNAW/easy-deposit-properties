@@ -39,7 +39,7 @@ class SQLDoiActionDaoSpec extends TestSupportFixture
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val doiActions = new SQLDoiActionDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
