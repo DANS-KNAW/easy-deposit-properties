@@ -155,7 +155,7 @@ object QueryGenerator {
   }
 
   def getDepositsById(tableName: String, idColumnName: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {
-    val query = s"SELECT $idColumnName, Deposit.depositId, bagName, creationTimestamp, depositorId, orogin FROM Deposit INNER JOIN $tableName ON Deposit.depositId = $tableName.depositId WHERE $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
+    val query = s"SELECT $idColumnName, Deposit.depositId, bagName, creationTimestamp, depositorId, origin FROM Deposit INNER JOIN $tableName ON Deposit.depositId = $tableName.depositId WHERE $idColumnName IN (${ ids.toList.map(_ => "?").mkString(", ") });"
 
     query -> ids.map(setInt).toList
   }
