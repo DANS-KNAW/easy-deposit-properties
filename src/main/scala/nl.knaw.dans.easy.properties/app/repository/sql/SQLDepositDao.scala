@@ -19,7 +19,6 @@ import java.sql.{ Connection, ResultSet }
 
 import cats.data.NonEmptyList
 import cats.instances.either._
-import cats.instances.option._
 import cats.instances.vector._
 import cats.syntax.either._
 import cats.syntax.functor._

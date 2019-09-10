@@ -31,5 +31,5 @@ trait IdentifierDao {
 
   def store(id: DepositId, identifier: InputIdentifier): MutationErrorOr[Identifier]
 
-  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]]
+  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]]
 }

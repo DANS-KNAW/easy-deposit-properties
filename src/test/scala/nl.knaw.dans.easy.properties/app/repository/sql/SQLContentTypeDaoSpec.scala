@@ -86,7 +86,7 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val contentTypes = new SQLContentTypeDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
@@ -135,17 +135,17 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
     val contentTypes = new SQLContentTypeDao
 
     contentTypes.getDepositsById(Seq("26", "28", "30")).value should contain only(
-      "26" -> Some(deposit1),
-      "28" -> Some(deposit2),
-      "30" -> Some(deposit4),
+      "26" -> deposit1,
+      "28" -> deposit2,
+      "30" -> deposit4,
     )
   }
 
-  it should "return a None if the contentTypeId is unknown" in {
+  it should "return an empty collection if the contentTypeId is unknown" in {
     val contentTypes = new SQLContentTypeDao
     val unknowncontentTypeId = "102"
 
-    contentTypes.getDepositsById(Seq(unknowncontentTypeId)).value should contain only (unknowncontentTypeId -> Option.empty)
+    contentTypes.getDepositsById(Seq(unknowncontentTypeId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {

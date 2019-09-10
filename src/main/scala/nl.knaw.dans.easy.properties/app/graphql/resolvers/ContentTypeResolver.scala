@@ -42,7 +42,7 @@ object ContentTypeResolver {
   }
 
   def depositByContentTypeId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
-    DeferredValue(depositByContentTypeIdFetcher.defer(id))
-      .map { case (_, optDeposit) => optDeposit }
+    DeferredValue(depositByContentTypeIdFetcher.deferOpt(id))
+      .map(_.map { case (_, deposit) => deposit })
   }
 }

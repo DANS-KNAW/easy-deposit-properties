@@ -100,7 +100,7 @@ class SQLStateDao(implicit connection: Connection, errorHandler: SQLErrorHandler
       .map(state.toOutput)
   }
 
-  override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]] = {
+  override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
     executeGetDepositById(parseStateIdAndDeposit)(QueryGenerator.getDepositsById("State", "stateId"))(ids)

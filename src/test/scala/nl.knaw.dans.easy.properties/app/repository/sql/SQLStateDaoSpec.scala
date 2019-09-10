@@ -86,7 +86,7 @@ class SQLStateDaoSpec extends TestSupportFixture
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val states = new SQLStateDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
@@ -135,17 +135,17 @@ class SQLStateDaoSpec extends TestSupportFixture
     val states = new SQLStateDao
 
     states.getDepositsById(Seq("7", "8", "15")).value should contain only(
-      "7" -> Some(deposit2),
-      "8" -> Some(deposit2),
-      "15" -> Some(deposit4),
+      "7" -> deposit2,
+      "8" -> deposit2,
+      "15" -> deposit4,
     )
   }
 
-  it should "return a None if the stateId is unknown" in {
+  it should "return an empty collection if the stateId is unknown" in {
     val states = new SQLStateDao
     val unknownStateId = "102"
 
-    states.getDepositsById(Seq(unknownStateId)).value should contain only (unknownStateId -> Option.empty)
+    states.getDepositsById(Seq(unknownStateId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {

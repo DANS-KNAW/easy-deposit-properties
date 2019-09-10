@@ -48,9 +48,9 @@ package object resolvers {
     Fetcher.caching(f(_)(_).toFuture)
   }
 
-  type DepositByIdFetcher = Fetcher[DataContext, (String, Option[Deposit]), (String, Option[Deposit]), String]
+  type DepositByIdFetcher = Fetcher[DataContext, (String, Deposit), (String, Deposit), String]
 
-  private[resolvers] def fetchDepositsById(f: DataContext => Seq[String] => QueryErrorOr[Seq[(String, Option[Deposit])]]): DepositByIdFetcher = {
+  private[resolvers] def fetchDepositsById(f: DataContext => Seq[String] => QueryErrorOr[Seq[(String, Deposit)]]): DepositByIdFetcher = {
     Fetcher.caching(f(_)(_).toFuture)
   }
 

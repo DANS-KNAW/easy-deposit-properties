@@ -137,22 +137,12 @@ private[sql] trait CommonResultSetParsers {
   private[sql] def executeGetDepositById(extract: ResultSet => Either[InvalidValueError, (String, Deposit)])
                                         (queryGen: NonEmptyList[String] => (String, Seq[PrepStatementResolver]))
                                         (ids: Seq[String])
-                                        (implicit connection: Connection): QueryErrorOr[Seq[(String, Option[Deposit])]] = {
-    def collectResults(stream: Stream[(String, Deposit)]): Seq[(String, Option[Deposit])] = {
-      val results = stream.toList
-        .groupBy { case (stateId, _) => stateId }
-        .flatMap { case (id, ss) =>
-          assert(ss.size == 1)
-          ss.headOption.map { case (_, deposit) => deposit }.tupleLeft(id)
-        }
-      ids.map(id => id -> results.get(id))
-    }
-
+                                        (implicit connection: Connection): QueryErrorOr[Seq[(String, Deposit)]] = {
     NonEmptyList.fromList(ids.toList)
       .map(_
         .traverse[Either[InvalidValueError, ?], String](validateId)
         .map(queryGen)
-        .flatMap(executeQuery(extract)(collectResults))
+        .flatMap(executeQuery(extract)(identity))
       )
       .getOrElse(Seq.empty.asRight)
   }

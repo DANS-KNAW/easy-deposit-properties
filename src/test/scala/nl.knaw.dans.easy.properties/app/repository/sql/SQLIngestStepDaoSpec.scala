@@ -85,7 +85,7 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val ingestSteps = new SQLIngestStepDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
@@ -134,17 +134,17 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
     val ingestSteps = new SQLIngestStepDao
 
     ingestSteps.getDepositsById(Seq("5", "11", "13")).value should contain only(
-      "5" -> Some(deposit1),
-      "11" -> Some(deposit2),
-      "13" -> Some(deposit2),
+      "5" -> deposit1,
+      "11" -> deposit2,
+      "13" -> deposit2,
     )
   }
 
-  it should "return a None if the ingestStepId is unknown" in {
+  it should "return an empty collection if the ingestStepId is unknown" in {
     val ingestSteps = new SQLIngestStepDao
     val unknownIngestStepId = "102"
 
-    ingestSteps.getDepositsById(Seq(unknownIngestStepId)).value should contain only (unknownIngestStepId -> Option.empty)
+    ingestSteps.getDepositsById(Seq(unknownIngestStepId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {

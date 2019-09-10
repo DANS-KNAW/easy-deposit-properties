@@ -28,5 +28,5 @@ trait SpringfieldDao {
 
   def store(id: DepositId, springfield: InputSpringfield): MutationErrorOr[Springfield]
 
-  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]]
+  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]]
 }

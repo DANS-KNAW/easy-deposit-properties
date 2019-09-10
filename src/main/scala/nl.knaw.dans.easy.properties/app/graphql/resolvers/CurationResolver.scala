@@ -50,8 +50,8 @@ object CurationResolver {
   }
 
   def depositByCurationId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
-    DeferredValue(depositByCurationIdFetcher.defer(id))
-      .map { case (_, optDeposit) => optDeposit }
+    DeferredValue(depositByCurationIdFetcher.deferOpt(id))
+      .map(_.map { case (_, deposit) => deposit })
   }
 
   def isNewVersion(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Boolean]] = {

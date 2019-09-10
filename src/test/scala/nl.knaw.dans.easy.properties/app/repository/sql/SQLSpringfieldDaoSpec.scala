@@ -85,7 +85,7 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val springfields = new SQLSpringfieldDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
@@ -134,17 +134,17 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
     val springfields = new SQLSpringfieldDao
 
     springfields.getDepositsById(Seq("0", "1", "2")).value should contain only(
-      "0" -> Some(deposit1),
-      "1" -> Some(deposit2),
-      "2" -> Some(deposit2),
+      "0" -> deposit1,
+      "1" -> deposit2,
+      "2" -> deposit2,
     )
   }
 
-  it should "return a None if the springfieldId is unknown" in {
+  it should "return an empty collection if the springfieldId is unknown" in {
     val springfields = new SQLSpringfieldDao
     val unknownspringfieldId = "102"
 
-    springfields.getDepositsById(Seq(unknownspringfieldId)).value should contain only (unknownspringfieldId -> Option.empty)
+    springfields.getDepositsById(Seq(unknownspringfieldId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {

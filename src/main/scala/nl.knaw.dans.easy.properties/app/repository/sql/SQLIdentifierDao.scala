@@ -145,7 +145,7 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
       .map(identifier.toOutput)
   }
 
-  override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]] = {
+  override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
     executeGetDepositById(parseIdentifierIdAndDeposit)(QueryGenerator.getDepositsById("Identifier", "identifierId"))(ids)

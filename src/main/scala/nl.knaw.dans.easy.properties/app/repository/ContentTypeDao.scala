@@ -28,5 +28,5 @@ trait ContentTypeDao {
 
   def store(id: DepositId, contentType: InputContentType): MutationErrorOr[ContentType]
 
-  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]]
+  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]]
 }

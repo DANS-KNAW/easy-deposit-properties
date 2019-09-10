@@ -86,7 +86,7 @@ class SQLCurationDaoSpec extends TestSupportFixture
     )
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val curations = new SQLCurationDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
@@ -147,18 +147,17 @@ class SQLCurationDaoSpec extends TestSupportFixture
     val curations = new SQLCurationDao
 
     curations.getDepositsById(Seq("1", "4", "7", "10")).value should contain only(
-      "1" -> Some(deposit1),
-      "4" -> Some(deposit3),
-      "7" -> Some(deposit4),
-      "10" -> None,
+      "1" -> deposit1,
+      "4" -> deposit3,
+      "7" -> deposit4,
     )
   }
 
-  it should "return a None if the curationId is unknown" in {
+  it should "return an empty collection if the curationId is unknown" in {
     val curations = new SQLCurationDao
     val unknowncurationId = "102"
 
-    curations.getDepositsById(Seq(unknowncurationId)).value should contain only (unknowncurationId -> Option.empty)
+    curations.getDepositsById(Seq(unknowncurationId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {

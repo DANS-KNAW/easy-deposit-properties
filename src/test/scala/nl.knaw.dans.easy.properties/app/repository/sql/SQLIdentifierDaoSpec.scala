@@ -115,7 +115,7 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
     results(depositId5) should contain only identifier13
   }
 
-  it should "return a None if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" in {
     val identifiers = new SQLIdentifierDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
@@ -175,17 +175,17 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
     val identifiers = new SQLIdentifierDao
 
     identifiers.getDepositsById(Seq("6", "8", "13")).value should contain only(
-      "6" -> Some(deposit2),
-      "8" -> Some(deposit3),
-      "13" -> Some(deposit5),
+      "6" -> deposit2,
+      "8" -> deposit3,
+      "13" -> deposit5,
     )
   }
 
-  it should "return a None if the identifierId is unknown" in {
+  it should "return an empty collection if the identifierId is unknown" in {
     val identifiers = new SQLIdentifierDao
     val unknownIdentifierId = "102"
 
-    identifiers.getDepositsById(Seq(unknownIdentifierId)).value should contain only (unknownIdentifierId -> Option.empty)
+    identifiers.getDepositsById(Seq(unknownIdentifierId)).value shouldBe empty
   }
 
   it should "return an empty collection when the input collection is empty" in {

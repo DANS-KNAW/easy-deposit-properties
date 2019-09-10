@@ -28,5 +28,5 @@ trait CurationDao {
 
   def store(id: DepositId, curation: InputCuration): MutationErrorOr[Curation]
 
-  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]]
+  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]]
 }

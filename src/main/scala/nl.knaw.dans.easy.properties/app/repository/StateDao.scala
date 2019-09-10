@@ -28,5 +28,5 @@ trait StateDao {
 
   def store(id: DepositId, state: InputState): MutationErrorOr[State]
 
-  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]]
+  def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]]
 }

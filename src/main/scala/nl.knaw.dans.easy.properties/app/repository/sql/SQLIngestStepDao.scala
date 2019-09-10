@@ -100,7 +100,7 @@ class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHa
       .map(step.toOutput)
   }
 
-  override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Option[Deposit])]] = {
+  override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
     executeGetDepositById(parseIngestStepIdAndDeposit)(QueryGenerator.getSimplePropsDepositsById("ingest-step"))(ids)
