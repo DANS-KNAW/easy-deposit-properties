@@ -100,7 +100,7 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
         case 0 =>
           for {
             deposits <- find(Seq(depositId)).leftMap(error => MutationError(error.msg)) // not expected to have an error here, but just to be sure
-            depId <- deposits.find(deposit => deposit.id == depositId)
+            depId <- deposits.find(_.id == depositId)
               .map(_ => BagNameAlreadySetError(depositId)) // deposit was found, this means the bagName was already set for this deposit
               .getOrElse(NoSuchDepositError(depositId)) // deposit did not occur in search results; cannot set bagName for not-existing deposit
               .asLeft[DepositId]
