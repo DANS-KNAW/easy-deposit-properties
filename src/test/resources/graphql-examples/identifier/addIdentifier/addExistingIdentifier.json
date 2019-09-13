@@ -4,7 +4,7 @@
   },
   "errors": [
     {
-      "message": "Cannot insert this identifier: identifier bag-store already exists for depositId 00000000-0000-0000-0000-000000000001 or timestamp '2019-05-26T23:06:00.000Z' is already used for another identifier associated to depositId 00000000-0000-0000-0000-000000000001.",
+      "message": "Cannot insert this identifier: identifier bag-store already exists for depositId 00000000-0000-0000-0000-000000000001 with timestamp '2019-05-26T23:06:00.000Z' or bag-store '00000000-0000-0000-0000-000000000001' is already associated with another deposit.",
       "path": [
         "addIdentifier"
       ],

@@ -149,7 +149,7 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
     identifiers.store(depositId6, inputIdentifier).leftValue shouldBe NoSuchDepositError(depositId6)
   }
 
-  it should "fail when the depositId and schema combination is already present, even though the value is different" in {
+  it should "fail when the depositId, schema and timestamp combination is already present, even though the value is different" in {
     val identifiers = new SQLIdentifierDao
     val depositId = depositId3
     val timestamp = new DateTime(2019, 3, 3, 1, 1, timeZone)
@@ -160,15 +160,16 @@ class SQLIdentifierDaoSpec extends TestSupportFixture
     identifiers.store(depositId, inputIdentifier2).leftValue.msg should include(s"identifier fedora already exists for depositId $depositId")
   }
 
-  it should "fail when the depositId and timestamp combination is already present, even though the schema and value are different" in {
+  it should "fail when the identifier type and value combination is already present (for another deposit), even though the timestamp and depositId are different" in {
     val identifiers = new SQLIdentifierDao
     val depositId = depositId3
     val timestamp = new DateTime(2019, 3, 3, 1, 1, timeZone)
-    val inputIdentifier1 = InputIdentifier(IdentifierType.FEDORA, "easy-dataset:12345", timestamp)
-    val inputIdentifier2 = InputIdentifier(IdentifierType.URN, "foobar", timestamp)
+    val idType = identifier5.idType
+    val idValue = identifier5.idValue
+    // NOTE: identifier5 was already associated with depositId2
+    val inputIdentifier = InputIdentifier(idType, idValue, timestamp)
 
-    identifiers.store(depositId, inputIdentifier1) shouldBe right
-    identifiers.store(depositId, inputIdentifier2).leftValue.msg should include(s"timestamp '$timestamp' is already used for another identifier associated to depositId $depositId")
+    identifiers.store(depositId, inputIdentifier).leftValue.msg should include(s"$idType '$idValue' is already associated with another deposit")
   }
 
   "getDepositsById" should "find deposits identified by these identifierIds" in {
