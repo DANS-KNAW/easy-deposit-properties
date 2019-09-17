@@ -1,0 +1,22 @@
+{
+  "data": {
+    "deposit": {
+      "states": null
+    }
+  },
+  "errors": [
+    {
+      "message": "arguments 'earlierThan' and 'laterThan' cannot have the same value; use 'atTimestamp' instead",
+      "path": [
+        "deposit",
+        "states"
+      ],
+      "locations": [
+        {
+          "line": 3,
+          "column": 9
+        }
+      ]
+    }
+  ]
+}
