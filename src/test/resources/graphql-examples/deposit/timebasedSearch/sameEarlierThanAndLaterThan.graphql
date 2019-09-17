@@ -1,0 +1,13 @@
+query {
+    deposit(id: "00000000-0000-0000-0000-000000000001") {
+        states(earlierThan: "2019-01-01T04:00:00.000Z", laterThan: "2019-01-01T04:00:00.000Z") {
+            edges {
+                node {
+                    label
+                    description
+                    timestamp
+                }
+            }
+        }
+    }
+}

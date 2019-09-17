@@ -18,16 +18,7 @@ query {
                 }
             }
         }
-        states3: states(earlierThan: "2019-01-01T04:00:00.000Z", laterThan: "2019-01-01T04:00:00.000Z") {
-            edges {
-                node {
-                    label
-                    description
-                    timestamp
-                }
-            }
-        }
-        states4: states(atTimestamp: "2019-01-01T04:04:00.000Z") {
+        states3: states(atTimestamp: "2019-01-01T04:04:00.000Z") {
             edges {
                 node {
                     label

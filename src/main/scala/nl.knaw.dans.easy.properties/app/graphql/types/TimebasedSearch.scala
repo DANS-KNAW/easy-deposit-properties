@@ -31,8 +31,10 @@ trait TimebasedSearch extends DebugEnhancedLogging {
                                       atTimestamp: Option[Timestamp],
                                      ) {
 
-    private def between(earlierThan: Timestamp, laterThan: Timestamp)(timestamped: Timestamped) = {
-      if (earlierThan > laterThan)
+    private def between(earlierThan: Timestamp, laterThan: Timestamp)(timestamped: Timestamped): Boolean = {
+      if (earlierThan equiv laterThan)
+        throw new IllegalArgumentException("arguments 'earlierThan' and 'laterThan' cannot have the same value; use 'atTimestamp' instead")
+      else if (earlierThan > laterThan)
         timestamped.timestamp < earlierThan && timestamped.timestamp > laterThan
       else
         timestamped.timestamp < earlierThan || timestamped.timestamp > laterThan
