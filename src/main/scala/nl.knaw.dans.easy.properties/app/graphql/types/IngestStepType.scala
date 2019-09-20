@@ -44,7 +44,6 @@ trait IngestStepType {
     DocumentValue("FEDORA", "A dissemination copy of the deposit is being made in Fedora."),
     DocumentValue("SPRINGFIELD", "Dissemination copies of the audio/video files in the deposit are being made in Springfield."),
     DocumentValue("BAGSTORE", "Creating an archival copy of the deposit for storage in the vault."),
-    DocumentValue("BAGINDEX", "Indexing the archival copy and its relation to other bags."),
     DocumentValue("SOLR4FILES", "The file content of the deposit's payload is being index."),
     DocumentValue("COMPLETED", "The ingest process of this deposit has completed."),
   )

@@ -983,9 +983,6 @@ enum IngestStepLabel {
   """The file content of the deposit's payload is being index."""
   SOLR4FILES
 
-  """Indexing the archival copy and its relation to other bags."""
-  BAGINDEX
-
   """Creating an archival copy of the deposit for storage in the vault."""
   BAGSTORE
 

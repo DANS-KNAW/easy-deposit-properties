@@ -101,8 +101,8 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
   "store" should "insert a new ingest step into the database" in {
     val ingestSteps = new SQLIngestStepDao
     val timestamp = new DateTime(2019, 7, 19, 22, 45, timeZone)
-    val inputIngestStep = InputIngestStep(IngestStepLabel.BAGINDEX, timestamp)
-    val expectedIngestStep = IngestStep("32", IngestStepLabel.BAGINDEX, timestamp)
+    val inputIngestStep = InputIngestStep(IngestStepLabel.BAGSTORE, timestamp)
+    val expectedIngestStep = IngestStep("32", IngestStepLabel.BAGSTORE, timestamp)
 
     ingestSteps.store(depositId4, inputIngestStep).value shouldBe expectedIngestStep
     ingestSteps.getById(Seq("32")).value should contain only expectedIngestStep
@@ -114,7 +114,7 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
     val ingestSteps = new SQLIngestStepDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
     val timestamp = new DateTime(2019, 7, 18, 22, 38, timeZone)
-    val inputIngestStep = InputIngestStep(IngestStepLabel.BAGINDEX, timestamp)
+    val inputIngestStep = InputIngestStep(IngestStepLabel.BAGSTORE, timestamp)
 
     ingestSteps.store(depositId6, inputIngestStep).leftValue shouldBe NoSuchDepositError(depositId6)
   }
@@ -123,8 +123,8 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
     val ingestSteps = new SQLIngestStepDao
     val depositId = depositId1
     val timestamp = new DateTime(2019, 1, 1, 6, 6, timeZone)
-    val inputIngestStep1 = InputIngestStep(IngestStepLabel.BAGINDEX, timestamp)
-    val inputIngestStep2 = InputIngestStep(IngestStepLabel.BAGSTORE, timestamp)
+    val inputIngestStep1 = InputIngestStep(IngestStepLabel.BAGSTORE, timestamp)
+    val inputIngestStep2 = InputIngestStep(IngestStepLabel.SOLR4FILES, timestamp)
 
     ingestSteps.store(depositId, inputIngestStep1) shouldBe right
     ingestSteps.store(depositId, inputIngestStep2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, "ingest step")
