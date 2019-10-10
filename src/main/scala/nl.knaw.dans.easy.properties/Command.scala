@@ -22,7 +22,7 @@ import nl.knaw.dans.easy.DataciteService
 import nl.knaw.dans.easy.properties.app.database.{ DatabaseAccess, SQLErrorHandler }
 import nl.knaw.dans.easy.properties.app.legacyImport.{ ImportProps, Interactor }
 import nl.knaw.dans.easy.properties.app.repository.sql.SQLRepo
-import nl.knaw.dans.easy.properties.server.{ GraphQLServlet, EasyDepositPropertiesService, EasyDepositPropertiesServlet, GraphiQLServlet }
+import nl.knaw.dans.easy.properties.server._
 import nl.knaw.dans.lib.error._
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 
@@ -83,6 +83,11 @@ object Command extends App with DebugEnhancedLogging {
 
     val service = new EasyDepositPropertiesService(configuration.serverPort, Map(
       "/" -> new EasyDepositPropertiesServlet(configuration.version),
+      "/register" -> new ImportServlet(
+        database = database,
+        repository = implicit conn => new SQLRepo().repository,
+        expectedAuth = configuration.auth,
+      ),
       "/graphql" -> new GraphQLServlet(
         database = database,
         repository = implicit conn => new SQLRepo().repository,
