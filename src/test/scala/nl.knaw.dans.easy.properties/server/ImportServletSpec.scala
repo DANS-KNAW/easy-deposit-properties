@@ -17,7 +17,7 @@ package nl.knaw.dans.easy.properties.server
 
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
-import nl.knaw.dans.easy.properties.app.register.DepositProperties
+import nl.knaw.dans.easy.properties.app.register.{ DepositProperties, DepositPropertiesRegistration }
 import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, InvalidValueError, Repository, SpringfieldDao, StateDao }
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseFixture, FileSystemSupport, ImportTestData, TestSupportFixture }
 import org.scalamock.scalatest.MockFactory
@@ -34,6 +34,7 @@ class ImportServletSpec extends TestSupportFixture
   with ImportTestData {
 
   private val authHeader = "Authorization" -> "Basic bXktdXNlcm5hbWU6bXktcGFzc3dvcmQ="
+  // TODO replace mocks with real DAOs and database
   private val depositDao = mock[DepositDao]
   private val stateDao = mock[StateDao]
   private val ingestStepDao = mock[IngestStepDao]
@@ -45,8 +46,10 @@ class ImportServletSpec extends TestSupportFixture
   private val contentTypeDao = mock[ContentTypeDao]
   private val repository = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
   private val servlet = new ImportServlet(
-    database = databaseAccess,
-    repository = _ => repository,
+    registrator = new DepositPropertiesRegistration(
+      database = databaseAccess,
+      repository = _ => repository,
+    ),
     expectedAuth = Auth("my-username", "my-password"),
   )
 

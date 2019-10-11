@@ -145,7 +145,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
     }
   }
 
-  "validateDepositDoesNotExist" should "succeed if the deposit does not yet exist" in {
+  "depositExists" should "return false if the deposit does not yet exist" in {
     val depositDao = mock[DepositDao]
     val stateDao = mock[StateDao]
     val ingestStepDao = mock[IngestStepDao]
@@ -160,10 +160,10 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
     val depositId = UUID.randomUUID()
     depositDao.find _ expects Seq(depositId) once() returning Seq.empty.asRight
 
-    validateDepositDoesNotExist(depositId)(repo).value shouldBe right
+    depositExists(depositId)(repo).value shouldBe false
   }
 
-  it should "fail if the deposit already exists" in {
+  it should "return true if the deposit already exists" in {
     val depositDao = mock[DepositDao]
     val stateDao = mock[StateDao]
     val ingestStepDao = mock[IngestStepDao]
@@ -178,7 +178,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
     val depositId = UUID.randomUUID()
     depositDao.find _ expects Seq(depositId) once() returning Seq(validDepositProperties.deposit).asRight
 
-    validateDepositDoesNotExist(depositId)(repo).value.leftValue shouldBe DepositAlreadyExistsError(depositId)
+    depositExists(depositId)(repo).value shouldBe true
   }
 
   it should "fail if the database returns an error" in {
@@ -197,6 +197,6 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
     val error = InvalidValueError("abc")
     depositDao.find _ expects Seq(depositId) once() returning error.asLeft
 
-    validateDepositDoesNotExist(depositId)(repo).leftValue shouldBe error
+    depositExists(depositId)(repo).leftValue shouldBe error
   }
 }

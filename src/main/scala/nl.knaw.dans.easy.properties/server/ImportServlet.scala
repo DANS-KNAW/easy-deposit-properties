@@ -15,21 +15,14 @@
  */
 package nl.knaw.dans.easy.properties.server
 
-import java.sql.Connection
-
-import cats.syntax.either._
-import cats.syntax.foldable._
-import nl.knaw.dans.easy.properties.app.database.DatabaseAccess
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.app.register._
-import nl.knaw.dans.easy.properties.app.repository.Repository
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import nl.knaw.dans.lib.logging.servlet.{ LogResponseBodyOnError, PlainLogFormatter, ServletLogger }
 import org.scalatra._
 import org.scalatra.auth.strategy.BasicAuthStrategy.BasicAuthRequest
 
-class ImportServlet(database: DatabaseAccess,
-                    repository: Connection => Repository,
+class ImportServlet(registrator: DepositPropertiesRegistration,
                     expectedAuth: Auth,
                    ) extends ScalatraServlet
   with ServletLogger
@@ -42,33 +35,8 @@ class ImportServlet(database: DatabaseAccess,
   }
 
   post("/") {
-    val result: ImportErrorOr[ActionResult] = for {
-      props <- DepositPropertiesImporter.readDepositProperties(request.getInputStream)
-      depositProperties <- DepositPropertiesValidator.validateDepositProperties(props)
-        .leftMap(es => ValidationImportErrors(es.toList))
-        .toEither
-      _ <- database.doTransaction(conn => {
-        implicit val repo: Repository = repository(conn)
-
-        for {
-          _ <- DepositPropertiesValidator.validateDepositDoesNotExist(depositProperties.deposit.id).toTry.flatMap(_.toTry)
-          _ <- DepositPropertiesImporter.importDepositProperties(depositProperties).toTry
-        } yield ()
-      }).toEither
-        .leftMap {
-          case e: ImportError => e
-          case e => DBImportError(e.getMessage, e)
-        }
-    } yield Ok(s"Deposit ${ depositProperties.deposit.id } has been registered")
-
-    result.fold({
-      case ReadImportError(msg, _) => BadRequest(msg)
-      case e: ValidationImportErrors => BadRequest(e.getMessage)
-      case e: DepositAlreadyExistsError => Conflict(e.getMessage)
-      case DBImportError(msg, cause) =>
-        logger.error(msg, cause)
-        InternalServerError(msg) // TODO split into 500/503
-    }, identity)
+    registrator.register(request.inputStream)
+      .fold(recoverError, depositId => Ok(s"Deposit $depositId has been registered"))
   }
 
   private def basicAuth(): Unit = {
@@ -95,5 +63,16 @@ class ImportServlet(database: DatabaseAccess,
 
   private def validate(userName: String, password: String): Boolean = {
     userName == expectedAuth.username && password == expectedAuth.password
+  }
+
+  private def recoverError(err: ImportError): ActionResult = {
+    err match {
+      case ReadImportError(msg, _) => BadRequest(msg)
+      case e: ValidationImportErrors => BadRequest(e.getMessage)
+      case e: DepositAlreadyExistsError => Conflict(e.getMessage)
+      case DBImportError(msg, cause) =>
+        logger.error(msg, cause)
+        InternalServerError(msg)
+    }
   }
 }

@@ -21,7 +21,6 @@ import cats.data.Validated
 import cats.instances.list._
 import cats.instances.option._
 import cats.syntax.apply._
-import cats.syntax.either._
 import cats.syntax.traverse._
 import cats.syntax.validated._
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, InputContentType }
@@ -200,11 +199,11 @@ object DepositPropertiesValidator {
       .map(_.map(InputContentType(_, timestamp)))
   }
 
-  def validateDepositDoesNotExist(depositId: DepositId)(implicit repo: Repository): QueryErrorOr[Either[DepositAlreadyExistsError, Unit]] = {
+  def depositExists(depositId: DepositId)(implicit repo: Repository): QueryErrorOr[Boolean] = {
     repo.deposits.find(Seq(depositId))
       .map {
-        case Seq() => ().asRight
-        case _ => DepositAlreadyExistsError(depositId).asLeft
+        case Seq() => false
+        case _ => true
       }
   }
 }
