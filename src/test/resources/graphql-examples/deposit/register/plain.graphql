@@ -1,0 +1,85 @@
+mutation RegisterDeposit {
+    registerDeposit(input: {
+        clientMutationId: "foobar",
+        depositId: "00000000-0000-0000-0000-000000000006",
+        depositProperties: "bag-store.bag-name = bag\ncreation.timestamp = 2019-01-01T00:00:00.000Z\ndepositor.userId = user001\ndeposit.origin = SWORD2\nstate.label = SUBMITTED\nstate.description = my description\ndeposit.ingest.current-step = BAGSTORE\nidentifier.doi = my-doi-value\nidentifier.urn = my-urn-value\nidentifier.fedora = my-fedora-value\nbag-store.bag-id = my-bag-store-value\nidentifier.dans-doi.registered = yes\nidentifier.dans-doi.action = update\ncuration.datamanager.userId = archie001\ncuration.datamanager.email = does.not.exists@dans.knaw.nl\ncuration.is-new-version = yes\ncuration.required = no\ncuration.performed = no\nspringfield.domain = domain\nspringfield.user = user\nspringfield.collection = collection\nspringfield.playmode = continuous\neasy-sword2.client-message.content-type = application/zip"}) {
+        clientMutationId
+        deposit {
+            depositId
+            bagName
+            creationTimestamp
+            lastModified
+            depositor {
+                depositorId
+            }
+            origin
+            states {
+                edges {
+                    node {
+                        label
+                        description
+                        timestamp
+                    }
+                }
+            }
+            ingestSteps {
+                edges {
+                    node {
+                        step
+                        timestamp
+                    }
+                }
+            }
+            identifiers {
+                type
+                value
+                timestamp
+            }
+            doiRegistered
+            doiRegisteredEvents {
+                value
+                timestamp
+            }
+            doiAction
+            doiActionEvents {
+                value
+                timestamp
+            }
+            curators {
+                edges {
+                    node {
+                        userId
+                        email
+                        timestamp
+                    }
+                }
+            }
+            isNewVersion
+            isNewVersionEvents {
+                value
+                timestamp
+            }
+            curationRequired
+            curationRequiredEvents {
+                value
+                timestamp
+            }
+            curationPerformed
+            curationPerformedEvents {
+                value
+                timestamp
+            }
+            springfields {
+                domain
+                user
+                collection
+                playmode
+                timestamp
+            }
+            contentTypes {
+                value
+                timestamp
+            }
+        }
+    }
+}

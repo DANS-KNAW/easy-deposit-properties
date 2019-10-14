@@ -1,0 +1,19 @@
+{
+    "data": {
+        "registerDeposit": null
+    },
+    "errors": [
+        {
+            "message": "Invalid input:\n - Mandatory property 'depositor.userId' was not found.\n - Mandatory property 'deposit.origin' was not found.",
+            "path": [
+                "registerDeposit"
+            ],
+            "locations": [
+                {
+                    "line": 2,
+                    "column": 5
+                }
+            ]
+        }
+    ]
+}

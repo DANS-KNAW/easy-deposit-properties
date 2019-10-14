@@ -50,6 +50,7 @@ trait MutationType {
   case class SetCurationPayload(clientMutationId: Option[String], objectId: String) extends Mutation
   case class SetSpringfieldPayload(clientMutationId: Option[String], objectId: String) extends Mutation
   case class SetContentTypePayload(clientMutationId: Option[String], objectId: String) extends Mutation
+  case class RegisterDepositPayload(clientMutationId: Option[String], depositId: DepositId) extends Mutation
 
   private val depositIdInputField: InputField[DepositId] = InputField(
     name = "depositId",
@@ -299,6 +300,14 @@ trait MutationType {
     astDirectives = Vector.empty,
     astNodes = Vector.empty,
   )
+  private val depositPropertiesInputField: InputField[String] = InputField(
+    name = "depositProperties",
+    description = Some("The 'deposit.properties' describing the deposit to be registered."),
+    defaultValue = None,
+    fieldType = StringType,
+    astDirectives = Vector.empty,
+    astNodes = Vector.empty,
+  )
 
   private val depositField: Field[DataContext, AddDepositPayload] = Field(
     name = "deposit",
@@ -349,6 +358,11 @@ trait MutationType {
     name = "contentType",
     fieldType = OptionType(ContentTypeType),
     resolve = ctx => ContentTypeResolver.contentTypeById(ctx.value.objectId)(ctx.ctx),
+  )
+  private val depositFieldForProperties: Field[DataContext, RegisterDepositPayload] = Field(
+    name = "deposit",
+    fieldType = OptionType(DepositType),
+    resolve = ctx => DepositResolver.depositById(ctx.value.depositId)(ctx.ctx),
   )
 
   private val addDepositField: Field[DataContext, Unit] = Mutation.fieldWithClientMutationId[DataContext, Unit, AddDepositPayload, InputObjectType.DefaultInput](
@@ -532,6 +546,23 @@ trait MutationType {
     mutateAndGetPayload = setContentType,
   )
 
+  private val registerDepositField: Field[DataContext, Unit] = Mutation.fieldWithClientMutationId[DataContext, Unit, RegisterDepositPayload, InputObjectType.DefaultInput](
+    fieldName = "registerDeposit",
+    typeName = "RegisterDeposit",
+    tags = List(
+      RequiresAuthentication,
+    ),
+    fieldDescription = Some("Register a new deposit with initial properties from a 'deposit.properties' string."),
+    inputFields = List(
+      depositIdInputField,
+      depositPropertiesInputField,
+    ),
+    outputFields = fields(
+      depositFieldForProperties,
+    ),
+    mutateAndGetPayload = registerDeposit,
+  )
+
   private def addDeposit(input: InputObjectType.DefaultInput, context: Context[DataContext, Unit]): Action[DataContext, AddDepositPayload] = {
     context.ctx.repo.deposits
       .store(Deposit(
@@ -698,6 +729,19 @@ trait MutationType {
       .toTry
   }
 
+  private def registerDeposit(input: InputObjectType.DefaultInput, context: Context[DataContext, Unit]): Action[DataContext, RegisterDepositPayload] = {
+    context.ctx.registration
+      .register(
+        depositId = input(depositIdInputField.name).asInstanceOf[DepositId],
+        props = input(depositPropertiesInputField.name).asInstanceOf[String],
+      )
+      .map(depositId => RegisterDepositPayload(
+        input.get(Mutation.ClientMutationIdFieldName).flatMap(_.asInstanceOf[Option[String]]),
+        depositId,
+      ))
+      .toTry
+  }
+
   implicit val MutationType: ObjectType[DataContext, Unit] = ObjectType(
     name = "Mutation",
     description = "The root query for implementing GraphQL mutations.",
@@ -712,6 +756,7 @@ trait MutationType {
       setCurationField,
       setSpringfieldField,
       setContentTypeField,
+      registerDepositField,
     ),
   )
 }
