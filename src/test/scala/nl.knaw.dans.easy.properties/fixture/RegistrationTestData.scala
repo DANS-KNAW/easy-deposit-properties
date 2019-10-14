@@ -28,7 +28,7 @@ import nl.knaw.dans.easy.properties.app.model.state.{ InputState, StateLabel }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin }
 import org.joda.time.DateTime
 
-trait ImportTestData {
+trait RegistrationTestData {
 
   val depositId: DepositId = UUID.fromString("9d507261-3b79-22e7-86d0-6fb9417d930d")
   val validDepositPropertiesBody: String =

@@ -21,7 +21,7 @@ import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesImporter._
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesValidator.{ depositorKey, _ }
 import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, MutationError, Repository, SpringfieldDao, StateDao }
-import nl.knaw.dans.easy.properties.fixture.{ ImportTestData, TestSupportFixture }
+import nl.knaw.dans.easy.properties.fixture.{ RegistrationTestData, TestSupportFixture }
 import org.scalamock.scalatest.MockFactory
 
 import scala.collection.JavaConverters._
@@ -30,7 +30,7 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
   with EitherValues
   with EitherMatchers
   with MockFactory
-  with ImportTestData {
+  with RegistrationTestData {
 
   "readDepositProperties" should "read the inputstream and produce a PropertiesConfiguration object" in {
     val is = validDepositPropertiesBody.inputStream

@@ -18,14 +18,14 @@ package nl.knaw.dans.easy.properties.app.register
 import java.util.UUID
 
 import cats.scalatest.{ EitherMatchers, EitherValues }
-import nl.knaw.dans.easy.properties.fixture.{ DatabaseFixture, FileSystemSupport, ImportTestData, TestSupportFixture }
+import nl.knaw.dans.easy.properties.fixture.{ DatabaseFixture, FileSystemSupport, RegistrationTestData, TestSupportFixture }
 
 class DepositPropertiesRegistrationSpec extends TestSupportFixture
   with EitherValues
   with EitherMatchers
   with FileSystemSupport
   with DatabaseFixture
-  with ImportTestData {
+  with RegistrationTestData {
 
   val registration = new DepositPropertiesRegistration(repository)
 

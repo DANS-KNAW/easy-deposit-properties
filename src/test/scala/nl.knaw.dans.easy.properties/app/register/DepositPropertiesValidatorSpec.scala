@@ -25,7 +25,7 @@ import cats.syntax.foldable._
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesImporter._
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesValidator._
 import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, InvalidValueError, Repository, SpringfieldDao, StateDao }
-import nl.knaw.dans.easy.properties.fixture.{ ImportTestData, TestSupportFixture }
+import nl.knaw.dans.easy.properties.fixture.{ RegistrationTestData, TestSupportFixture }
 import org.apache.commons.configuration.ConversionException
 import org.scalamock.scalatest.MockFactory
 
@@ -35,7 +35,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
   with ValidatedValues
   with ValidatedMatchers
   with MockFactory
-  with ImportTestData {
+  with RegistrationTestData {
 
   "validateDepositProperties" should "parse the properties file into an object structure" in {
     val props = readDepositProperties(validDepositPropertiesBody.inputStream).value
