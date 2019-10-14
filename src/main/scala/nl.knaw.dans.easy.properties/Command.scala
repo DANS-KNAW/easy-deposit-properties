@@ -22,7 +22,7 @@ import nl.knaw.dans.easy.DataciteService
 import nl.knaw.dans.easy.properties.app.database.{ DatabaseAccess, SQLErrorHandler }
 import nl.knaw.dans.easy.properties.app.legacyImport.{ ImportProps, Interactor }
 import nl.knaw.dans.easy.properties.app.repository.sql.SQLRepo
-import nl.knaw.dans.easy.properties.server._
+import nl.knaw.dans.easy.properties.server.{ GraphQLServlet, EasyDepositPropertiesService, EasyDepositPropertiesServlet, GraphiQLServlet }
 import nl.knaw.dans.lib.error._
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 
