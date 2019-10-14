@@ -17,7 +17,6 @@ package nl.knaw.dans.easy.properties.server
 
 import better.files.File
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
-import nl.knaw.dans.easy.properties.app.repository.sql.SQLRepo
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
 import org.json4s.JsonAST.JNull
 import org.json4s.JsonDSL._
@@ -44,7 +43,7 @@ class GraphQLExamplesSpec extends TestSupportFixture
   private val authHeader = "Authorization" -> "Basic bXktdXNlcm5hbWU6bXktcGFzc3dvcmQ="
   private val servlet = new GraphQLServlet(
     database = databaseAccess,
-    repository = new SQLRepo()(_, errorHandler).repository,
+    repository = repository(_),
     profilingThreshold = 1 minute,
     expectedAuth = Auth("my-username", "my-password"),
   )

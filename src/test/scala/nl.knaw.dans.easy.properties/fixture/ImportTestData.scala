@@ -33,7 +33,7 @@ trait ImportTestData {
   val validDepositPropertiesBody: String =
     """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
       |bag-store.bag-name = bag
-      |creation.timestamp = 2019-01-01T00:00:00.000+01:00
+      |creation.timestamp = 2019-01-01T00:00:00.000Z
       |depositor.userId = user001
       |deposit.origin = SWORD2
       |
@@ -66,11 +66,11 @@ trait ImportTestData {
 
   val minimalDepositPropertiesBody: String =
     """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
-      |creation.timestamp = 2019-01-01T00:00:00.000+01:00
+      |creation.timestamp = 2019-01-01T00:00:00.000Z
       |depositor.userId = user001
       |deposit.origin = SWORD2""".stripMargin
 
-  private val timestamp = DateTime.parse("2019-01-01T00:00:00.000+01:00")
+  private val timestamp = DateTime.parse("2019-01-01T00:00:00.000Z")
   val validDepositProperties = DepositProperties(
     deposit = Deposit(UUID.fromString("9d507261-3b79-22e7-86d0-6fb9417d930d"), "bag".some, timestamp, "user001", Origin.SWORD2),
     state = InputState(StateLabel.SUBMITTED, "my description", timestamp).some,
