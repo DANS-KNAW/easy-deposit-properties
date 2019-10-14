@@ -47,7 +47,7 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     )
     props.getString(depositIdKey) shouldBe "9d507261-3b79-22e7-86d0-6fb9417d930d"
     props.getString(bagNameKey) shouldBe "bag"
-    props.getString(creationTimestampKey) shouldBe "2019-01-01T00:00:00.000+01:00"
+    props.getString(creationTimestampKey) shouldBe "2019-01-01T00:00:00.000Z"
     props.getString(depositorKey) shouldBe "user001"
     props.getString(originKey) shouldBe "SWORD2"
     props.getString(stateLabelKey) shouldBe "SUBMITTED"
