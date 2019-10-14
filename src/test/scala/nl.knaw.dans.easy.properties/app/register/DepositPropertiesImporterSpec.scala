@@ -35,39 +35,37 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
   "readDepositProperties" should "read the inputstream and produce a PropertiesConfiguration object" in {
     val is = validDepositPropertiesBody.inputStream
     val props = readDepositProperties(is).value
-    props.getKeys.asScala.toList should contain only(
-      bagNameKey, creationTimestampKey,
-      depositorKey, originKey, stateLabelKey, stateDescriptionKey,
-      ingestStepKey, fedoraIdentifierKey, urnIdentifierKey, doiIdentifierKey,
-      bagStoreIdentifierKey, dansDoiActionKey, dansDoiRegisteredKey,
-      isNewVersionKey, isCurationRequiredKey, isCurationPerformedKey,
-      datamanagerUserIdKey, datamanagerEmailKey, springfieldDomainKey,
-      springfieldUserKey, springfieldCollectionKey, springfieldPlaymodeKey,
-      contentTypeKey,
+    val expectedResult = Map(
+      bagNameKey -> "bag",
+      creationTimestampKey -> "2019-01-01T00:00:00.000Z",
+      depositorKey -> "user001",
+      originKey -> "SWORD2",
+      stateLabelKey -> "SUBMITTED",
+      stateDescriptionKey -> "my description",
+      ingestStepKey -> "BAGSTORE",
+      fedoraIdentifierKey -> "my-fedora-value",
+      urnIdentifierKey -> "my-urn-value",
+      doiIdentifierKey -> "my-doi-value",
+      bagStoreIdentifierKey -> "my-bag-store-value",
+      dansDoiActionKey -> "update",
+      dansDoiRegisteredKey -> "yes",
+      isNewVersionKey -> "yes",
+      isCurationRequiredKey -> "no",
+      isCurationPerformedKey -> "no",
+      datamanagerUserIdKey -> "archie001",
+      datamanagerEmailKey -> "does.not.exists@dans.knaw.nl",
+      springfieldDomainKey -> "domain",
+      springfieldUserKey -> "user",
+      springfieldCollectionKey -> "collection",
+      springfieldPlaymodeKey -> "continuous",
+      contentTypeKey -> "application/zip",
     )
-    props.getString(bagNameKey) shouldBe "bag"
-    props.getString(creationTimestampKey) shouldBe "2019-01-01T00:00:00.000Z"
-    props.getString(depositorKey) shouldBe "user001"
-    props.getString(originKey) shouldBe "SWORD2"
-    props.getString(stateLabelKey) shouldBe "SUBMITTED"
-    props.getString(stateDescriptionKey) shouldBe "my description"
-    props.getString(ingestStepKey) shouldBe "BAGSTORE"
-    props.getString(fedoraIdentifierKey) shouldBe "my-fedora-value"
-    props.getString(urnIdentifierKey) shouldBe "my-urn-value"
-    props.getString(doiIdentifierKey) shouldBe "my-doi-value"
-    props.getString(bagStoreIdentifierKey) shouldBe "my-bag-store-value"
-    props.getString(dansDoiActionKey) shouldBe "update"
-    props.getString(dansDoiRegisteredKey) shouldBe "yes"
-    props.getString(isNewVersionKey) shouldBe "yes"
-    props.getString(isCurationRequiredKey) shouldBe "no"
-    props.getString(isCurationPerformedKey) shouldBe "no"
-    props.getString(datamanagerUserIdKey) shouldBe "archie001"
-    props.getString(datamanagerEmailKey) shouldBe "does.not.exists@dans.knaw.nl"
-    props.getString(springfieldDomainKey) shouldBe "domain"
-    props.getString(springfieldUserKey) shouldBe "user"
-    props.getString(springfieldCollectionKey) shouldBe "collection"
-    props.getString(springfieldPlaymodeKey) shouldBe "continuous"
-    props.getString(contentTypeKey) shouldBe "application/zip"
+
+    props.getKeys.asScala.toList should contain theSameElementsAs expectedResult.keySet
+
+    forEvery(expectedResult) {
+      case (key, value) => props.getString(key) shouldBe value
+    }
   }
 
   "importDepositProperties" should "store the properties in the database" in {
