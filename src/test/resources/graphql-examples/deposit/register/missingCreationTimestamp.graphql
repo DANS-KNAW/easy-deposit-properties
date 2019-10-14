@@ -1,5 +1,10 @@
 mutation RegisterMinimal {
-    registerDeposit(input: {clientMutationId: "foobar", depositId: "00000000-0000-0000-0000-000000000006", depositProperties: "depositor.userId = user001\ndeposit.origin = SWORD2"}) {
+    registerDeposit(input: {
+        clientMutationId: "foobar",
+        depositId: "00000000-0000-0000-0000-000000000006",
+        depositProperties: """depositor.userId = user001
+        deposit.origin = SWORD2"""
+    }) {
         clientMutationId
         deposit {
             depositId

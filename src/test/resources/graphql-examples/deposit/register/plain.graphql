@@ -2,7 +2,29 @@ mutation RegisterDeposit {
     registerDeposit(input: {
         clientMutationId: "foobar",
         depositId: "00000000-0000-0000-0000-000000000006",
-        depositProperties: "bag-store.bag-name = bag\ncreation.timestamp = 2019-01-01T00:00:00.000Z\ndepositor.userId = user001\ndeposit.origin = SWORD2\nstate.label = SUBMITTED\nstate.description = my description\ndeposit.ingest.current-step = BAGSTORE\nidentifier.doi = my-doi-value\nidentifier.urn = my-urn-value\nidentifier.fedora = my-fedora-value\nbag-store.bag-id = my-bag-store-value\nidentifier.dans-doi.registered = yes\nidentifier.dans-doi.action = update\ncuration.datamanager.userId = archie001\ncuration.datamanager.email = does.not.exists@dans.knaw.nl\ncuration.is-new-version = yes\ncuration.required = no\ncuration.performed = no\nspringfield.domain = domain\nspringfield.user = user\nspringfield.collection = collection\nspringfield.playmode = continuous\neasy-sword2.client-message.content-type = application/zip"}) {
+        depositProperties: """bag-store.bag-name = bag
+        creation.timestamp = 2019-01-01T00:00:00.000Z
+        depositor.userId = user001
+        deposit.origin = SWORD2
+        state.label = SUBMITTED
+        state.description = my description
+        deposit.ingest.current-step = BAGSTORE
+        identifier.doi = my-doi-value
+        identifier.urn = my-urn-value
+        identifier.fedora = my-fedora-value
+        bag-store.bag-id = my-bag-store-value
+        identifier.dans-doi.registered = yes
+        identifier.dans-doi.action = update
+        curation.datamanager.userId = archie001
+        curation.datamanager.email = does.not.exists@dans.knaw.nl
+        curation.is-new-version = yes
+        curation.required = no
+        curation.performed = no
+        springfield.domain = domain
+        springfield.user = user
+        springfield.collection = collection
+        springfield.playmode = continuous
+        easy-sword2.client-message.content-type = application/zip"""}) {
         clientMutationId
         deposit {
             depositId

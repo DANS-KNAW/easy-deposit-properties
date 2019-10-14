@@ -1,5 +1,11 @@
 mutation RegisterDepositAlreadyExists {
-    registerDeposit(input: {clientMutationId: "foobar", depositId: "00000000-0000-0000-0000-000000000001", depositProperties: "creation.timestamp = 2019-01-01T00:00:00.000Z\ndepositor.userId = user001\ndeposit.origin = SWORD2"}) {
+    registerDeposit(input: {
+        clientMutationId: "foobar",
+        depositId: "00000000-0000-0000-0000-000000000001",
+        depositProperties: """creation.timestamp = 2019-01-01T00:00:00.000Z
+        depositor.userId = user001
+        deposit.origin = SWORD2"""
+    }) {
         clientMutationId
         deposit {
             depositId

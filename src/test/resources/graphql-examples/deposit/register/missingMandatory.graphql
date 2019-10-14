@@ -1,5 +1,9 @@
 mutation RegisterMinimal {
-    registerDeposit(input: {clientMutationId: "foobar", depositId: "00000000-0000-0000-0000-000000000006", depositProperties: "creation.timestamp = 2019-01-01T00:00:00.000Z"}) {
+    registerDeposit(input: {
+        clientMutationId: "foobar",
+        depositId: "00000000-0000-0000-0000-000000000006",
+        depositProperties: "creation.timestamp = 2019-01-01T00:00:00.000Z"
+    }) {
         clientMutationId
         deposit {
             depositId
