@@ -15,15 +15,20 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql
 
+import java.sql.Connection
+
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.app.repository.Repository
 
 import scala.concurrent.ExecutionContext
 
-case class DataContext(repo: Repository,
+case class DataContext(private val connection: Connection,
+                       private val repoGen: Connection => Repository,
                        private val auth: Option[Auth],
                        private val expectedAuth: Auth,
                       )(implicit val executionContext: ExecutionContext) {
 
   def isLoggedIn: Boolean = auth contains expectedAuth
+
+  lazy val repo: Repository = repoGen(connection)
 }

@@ -101,7 +101,7 @@ class GraphQLServlet(database: DatabaseAccess,
       Executor.execute(
         schema = GraphQLSchema.schema,
         queryAst = queryAst,
-        userContext = DataContext(repository(conn), auth, expectedAuth),
+        userContext = DataContext(conn, repository, auth, expectedAuth),
         operationName = operation,
         variables = parseVariables(variables),
         deferredResolver = GraphQLSchema.deferredResolver,
