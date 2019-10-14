@@ -122,10 +122,6 @@ object DepositPropertiesValidator {
     getMandatoryProp[DateTime, IllegalArgumentException](creationTimestampKey)(DateTime.parse)
   }
 
-  implicit class Wrapper[T](val t: T) extends AnyVal {
-    def validated: ValidationImportErrorsOr[T] = t.validNec
-  }
-
   private def validateDeposit(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Deposit] = {
     // @formatter:off
     (
