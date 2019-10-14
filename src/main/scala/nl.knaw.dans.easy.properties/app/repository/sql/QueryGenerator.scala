@@ -246,19 +246,9 @@ object QueryGenerator {
 
   lazy val storeState: String = "INSERT INTO State (depositId, label, description, timestamp) VALUES (?, ?, ?, ?);"
 
-  def deleteByDepositId(tableNames: NonEmptyList[String])(ids: NonEmptyList[DepositId]): String = {
-    // https://stackoverflow.com/questions/16481379/how-to-delete-using-inner-join-with-sql-server
-    // DELETE messages , usersmessages  FROM messages  INNER JOIN usersmessages
-    // WHERE messages.messageid= usersmessages.messageid and messages.messageid = '1'
-    // https://stackoverflow.com/questions/1233451/delete-from-two-tables-in-one-query
-    // https://stackoverflow.com/questions/7854969/sql-multiple-join-statement
-    // https://www.javatpoint.com/sql-delete-join
-    val placeHolders = ids.toList.map(_ => "?").mkString(", ")
-    val tableNameList = tableNames.toList
-    val firstTable = tableNames.head
-    val joins = tableNameList.tail
-      .map(tableName => s"INNER JOIN $tableName ON $tableName.depositId = $firstTable.depositId")
-      .mkString(" ")
-    s"DELETE ${ tableNameList.mkString(",") } FROM $firstTable $joins WHERE $firstTable.depositId IN ($placeHolders);"
+  // TODO prepare queries with a fixed number of placeholders just once (or once per ...)?
+
+  def deleteByDepositId(tableName: String)(ids: NonEmptyList[DepositId]): String = {
+    s"DELETE FROM  $tableName WHERE depositId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
   }
 }

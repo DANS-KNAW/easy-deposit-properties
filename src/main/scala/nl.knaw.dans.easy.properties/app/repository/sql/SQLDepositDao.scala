@@ -119,25 +119,27 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
       .map(executeQuery(parseLastModifiedResponse)(identity))
       .getOrElse(Seq.empty.asRight)
   }
-
   override def delete(ids: Seq[DepositId]): MutationErrorOr[Unit] = {
     trace(ids)
 
-    val maybeNonEmptyLists = for {
-      names <- NonEmptyList.fromList(List("Deposit", "State", "Identifier", "Curation", "Springfield", "SimplePoprties"))
-      values <- NonEmptyList.fromList(ids.toList)
-      query = QueryGenerator.deleteByDepositId(names)(values)
-    } yield (query, values)
+    NonEmptyList.fromList(ids.toList)
+      .map{ idValues =>
+        Stream("State", "Identifier", "Curation", "Springfield", "SimpleProperties", "Deposit")
+          .map(delete(_, idValues))
+          .find(_.isLeft) // the stream makes it a fail fast
+          .getOrElse(Right(()))
+      }.getOrElse(Right(()))
+  }
 
-    maybeNonEmptyLists.map { case (query, values) =>
-      managed(connection.prepareStatement(query))
-        .map(_.executeWith(values))
-        .either
-        .either
-        .leftMap(throwables => {
-          assert(throwables.nonEmpty)
-          MutationError(throwables.map(_.getMessage).mkString("; "))
-        })
-    }.getOrElse(Right(()))
+  private def delete(tableName: String, ids: NonEmptyList[DepositId]) = {
+    val query = QueryGenerator.deleteByDepositId(tableName)(ids)
+    managed(connection.prepareStatement(query))
+      .map(_.executeWith(ids))
+      .either
+      .either
+      .leftMap(throwables => {
+        assert(throwables.nonEmpty)
+        MutationError(throwables.map(_.getMessage).mkString("; "))
+      })
   }
 }
