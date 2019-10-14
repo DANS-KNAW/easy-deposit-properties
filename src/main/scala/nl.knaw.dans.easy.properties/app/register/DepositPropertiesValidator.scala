@@ -82,26 +82,6 @@ object DepositPropertiesValidator {
       })
   }
 
-  @deprecated
-  def validateDepositProperties(implicit props: PropertiesConfiguration): ValidationImportErrorsOr[DepositProperties] = {
-    validateCreationTimestamp
-      .andThen(implicit timestamp => {
-        // @formatter:off
-        (
-          validateDeposit,
-          validateState,
-          validateIngestStep,
-          validateIdentifiers,
-          validateDoiAction,
-          validateDoiRegistered,
-          validateCuration,
-          validateSpringfield,
-          validateContentType,
-        ).mapN(DepositProperties)
-        // @formatter:on
-      })
-  }
-
   private def getMandatoryStringProp(key: String)(implicit props: PropertiesConfiguration): ValidationImportErrorsOr[String] = {
     Option(props.getString(key))
       .map(_.validNec)

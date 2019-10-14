@@ -15,8 +15,6 @@
  */
 package nl.knaw.dans.easy.properties.app.register
 
-import java.io.InputStream
-
 import better.files.StringOps
 import cats.syntax.either._
 import cats.syntax.foldable._
@@ -25,21 +23,6 @@ import nl.knaw.dans.easy.properties.app.model.DepositId
 import nl.knaw.dans.easy.properties.app.repository.Repository
 
 class DepositPropertiesRegistration(repository: => Repository) {
-
-  @deprecated
-  def register(is: InputStream): ImportErrorOr[DepositId] = {
-    for {
-      props <- DepositPropertiesImporter.readDepositProperties(is)
-      depositProperties <- DepositPropertiesValidator.validateDepositProperties(props)
-        .leftMap(es => ValidationImportErrors(es.toList))
-        .toEither
-      _ <- importDeposit(depositProperties)
-        .leftMap {
-          case e: ImportError => e
-          case e => DBImportError(e.getMessage, e)
-        }
-    } yield depositProperties.deposit.id
-  }
 
   def register(depositId: DepositId, props: String): ImportErrorOr[DepositId] = {
     for {

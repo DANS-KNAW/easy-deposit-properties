@@ -83,11 +83,6 @@ object Command extends App with DebugEnhancedLogging {
 
     val service = new EasyDepositPropertiesService(configuration.serverPort, Map(
       "/" -> new EasyDepositPropertiesServlet(configuration.version),
-      "/register" -> new ImportServlet(
-        databaseAccess = database,
-        repository = implicit conn => new SQLRepo().repository,
-        expectedAuth = configuration.auth,
-      ),
       "/graphql" -> new GraphQLServlet(
         database = database,
         repository = implicit conn => new SQLRepo().repository,
