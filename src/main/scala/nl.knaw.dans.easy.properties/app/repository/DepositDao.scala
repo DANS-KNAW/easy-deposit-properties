@@ -31,5 +31,5 @@ trait DepositDao {
 
   def lastModified(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Timestamp)]]
 
-  def delete(ids: Seq[DepositId]): MutationErrorOr[Unit]
+  def deleteBy(ids: Seq[DepositId]): MutationErrorOr[Seq[DepositId]]
 }

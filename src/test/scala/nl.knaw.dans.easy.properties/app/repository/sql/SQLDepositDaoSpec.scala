@@ -288,9 +288,9 @@ class SQLDepositDaoSpec extends TestSupportFixture
       "00000000-0000-0000-0000-000000000006",
     ).map(UUID.fromString)
     val dao = new SQLDepositDao
-    dao.find(uuids)
-      .getOrElse(fail) shouldNot be(empty)
-    dao.delete(uuids) shouldBe a[Right[_,_]]
+    dao.deleteBy(uuids) should matchPattern {
+      case Right(List(_)) => // just one was found
+    }
     dao.find(uuids)
       .getOrElse(fail) shouldBe empty
   }
