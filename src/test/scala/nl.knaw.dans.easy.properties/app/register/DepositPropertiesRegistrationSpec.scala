@@ -2,7 +2,6 @@ package nl.knaw.dans.easy.properties.app.register
 
 import java.util.UUID
 
-import better.files.StringOps
 import cats.scalatest.{ EitherMatchers, EitherValues }
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseFixture, FileSystemSupport, ImportTestData, TestSupportFixture }
 
@@ -13,10 +12,10 @@ class DepositPropertiesRegistrationSpec extends TestSupportFixture
   with DatabaseFixture
   with ImportTestData {
 
-  val registration = new DepositPropertiesRegistration(databaseAccess, repository(_))
+  val registration = new DepositPropertiesRegistration(repository)
 
   "register" should "import the data from the deposit.properties in the inputstream" in {
-    val is = validDepositPropertiesBody.inputStream
+    val props = validDepositPropertiesBody
     // @formatter:off
     val DepositProperties(
       deposit, Some(state), Some(ingestStep), Seq(fedora, doi, urn, bagstore), Some(doiAction),
@@ -25,7 +24,7 @@ class DepositPropertiesRegistrationSpec extends TestSupportFixture
     // @formatter:on
     val depositId = deposit.id
 
-    registration.register(is).value shouldBe depositId
+    registration.register(depositId, props).value shouldBe depositId
 
     repository.deposits.find(Seq(depositId)).value should contain only deposit
     repository.states.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only state.toOutput("0")
@@ -44,11 +43,11 @@ class DepositPropertiesRegistrationSpec extends TestSupportFixture
   }
 
   it should "import the minimal example" in {
-    val is = minimalDepositPropertiesBody.inputStream
+    val props = minimalDepositPropertiesBody
     val DepositProperties(deposit, None, None, Seq(), None, None, None, None, None) = minimalDepositProperties
     val depositId = deposit.id
 
-    registration.register(is).value shouldBe depositId
+    registration.register(depositId, props).value shouldBe depositId
 
     repository.deposits.find(Seq(depositId)).value should contain only deposit
     repository.states.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
@@ -62,11 +61,10 @@ class DepositPropertiesRegistrationSpec extends TestSupportFixture
   }
 
   it should "not import data into the database when the deposit.properties is not valid" in {
-    val invalidProps = """creation.timestamp = 2019-01-01T00:00:00.000Z""".stripMargin.inputStream
+    val invalidProps = """creation.timestamp = 2019-01-01T00:00:00.000Z""".stripMargin
 
-    inside(registration.register(invalidProps).leftValue) {
-      case ValidationImportErrors(depositIdError :: userIdError :: originError :: Nil) =>
-        depositIdError shouldBe PropertyNotFoundError("depositId")
+    inside(registration.register(UUID.randomUUID(), invalidProps).leftValue) {
+      case ValidationImportErrors(userIdError :: originError :: Nil) =>
         userIdError shouldBe PropertyNotFoundError("depositor.userId")
         originError shouldBe PropertyNotFoundError("deposit.origin")
     }
@@ -76,17 +74,15 @@ class DepositPropertiesRegistrationSpec extends TestSupportFixture
 
   it should "not import data into the database when the deposit is already registered in the database" in {
     val props1 =
-      """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
-        |creation.timestamp = 2019-01-01T01:01:01.000Z
+      """creation.timestamp = 2019-01-01T01:01:01.000Z
         |depositor.userId = user001
-        |deposit.origin = SWORD2""".stripMargin.inputStream
+        |deposit.origin = SWORD2""".stripMargin
     val props2 =
-      """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
-        |creation.timestamp = 2019-02-02T02:02:02.000Z
+      """creation.timestamp = 2019-02-02T02:02:02.000Z
         |depositor.userId = user002
-        |deposit.origin = SMD""".stripMargin.inputStream
-    
-    registration.register(props1) shouldBe right
-    registration.register(props2).leftValue shouldBe DepositAlreadyExistsError(UUID.fromString("9d507261-3b79-22e7-86d0-6fb9417d930d"))
+        |deposit.origin = SMD""".stripMargin
+
+    registration.register(depositId, props1) shouldBe right
+    registration.register(depositId, props2).leftValue shouldBe DepositAlreadyExistsError(depositId)
   }
 }

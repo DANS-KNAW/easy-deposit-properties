@@ -17,7 +17,7 @@ package nl.knaw.dans.easy.properties.server
 
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
-import nl.knaw.dans.easy.properties.app.register.{ DepositProperties, DepositPropertiesRegistration }
+import nl.knaw.dans.easy.properties.app.register.DepositProperties
 import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, InvalidValueError, Repository, SpringfieldDao, StateDao }
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseFixture, FileSystemSupport, ImportTestData, TestSupportFixture }
 import org.scalamock.scalatest.MockFactory
@@ -46,17 +46,15 @@ class ImportServletSpec extends TestSupportFixture
   private val contentTypeDao = mock[ContentTypeDao]
   private val repository = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
   private val servlet = new ImportServlet(
-    registrator = new DepositPropertiesRegistration(
-      database = databaseAccess,
-      repository = _ => repository,
-    ),
+    databaseAccess = databaseAccess,
+    repository = _ => repository,
     expectedAuth = Auth("my-username", "my-password"),
   )
 
   addServlet(servlet, "/*")
 
   "post /" should "register the provided deposit properties in the database" in {
-    val testBody = validDepositPropertiesBody
+    val testBody = s"depositId=$depositId\n" + validDepositPropertiesBody
 
     // @formatter:off
     val DepositProperties(
@@ -64,7 +62,6 @@ class ImportServletSpec extends TestSupportFixture
       Some(doiRegistered), Some(curation), Some(springfield), Some(contentType),
     ) = validDepositProperties
     // @formatter:on
-    val depositId = deposit.id
     depositDao.find _ expects Seq(depositId) once() returning Seq.empty.asRight
     depositDao.store _ expects deposit once() returning deposit.asRight
     stateDao.store _ expects(depositId, state) once() returning state.toOutput("abc").asRight
@@ -110,8 +107,7 @@ class ImportServletSpec extends TestSupportFixture
 
   it should "return 400 when no 'creation.timestamp' property is provided" in {
     val testBody =
-      """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
-        |depositor.userId = user001
+      """depositor.userId = user001
         |deposit.origin = SWORD2""".stripMargin
     post("/", body = testBody, headers = Seq(authHeader)) {
       body shouldBe
@@ -135,10 +131,9 @@ class ImportServletSpec extends TestSupportFixture
   }
 
   it should "return 409 for a deposit that already exists in the database" in {
-    val testBody = validDepositPropertiesBody
+    val testBody = s"depositId=$depositId\n" + validDepositPropertiesBody
 
     val DepositProperties(deposit, _, _, _, _, _, _, _, _) = validDepositProperties
-    val depositId = deposit.id
     depositDao.find _ expects Seq(depositId) once() returning Seq(deposit).asRight
 
     post("/", body = testBody, headers = Seq(authHeader)) {
@@ -148,10 +143,9 @@ class ImportServletSpec extends TestSupportFixture
   }
 
   it should "return 500 when the database is not available" in {
-    val testBody = validDepositPropertiesBody
+    val testBody = s"depositId=$depositId\n" + validDepositPropertiesBody
 
     val DepositProperties(deposit, _, _, _, _, _, _, _, _) = validDepositProperties
-    val depositId = deposit.id
     depositDao.find _ expects Seq(depositId) once() returning InvalidValueError("some obscure database error").asLeft
 
     post("/", body = testBody, headers = Seq(authHeader)) {

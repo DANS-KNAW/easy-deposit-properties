@@ -16,44 +16,52 @@
 package nl.knaw.dans.easy.properties.app.register
 
 import java.io.InputStream
-import java.sql.Connection
 
+import better.files.StringOps
 import cats.syntax.either._
 import cats.syntax.foldable._
 import nl.knaw.dans.easy.properties.ApplicationErrorOr
-import nl.knaw.dans.easy.properties.app.database.DatabaseAccess
 import nl.knaw.dans.easy.properties.app.model.DepositId
 import nl.knaw.dans.easy.properties.app.repository.Repository
 
-class DepositPropertiesRegistration(database: DatabaseAccess,
-                                    repository: Connection => Repository) {
+class DepositPropertiesRegistration(repository: => Repository) {
 
+  @deprecated
   def register(is: InputStream): ImportErrorOr[DepositId] = {
     for {
       props <- DepositPropertiesImporter.readDepositProperties(is)
       depositProperties <- DepositPropertiesValidator.validateDepositProperties(props)
         .leftMap(es => ValidationImportErrors(es.toList))
         .toEither
-      _ <- databaseInteract { implicit repo => importDeposit(depositProperties) }
+      _ <- importDeposit(depositProperties)
+        .leftMap {
+          case e: ImportError => e
+          case e => DBImportError(e.getMessage, e)
+        }
     } yield depositProperties.deposit.id
   }
 
-  private def databaseInteract[T](f: Repository => ApplicationErrorOr[T]): ImportErrorOr[T] = {
-    database.doTransaction(conn => f(repository(conn)).toTry)
-      .toEither
-      .leftMap {
-        case e: ImportError => e
-        case e => DBImportError(e.getMessage, e)
-      }
+  def register(depositId: DepositId, props: String): ImportErrorOr[DepositId] = {
+    for {
+      props <- DepositPropertiesImporter.readDepositProperties(props.inputStream)
+      depositProperties <- DepositPropertiesValidator.validateDepositProperties(depositId)(props)
+        .leftMap(es => ValidationImportErrors(es.toList))
+        .toEither
+      _ <- importDeposit(depositProperties)
+        .leftMap {
+          case e: ImportError => e
+          case e => DBImportError(e.getMessage, e)
+        }
+    } yield depositProperties.deposit.id
   }
 
-  private def importDeposit(depositProperties: DepositProperties)(implicit repo: Repository): ApplicationErrorOr[Unit] = {
+  private def importDeposit(depositProperties: DepositProperties): ApplicationErrorOr[Unit] = {
     val depositId = depositProperties.deposit.id
     for {
-      exists <- DepositPropertiesValidator.depositExists(depositId)
+      exists <- DepositPropertiesValidator.depositExists(depositId)(repository)
       _ <- if (exists) DepositAlreadyExistsError(depositId).asLeft
            else ().asRight
-      _ <- DepositPropertiesImporter.importDepositProperties(depositProperties)
+      _ <- DepositPropertiesImporter.importDepositProperties(depositProperties)(repository)
     } yield ()
   }
 }

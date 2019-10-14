@@ -63,6 +63,26 @@ object DepositPropertiesValidator {
   val springfieldPlaymodeKey = "springfield.playmode"
   val contentTypeKey = "easy-sword2.client-message.content-type"
 
+  def validateDepositProperties(depositId: DepositId)(implicit props: PropertiesConfiguration): ValidationImportErrorsOr[DepositProperties] = {
+    validateCreationTimestamp
+      .andThen(implicit timestamp => {
+        // @formatter:off
+        (
+          validateDeposit(depositId),
+          validateState,
+          validateIngestStep,
+          validateIdentifiers,
+          validateDoiAction,
+          validateDoiRegistered,
+          validateCuration,
+          validateSpringfield,
+          validateContentType,
+        ).mapN(DepositProperties)
+        // @formatter:on
+      })
+  }
+
+  @deprecated
   def validateDepositProperties(implicit props: PropertiesConfiguration): ValidationImportErrorsOr[DepositProperties] = {
     validateCreationTimestamp
       .andThen(implicit timestamp => {
@@ -130,6 +150,16 @@ object DepositPropertiesValidator {
       getMandatoryStringProp(depositorKey),
       getMandatoryEnumProp(originKey)(Origin),
     ).mapN(Deposit(_, _, timestamp, _, _))
+    // @formatter:on
+  }
+
+  private def validateDeposit(depositId: DepositId)(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Deposit] = {
+    // @formatter:off
+    (
+      getOptionalStringProp(bagNameKey),
+      getMandatoryStringProp(depositorKey),
+      getMandatoryEnumProp(originKey)(Origin),
+    ).mapN(Deposit(depositId, _, timestamp, _, _))
     // @formatter:on
   }
 

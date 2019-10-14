@@ -36,7 +36,7 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     val is = validDepositPropertiesBody.inputStream
     val props = readDepositProperties(is).value
     props.getKeys.asScala.toList should contain only(
-      depositIdKey, bagNameKey, creationTimestampKey,
+      bagNameKey, creationTimestampKey,
       depositorKey, originKey, stateLabelKey, stateDescriptionKey,
       ingestStepKey, fedoraIdentifierKey, urnIdentifierKey, doiIdentifierKey,
       bagStoreIdentifierKey, dansDoiActionKey, dansDoiRegisteredKey,
@@ -45,7 +45,6 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
       springfieldUserKey, springfieldCollectionKey, springfieldPlaymodeKey,
       contentTypeKey,
     )
-    props.getString(depositIdKey) shouldBe "9d507261-3b79-22e7-86d0-6fb9417d930d"
     props.getString(bagNameKey) shouldBe "bag"
     props.getString(creationTimestampKey) shouldBe "2019-01-01T00:00:00.000Z"
     props.getString(depositorKey) shouldBe "user001"

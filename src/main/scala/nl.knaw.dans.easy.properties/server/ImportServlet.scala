@@ -15,14 +15,22 @@
  */
 package nl.knaw.dans.easy.properties.server
 
+import java.sql.Connection
+
+import nl.knaw.dans.easy.properties.app.database.DatabaseAccess
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.app.register._
+import nl.knaw.dans.easy.properties.app.repository.Repository
+import nl.knaw.dans.lib.error._
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import nl.knaw.dans.lib.logging.servlet.{ LogResponseBodyOnError, PlainLogFormatter, ServletLogger }
 import org.scalatra._
 import org.scalatra.auth.strategy.BasicAuthStrategy.BasicAuthRequest
 
-class ImportServlet(registrator: DepositPropertiesRegistration,
+import scala.util.Try
+
+class ImportServlet(databaseAccess: DatabaseAccess,
+                    repository: Connection => Repository,
                     expectedAuth: Auth,
                    ) extends ScalatraServlet
   with ServletLogger
@@ -35,8 +43,15 @@ class ImportServlet(registrator: DepositPropertiesRegistration,
   }
 
   post("/") {
-    registrator.register(request.inputStream)
-      .fold(recoverError, depositId => Ok(s"Deposit $depositId has been registered"))
+    databaseAccess.doTransaction(conn => Try {
+      val registrator = new DepositPropertiesRegistration(repository(conn))
+      registrator.register(request.inputStream)
+        .fold(recoverError, depositId => Ok(s"Deposit $depositId has been registered"))
+    })
+      .getOrRecover(e => {
+        logger.error(e.getMessage, e)
+        ServiceUnavailable(e.getMessage)
+      })
   }
 
   private def basicAuth(): Unit = {

@@ -25,14 +25,14 @@ import nl.knaw.dans.easy.properties.app.model.identifier.{ IdentifierType, Input
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStepLabel, InputIngestStep }
 import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin }
 import org.joda.time.DateTime
 
 trait ImportTestData {
 
+  val depositId: DepositId = UUID.fromString("9d507261-3b79-22e7-86d0-6fb9417d930d")
   val validDepositPropertiesBody: String =
-    """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
-      |bag-store.bag-name = bag
+    """bag-store.bag-name = bag
       |creation.timestamp = 2019-01-01T00:00:00.000Z
       |depositor.userId = user001
       |deposit.origin = SWORD2
@@ -65,8 +65,7 @@ trait ImportTestData {
       |easy-sword2.client-message.content-type = application/zip""".stripMargin
 
   val minimalDepositPropertiesBody: String =
-    """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
-      |creation.timestamp = 2019-01-01T00:00:00.000Z
+    """creation.timestamp = 2019-01-01T00:00:00.000Z
       |depositor.userId = user001
       |deposit.origin = SWORD2""".stripMargin
 

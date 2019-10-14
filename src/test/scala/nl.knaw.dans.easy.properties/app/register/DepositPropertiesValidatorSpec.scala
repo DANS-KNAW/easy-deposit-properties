@@ -39,22 +39,21 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
 
   "validateDepositProperties" should "parse the properties file into an object structure" in {
     val props = readDepositProperties(validDepositPropertiesBody.inputStream).value
-    validateDepositProperties(props).value shouldBe validDepositProperties
+    validateDepositProperties(depositId)(props).value shouldBe validDepositProperties
   }
 
   it should "parse the minimal example" in {
     val props = readDepositProperties(minimalDepositPropertiesBody.inputStream).value
-    validateDepositProperties(props).value shouldBe minimalDepositProperties
+    validateDepositProperties(depositId)(props).value shouldBe minimalDepositProperties
   }
 
   it should "fail when creation.timestamp cannot be parsed" in {
     val props = readDepositProperties(
-      """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
-        |creation.timestamp = invalid
+      """creation.timestamp = invalid
         |depositor.userId = user001
         |deposit.origin = SWORD2""".stripMargin.inputStream
     ).value
-    inside(validateDepositProperties(props).leftMap(_.toList)) {
+    inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {
       case Invalid(error :: Nil) =>
         error should matchPattern { case PropertyParseError("creation.timestamp", _: IllegalArgumentException) => }
     }
@@ -64,32 +63,16 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
     val props = readDepositProperties(
       """creation.timestamp = 2019-01-01T00:00:00.000+01:00""".stripMargin.inputStream
     ).value
-    inside(validateDepositProperties(props).leftMap(_.toList)) {
-      case Invalid(depositIdError :: depositorIdError :: originError :: Nil) =>
-        depositIdError should matchPattern { case PropertyNotFoundError("depositId") => }
-        depositorIdError should matchPattern { case PropertyNotFoundError("depositor.userId") => }
-        originError should matchPattern { case PropertyNotFoundError("deposit.origin") => }
-    }
-  }
-
-  it should "fail when the depositId value cannot be parsed" in {
-    val props = readDepositProperties(
-      """depositId = invalid-uuid
-        |creation.timestamp = 2019-01-01T00:00:00.000+01:00
-        |depositor.userId = user001
-        |deposit.origin = SWORD2""".stripMargin.inputStream
-    ).value
-
-    inside(validateDepositProperties(props).leftMap(_.toList)) {
-      case Invalid(depositIdError :: Nil) =>
-        depositIdError should matchPattern { case PropertyParseError("depositId", _: IllegalArgumentException) => }
+    inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {
+      case Invalid(depositorIdError :: originError :: Nil) =>
+        depositorIdError shouldBe PropertyNotFoundError("depositor.userId")
+        originError shouldBe PropertyNotFoundError("deposit.origin")
     }
   }
 
   it should "fail when enum values cannot be parsed" in {
     val props = readDepositProperties(
-      """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
-        |creation.timestamp = 2019-01-01T00:00:00.000+01:00
+      """creation.timestamp = 2019-01-01T00:00:00.000+01:00
         |depositor.userId = user001
         |deposit.origin = invalid-origin
         |
@@ -108,7 +91,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
         |easy-sword2.client-message.content-type = invalid-content-type""".stripMargin.inputStream
     ).value
 
-    inside(validateDepositProperties(props).leftMap(_.toList)) {
+    inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {
       case Invalid(originError :: stateLabelError :: ingestStepError :: doiActionError :: playmodeError :: contentTypeError :: Nil) =>
         originError should matchPattern { case PropertyParseError("deposit.origin", _: NoSuchElementException) => }
         stateLabelError should matchPattern { case PropertyParseError("state.label", _: NoSuchElementException) => }
@@ -121,8 +104,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
 
   it should "fail when boolean values cannot be parsed" in {
     val props = readDepositProperties(
-      """depositId = 9d507261-3b79-22e7-86d0-6fb9417d930d
-        |creation.timestamp = 2019-01-01T00:00:00.000+01:00
+      """creation.timestamp = 2019-01-01T00:00:00.000+01:00
         |depositor.userId = user001
         |deposit.origin = SWORD2
         |
@@ -136,7 +118,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
         |curation.performed = invalid-value""".stripMargin.inputStream
     ).value
 
-    inside(validateDepositProperties(props).leftMap(_.toList)) {
+    inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {
       case Invalid(dansDoiRegisteredError :: isNewVersionError :: isRequiredError :: isPerformedError :: Nil) =>
         dansDoiRegisteredError should matchPattern { case PropertyParseError("identifier.dans-doi.registered", _: ConversionException) => }
         isNewVersionError should matchPattern { case PropertyParseError("curation.is-new-version", _: ConversionException) => }
