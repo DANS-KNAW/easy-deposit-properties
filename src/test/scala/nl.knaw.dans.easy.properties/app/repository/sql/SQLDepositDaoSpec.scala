@@ -281,4 +281,12 @@ class SQLDepositDaoSpec extends TestSupportFixture
 
     deposits.lastModified(Seq(depositId6)).value shouldBe empty
   }
+
+  "delete" should "..." in {
+    val uuids = Seq(
+      "00000000-0000-0000-0000-000000000005",
+      "00000000-0000-0000-0000-000000000006",
+    ).map(UUID.fromString)
+    (new SQLDepositDao).delete(uuids) shouldBe a[Right[_,_]]
+  }
 }

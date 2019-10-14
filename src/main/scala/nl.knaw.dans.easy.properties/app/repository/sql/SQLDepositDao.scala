@@ -119,4 +119,25 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
       .map(executeQuery(parseLastModifiedResponse)(identity))
       .getOrElse(Seq.empty.asRight)
   }
+
+  override def delete(ids: Seq[DepositId]): MutationErrorOr[Unit] = {
+    trace(ids)
+
+    val maybeNonEmptyLists = for {
+      names <- NonEmptyList.fromList(List("Deposit", "State", "Identifier", "Curation", "Springfield", "SimplePoprties"))
+      values <- NonEmptyList.fromList(ids.toList)
+      query = QueryGenerator.deleteByDepositId(names)(values)
+    } yield (query, values)
+
+    maybeNonEmptyLists.map { case (query, values) =>
+      managed(connection.prepareStatement(query))
+        .map(_.executeWith(values))
+        .either
+        .either
+        .leftMap(throwables => {
+          assert(throwables.nonEmpty)
+          MutationError(throwables.map(_.getMessage).mkString("; "))
+        })
+    }.getOrElse(Right(()))
+  }
 }

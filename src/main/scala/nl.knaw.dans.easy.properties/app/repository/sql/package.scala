@@ -18,6 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository
 import java.sql.{ PreparedStatement, Timestamp }
 import java.util.Calendar
 
+import cats.data.NonEmptyList
 import nl.knaw.dans.easy.properties.app.model.DepositId
 import org.joda.time.format.{ DateTimeFormatter, ISODateTimeFormat }
 import org.joda.time.{ DateTime, DateTimeZone }
@@ -28,14 +29,29 @@ package object sql {
 
   val dateTimeFormatter: DateTimeFormatter = ISODateTimeFormat.dateTime()
   val timeZone: DateTimeZone = DateTimeZone.UTC
+
   implicit def timeZoneToCalendar(timeZone: DateTimeZone): Calendar = {
     Calendar.getInstance(timeZone.toTimeZone)
   }
+
   implicit def dateTimeToTimestamp(dt: DateTime): Timestamp = new Timestamp(dt.getMillis)
 
   type PrepStatementResolver = (PreparedStatement, Int) => Unit
+
   def setString(s: String): PrepStatementResolver = (ps, i) => ps.setString(i, s)
+
   def setDepositId(depositId: DepositId): PrepStatementResolver = setString(depositId.toString)
+
   def setInt(int: => Int): PrepStatementResolver = (ps, i) => ps.setInt(i, int)
+
   def setInt(s: String): PrepStatementResolver = setInt(s.toInt)
+
+  implicit class RichPreparedStatement(val preparedStatement: PreparedStatement) extends AnyVal {
+    def executeWith(values: NonEmptyList[DepositId]): Unit = {
+      values.zipWithIndex.toList.foreach { case (value, i) =>
+        preparedStatement.setString(i + 1, value.toString)
+      }
+      preparedStatement.executeUpdate()
+    }
+  }
 }
