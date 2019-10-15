@@ -130,7 +130,7 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
     Stream("State", "Identifier", "Curation", "Springfield", "SimpleProperties", "Deposit")
       .map(delete(_, ids))
       .find(_.isLeft) // the stream makes it a fail fast
-      .getOrElse(Right(1))
+      .getOrElse(1.asRight)
   }
 
   private def delete(tableName: String, ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {

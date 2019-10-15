@@ -30,7 +30,7 @@ trait Scalars {
 
   private def parseUUID(s: String): Either[Violation, UUID] = {
     Either.catchNonFatal { UUID.fromString(s) }
-      .fold(_ => Left(UUIDCoercionViolation), Right(_))
+      .fold(_ => Left(UUIDCoercionViolation), _.asRight)
   }
 
   implicit val UUIDType: ScalarType[UUID] = ScalarType("UUID",
@@ -51,7 +51,7 @@ trait Scalars {
 
   private def parseDate(s: String): Either[Violation, DateTime] = {
     Either.catchNonFatal { DateTime.parse(s) }
-      .fold(_ => Left(DateCoercionViolation), Right(_))
+      .fold(_ => Left(DateCoercionViolation), _.asRight)
   }
 
   implicit val DateTimeType: ScalarType[DateTime] = ScalarType("DateTime",
