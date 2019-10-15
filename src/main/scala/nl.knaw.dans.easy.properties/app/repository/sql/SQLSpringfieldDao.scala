@@ -25,7 +25,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlread
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends SpringfieldDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLSpringfieldDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends SpringfieldDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[Deletable] val tableName = "Springfield"
 
   private def parseSpringfield(resultSet: ResultSet): Either[InvalidValueError, Springfield] = {
     for {
@@ -55,19 +57,19 @@ class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorH
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[Springfield]] = {
     trace(ids)
 
-    executeGetById(parseSpringfield)(QueryGenerator.getElementsById("Springfield", "springfieldId"))(ids)
+    executeGetById(parseSpringfield)(QueryGenerator.getElementsById(tableName, "springfieldId"))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Springfield)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndSpringfield)(QueryGenerator.getCurrentElementByDepositId("Springfield"))(ids)
+    executeGetCurrent(parseDepositIdAndSpringfield)(QueryGenerator.getCurrentElementByDepositId(tableName))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[Springfield])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndSpringfield)(QueryGenerator.getAllElementsByDepositId("Springfield"))(ids)
+    executeGetAll(parseDepositIdAndSpringfield)(QueryGenerator.getAllElementsByDepositId(tableName))(ids)
   }
 
   override def store(id: DepositId, springfield: InputSpringfield): MutationErrorOr[Springfield] = {
@@ -97,7 +99,7 @@ class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorH
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, springfield.timestamp, "springfield")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, springfield.timestamp, tableName)
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)
@@ -107,6 +109,6 @@ class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorH
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseSpringfieldIdAndDeposit)(QueryGenerator.getDepositsById("Springfield", "springfieldId"))(ids)
+    executeGetDepositById(parseSpringfieldIdAndDeposit)(QueryGenerator.getDepositsById(tableName, "springfieldId"))(ids)
   }
 }

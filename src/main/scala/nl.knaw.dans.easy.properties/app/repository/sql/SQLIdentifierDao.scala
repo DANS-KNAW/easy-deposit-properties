@@ -28,7 +28,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ IdentifierDao, InvalidValue
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends IdentifierDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLIdentifierDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends IdentifierDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[Deletable] val tableName = "Identifier"
 
   private def parseIdentifier(resultSet: ResultSet): Either[InvalidValueError, Identifier] = {
     for {
@@ -56,7 +58,7 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[Identifier]] = {
     trace(ids)
 
-    executeGetById(parseIdentifier)(QueryGenerator.getElementsById("Identifier", "identifierId"))(ids)
+    executeGetById(parseIdentifier)(QueryGenerator.getElementsById(tableName, "identifierId"))(ids)
   }
 
   override def getByType(ids: Seq[(DepositId, IdentifierType)]): QueryErrorOr[Seq[((DepositId, IdentifierType), Identifier)]] = {
@@ -106,7 +108,7 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[Identifier])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndIdentifier)(QueryGenerator.getAllElementsByDepositId("Identifier"))(ids)
+    executeGetAll(parseDepositIdAndIdentifier)(QueryGenerator.getAllElementsByDepositId(tableName))(ids)
   }
 
   override def store(id: DepositId, identifier: InputIdentifier): MutationErrorOr[Identifier] = {
@@ -148,6 +150,6 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseIdentifierIdAndDeposit)(QueryGenerator.getDepositsById("Identifier", "identifierId"))(ids)
+    executeGetDepositById(parseIdentifierIdAndDeposit)(QueryGenerator.getDepositsById(tableName, "identifierId"))(ids)
   }
 }

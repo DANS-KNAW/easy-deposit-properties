@@ -24,7 +24,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlread
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLDoiRegisteredDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends DoiRegisteredDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLDoiRegisteredDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends DoiRegisteredDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[Deletable] val tableName = "Identifier"
 
   private def parseDoiRegisteredEvent(resultSet: ResultSet): Either[InvalidValueError, DoiRegisteredEvent] = {
     for {

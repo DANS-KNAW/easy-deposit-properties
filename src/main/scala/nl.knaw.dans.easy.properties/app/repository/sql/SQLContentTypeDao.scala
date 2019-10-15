@@ -25,7 +25,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, DepositIdAn
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends ContentTypeDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLContentTypeDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends ContentTypeDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[Deletable] val tableName = "ContentType"
 
   private def parseContentType(resultSet: ResultSet): Either[InvalidValueError, ContentType] = {
     for {

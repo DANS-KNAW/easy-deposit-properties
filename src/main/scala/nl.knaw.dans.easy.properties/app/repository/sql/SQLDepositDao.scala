@@ -28,7 +28,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ BagNameAlreadySetError, Dep
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLDepositDao(implicit connection: Connection) extends DepositDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLDepositDao(override implicit val connection: Connection) extends DepositDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[Deletable] val tableName = "Deposit"
 
   private def parseLastModifiedResponse(resultSet: ResultSet): Either[InvalidValueError, (DepositId, Timestamp)] = {
     for {
@@ -115,6 +117,7 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
       .map(executeQuery(parseLastModifiedResponse)(identity))
       .getOrElse(Seq.empty.asRight)
   }
+
   override def deleteBy(ids: Seq[DepositId]): MutationErrorOr[Seq[DepositId]] = {
     trace(ids)
 
@@ -126,8 +129,8 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
   }
 
   private def deleteFromAllTables(ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
-    // TODO get these names from foreign keys defined in the database schema?
-    Stream("State", "Identifier", "Curation", "Springfield", "SimpleProperties", "Deposit")
+    // TODO reuse DAOs? Perhaps move caller to MutationType? would conflict with #14
+    Stream("State", "Identifier", "Curation", "Springfield", "SimpleProperties", tableName)
       .map(delete(_, ids))
       .find(_.isLeft) // the stream makes it a fail fast
       .getOrElse(1.asRight)
