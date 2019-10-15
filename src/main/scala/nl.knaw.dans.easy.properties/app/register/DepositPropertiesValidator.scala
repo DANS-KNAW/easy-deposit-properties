@@ -15,8 +15,6 @@
  */
 package nl.knaw.dans.easy.properties.app.register
 
-import java.util.UUID
-
 import cats.data.Validated
 import cats.instances.list._
 import cats.instances.option._
@@ -38,7 +36,6 @@ import scala.reflect.ClassTag
 
 object DepositPropertiesValidator {
 
-  val depositIdKey = "depositId"
   val creationTimestampKey = "creation.timestamp"
   val bagNameKey = "bag-store.bag-name"
   val depositorKey = "depositor.userId"
@@ -122,17 +119,6 @@ object DepositPropertiesValidator {
     getMandatoryProp[DateTime, IllegalArgumentException](creationTimestampKey)(DateTime.parse)
   }
 
-  private def validateDeposit(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Deposit] = {
-    // @formatter:off
-    (
-      getMandatoryProp[DepositId, IllegalArgumentException](depositIdKey)(UUID.fromString),
-      getOptionalStringProp(bagNameKey),
-      getMandatoryStringProp(depositorKey),
-      getMandatoryEnumProp(originKey)(Origin),
-    ).mapN(Deposit(_, _, timestamp, _, _))
-    // @formatter:on
-  }
-
   private def validateDeposit(depositId: DepositId)(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Deposit] = {
     // @formatter:off
     (
@@ -206,10 +192,8 @@ object DepositPropertiesValidator {
   }
 
   def depositExists(depositId: DepositId)(implicit repo: Repository): QueryErrorOr[Boolean] = {
-    repo.deposits.find(Seq(depositId))
-      .map {
-        case Seq() => false
-        case _ => true
-      }
+    repo.deposits
+      .find(Seq(depositId))
+      .map(_.nonEmpty)
   }
 }

@@ -15,7 +15,6 @@
  */
 package nl.knaw.dans.easy.properties.app.register
 
-import better.files.StringOps
 import cats.syntax.either._
 import cats.syntax.foldable._
 import nl.knaw.dans.easy.properties.ApplicationErrorOr
@@ -26,9 +25,9 @@ class DepositPropertiesRegistration(repository: => Repository) {
 
   def register(depositId: DepositId, props: String): ImportErrorOr[DepositId] = {
     for {
-      props <- DepositPropertiesImporter.readDepositProperties(props.inputStream)
+      props <- DepositPropertiesImporter.readDepositProperties(props)
       depositProperties <- DepositPropertiesValidator.validateDepositProperties(depositId)(props)
-        .leftMap(es => ValidationImportErrors(es.toList))
+        .leftMap(errors => ValidationImportErrors(errors.toList))
         .toEither
       _ <- importDeposit(depositProperties)
         .leftMap {
@@ -44,7 +43,7 @@ class DepositPropertiesRegistration(repository: => Repository) {
       exists <- DepositPropertiesValidator.depositExists(depositId)(repository)
       _ <- if (exists) DepositAlreadyExistsError(depositId).asLeft
            else ().asRight
-      _ <- DepositPropertiesImporter.importDepositProperties(depositProperties)(repository)
+      _ <- DepositPropertiesImporter.importDepositProperties(depositProperties, repository)
     } yield ()
   }
 }

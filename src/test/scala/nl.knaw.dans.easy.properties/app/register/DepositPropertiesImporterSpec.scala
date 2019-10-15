@@ -15,7 +15,6 @@
  */
 package nl.knaw.dans.easy.properties.app.register
 
-import better.files.StringOps
 import cats.scalatest.{ EitherMatchers, EitherValues }
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesImporter._
@@ -33,8 +32,7 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
   with RegistrationTestData {
 
   "readDepositProperties" should "read the inputstream and produce a PropertiesConfiguration object" in {
-    val is = validDepositPropertiesBody.inputStream
-    val props = readDepositProperties(is).value
+    val props = readDepositProperties(validDepositPropertiesBody).value
     val expectedResult = Map(
       bagNameKey -> "bag",
       creationTimestampKey -> "2019-01-01T00:00:00.000Z",
@@ -100,7 +98,7 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     springfieldDao.store _ expects(depositId, springfield) once() returning springfield.toOutput("abc").asRight
     contentTypeDao.store _ expects(depositId, contentType) once() returning contentType.toOutput("abc").asRight
 
-    importDepositProperties(input)(repo) shouldBe right
+    importDepositProperties(input, repo) shouldBe right
   }
 
   it should "store minimal properties in the database" in {
@@ -126,7 +124,7 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     springfieldDao.store _ expects(*, *) never()
     contentTypeDao.store _ expects(*, *) never()
 
-    importDepositProperties(input)(repo) shouldBe right
+    importDepositProperties(input, repo) shouldBe right
   }
 
   it should "fail when one of the store functions returns an error" in {
@@ -155,6 +153,6 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     springfieldDao.store _ expects(*, *) never()
     contentTypeDao.store _ expects(*, *) never()
 
-    importDepositProperties(input)(repo).leftValue shouldBe error
+    importDepositProperties(input, repo).leftValue shouldBe error
   }
 }

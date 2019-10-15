@@ -17,7 +17,6 @@ package nl.knaw.dans.easy.properties.app.register
 
 import java.util.UUID
 
-import better.files.StringOps
 import cats.data.Validated.Invalid
 import cats.scalatest.{ EitherMatchers, EitherValues, ValidatedMatchers, ValidatedValues }
 import cats.syntax.either._
@@ -38,12 +37,12 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
   with RegistrationTestData {
 
   "validateDepositProperties" should "parse the properties file into an object structure" in {
-    val props = readDepositProperties(validDepositPropertiesBody.inputStream).value
+    val props = readDepositProperties(validDepositPropertiesBody).value
     validateDepositProperties(depositId)(props).value shouldBe validDepositProperties
   }
 
   it should "parse the minimal example" in {
-    val props = readDepositProperties(minimalDepositPropertiesBody.inputStream).value
+    val props = readDepositProperties(minimalDepositPropertiesBody).value
     validateDepositProperties(depositId)(props).value shouldBe minimalDepositProperties
   }
 
@@ -51,7 +50,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
     val props = readDepositProperties(
       """creation.timestamp = invalid
         |depositor.userId = user001
-        |deposit.origin = SWORD2""".stripMargin.inputStream
+        |deposit.origin = SWORD2""".stripMargin
     ).value
     inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {
       case Invalid(error :: Nil) =>
@@ -61,7 +60,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
 
   it should "fail when mandatory fields are not present" in {
     val props = readDepositProperties(
-      """creation.timestamp = 2019-01-01T00:00:00.000+01:00""".stripMargin.inputStream
+      """creation.timestamp = 2019-01-01T00:00:00.000+01:00""".stripMargin
     ).value
     inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {
       case Invalid(depositorIdError :: originError :: Nil) =>
@@ -88,7 +87,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
         |springfield.collection = collection
         |springfield.playmode = invalid-playmode
         |
-        |easy-sword2.client-message.content-type = invalid-content-type""".stripMargin.inputStream
+        |easy-sword2.client-message.content-type = invalid-content-type""".stripMargin
     ).value
 
     inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {
@@ -115,7 +114,7 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
         |
         |curation.is-new-version = invalid-value
         |curation.required = invalid-value
-        |curation.performed = invalid-value""".stripMargin.inputStream
+        |curation.performed = invalid-value""".stripMargin
     ).value
 
     inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {

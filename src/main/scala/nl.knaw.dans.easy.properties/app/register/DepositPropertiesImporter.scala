@@ -15,8 +15,7 @@
  */
 package nl.knaw.dans.easy.properties.app.register
 
-import java.io.InputStream
-
+import better.files.StringOps
 import cats.instances.either._
 import cats.instances.list._
 import cats.instances.option._
@@ -27,16 +26,16 @@ import org.apache.commons.configuration.{ ConfigurationException, PropertiesConf
 
 object DepositPropertiesImporter {
 
-  def readDepositProperties(in: InputStream): Either[ReadImportError, PropertiesConfiguration] = {
+  def readDepositProperties(props: String): Either[ReadImportError, PropertiesConfiguration] = {
     Either.catchOnly[ConfigurationException] {
       new PropertiesConfiguration() {
         setDelimiterParsingDisabled(true)
-        load(in)
+        load(props.inputStream)
       }
     }.leftMap(e => ReadImportError(e.getMessage, e))
   }
 
-  def importDepositProperties(props: DepositProperties)(implicit repo: Repository): MutationErrorOr[Unit] = {
+  def importDepositProperties(props: DepositProperties, repo: Repository): MutationErrorOr[Unit] = {
     val depositId = props.deposit.id
 
     for {
