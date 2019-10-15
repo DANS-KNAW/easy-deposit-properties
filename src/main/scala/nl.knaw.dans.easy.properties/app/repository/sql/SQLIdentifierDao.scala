@@ -30,7 +30,7 @@ import resource.managed
 
 class SQLIdentifierDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends IdentifierDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[Deletable] val tableName = "Identifier"
+  override private[sql] val tableName = "Identifier"
 
   private def parseIdentifier(resultSet: ResultSet): Either[InvalidValueError, Identifier] = {
     for {

@@ -27,7 +27,7 @@ import resource.managed
 
 class SQLContentTypeDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends ContentTypeDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[Deletable] val tableName = "ContentType"
+  override private[sql] val tableName = "ContentType"
 
   private def parseContentType(resultSet: ResultSet): Either[InvalidValueError, ContentType] = {
     for {

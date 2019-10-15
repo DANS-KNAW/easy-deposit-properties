@@ -28,7 +28,7 @@ import resource.managed
 
 class SQLCurationDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends CurationDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[Deletable] val tableName = "Curation"
+  override private[sql] val tableName = "Curation"
 
   private def parseCuration(resultSet: ResultSet): Either[InvalidValueError, Curation] = {
     for {

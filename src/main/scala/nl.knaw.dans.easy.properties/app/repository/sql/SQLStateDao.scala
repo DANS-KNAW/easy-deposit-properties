@@ -27,7 +27,7 @@ import resource.managed
 
 class SQLStateDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends StateDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[Deletable] val tableName = "State"
+  override private[sql] val tableName = "State"
 
   private def parseState(resultSet: ResultSet): Either[InvalidValueError, State] = {
     for {

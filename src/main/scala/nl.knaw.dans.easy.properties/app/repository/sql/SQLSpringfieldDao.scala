@@ -27,7 +27,7 @@ import resource.managed
 
 class SQLSpringfieldDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends SpringfieldDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[Deletable] val tableName = "Springfield"
+  override private[sql] val tableName = "Springfield"
 
   private def parseSpringfield(resultSet: ResultSet): Either[InvalidValueError, Springfield] = {
     for {

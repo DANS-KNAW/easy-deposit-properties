@@ -10,7 +10,7 @@ import resource.managed
 
 trait SQLDeletable {
   implicit val connection: Connection
-  private[SQLDeletable] val tableName: String
+  private[sql] val tableName: String
 
   def delete(ids: Seq[DepositId]): Either[MutationError, Int] = {
     NonEmptyList.fromList(ids.toList)

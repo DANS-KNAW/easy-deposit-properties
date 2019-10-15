@@ -27,7 +27,7 @@ import resource.managed
 
 class SQLIngestStepDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends IngestStepDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[Deletable] val tableName = "IngestStep"
+  override private[sql] val tableName = "IngestStep"
 
   private def parseIngestStep(resultSet: ResultSet): Either[InvalidValueError, IngestStep] = {
     for {

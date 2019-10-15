@@ -26,7 +26,7 @@ import resource.managed
 
 class SQLDoiRegisteredDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends DoiRegisteredDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[Deletable] val tableName = "Identifier"
+  override private[sql] val tableName = "Identifier"
 
   private def parseDoiRegisteredEvent(resultSet: ResultSet): Either[InvalidValueError, DoiRegisteredEvent] = {
     for {
