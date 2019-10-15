@@ -25,6 +25,8 @@ import nl.knaw.dans.easy.properties.app.repository.{ BagNameAlreadySetError, Dep
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
 import org.joda.time.DateTime
 
+import scala.util.Try
+
 class SQLDepositDaoSpec extends TestSupportFixture
   with FileSystemSupport
   with DatabaseFixture
@@ -282,16 +284,31 @@ class SQLDepositDaoSpec extends TestSupportFixture
     deposits.lastModified(Seq(depositId6)).value shouldBe empty
   }
 
-  "delete" should "..." in {
+  "delete" should "succeed with a mix of existing and non existing IDs" in {
     val uuids = Seq(
       "00000000-0000-0000-0000-000000000005",
       "00000000-0000-0000-0000-000000000006",
     ).map(UUID.fromString)
+
+    // just sampling preconditions of one other table
+    val stateDao = new SQLStateDao()(connection, errorHandler)
+    stateDao.getAll(uuids).getOrElse(fail) shouldNot be(empty)
+
     val dao = new SQLDepositDao
     dao.deleteBy(uuids) should matchPattern {
-      case Right(List(_)) => // just one was found
+      case Right(List(_)) => // just one of the IDs is found
     }
-    dao.find(uuids)
-      .getOrElse(fail) shouldBe empty
+    dao.find(uuids).getOrElse(fail) shouldBe empty
+    stateDao.getAll(uuids).getOrElse(fail) shouldBe empty
+  }
+
+  it should "fail on a null" in {
+    // TODO MutationError?
+    val uuids = Seq(
+      UUID.fromString("00000000-0000-0000-0000-000000000005"),
+      null,
+    )
+    val dao = new SQLDepositDao
+    Try(dao.deleteBy(uuids)) shouldBe a[NullPointerException]
   }
 }
