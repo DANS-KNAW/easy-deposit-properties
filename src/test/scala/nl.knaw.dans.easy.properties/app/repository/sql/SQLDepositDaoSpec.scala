@@ -25,7 +25,7 @@ import nl.knaw.dans.easy.properties.app.repository.{ BagNameAlreadySetError, Dep
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
 import org.joda.time.DateTime
 
-import scala.util.Try
+import scala.util.{ Failure, Try }
 
 class SQLDepositDaoSpec extends TestSupportFixture
   with FileSystemSupport
@@ -292,23 +292,33 @@ class SQLDepositDaoSpec extends TestSupportFixture
 
     // just sampling preconditions of one other table
     val stateDao = new SQLStateDao()(connection, errorHandler)
-    stateDao.getAll(uuids).getOrElse(fail) shouldNot be(empty)
+    stateDao.getAll(uuids).getOrElse(fail)should matchPattern {
+      case List((_,List(_,_,_,_)), (_,List())) =>
+    }
 
-    val dao = new SQLDepositDao
-    dao.deleteBy(uuids) should matchPattern {
+    val depositDao = new SQLDepositDao
+    depositDao.deleteBy(uuids) should matchPattern {
       case Right(List(_)) => // just one of the IDs is found
     }
-    dao.find(uuids).getOrElse(fail) shouldBe empty
-    stateDao.getAll(uuids).getOrElse(fail) shouldBe empty
+    depositDao.find(uuids).getOrElse(fail) shouldBe empty
+
+    // sampling post conditions of the same other table
+    stateDao.getAll(uuids).getOrElse(fail)should matchPattern {
+      // deletion succeeds when dropping this tableName in deleteAllFromTables
+      // TODO apparently the test database does not throw a ForeignKeyError on deletion
+      case List((_,List()), (_,List())) =>
+    }
   }
 
-  it should "fail on a null" in {
+  it should "fail on a null as id" in {
     // TODO MutationError?
     val uuids = Seq(
       UUID.fromString("00000000-0000-0000-0000-000000000005"),
       null,
     )
     val dao = new SQLDepositDao
-    Try(dao.deleteBy(uuids)) shouldBe a[NullPointerException]
+    Try(dao.deleteBy(uuids)) should matchPattern {
+      case Failure(e) if e.isInstanceOf[NullPointerException] =>
+    }
   }
 }

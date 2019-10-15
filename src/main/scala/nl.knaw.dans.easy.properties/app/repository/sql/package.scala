@@ -18,7 +18,6 @@ package nl.knaw.dans.easy.properties.app.repository
 import java.sql.{ PreparedStatement, Timestamp }
 import java.util.Calendar
 
-import cats.data.NonEmptyList
 import nl.knaw.dans.easy.properties.app.model.DepositId
 import org.joda.time.format.{ DateTimeFormatter, ISODateTimeFormat }
 import org.joda.time.{ DateTime, DateTimeZone }
@@ -47,7 +46,7 @@ package object sql {
   def setInt(s: String): PrepStatementResolver = setInt(s.toInt)
 
   implicit class RichPreparedStatement(val preparedStatement: PreparedStatement) extends AnyVal {
-    def executeWith(values: NonEmptyList[DepositId]): Unit = {
+    def executeUpdateWith(values: Seq[String]): Int = {
       values.zipWithIndex.toList.foreach { case (value, i) =>
         preparedStatement.setString(i + 1, value.toString)
       }

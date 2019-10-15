@@ -88,11 +88,7 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
     val query = QueryGenerator.storeBagName
 
     managed(connection.prepareStatement(query))
-      .map(prepStatement => {
-        prepStatement.setString(1, bagName)
-        prepStatement.setString(2, depositId.toString)
-        prepStatement.executeUpdate()
-      })
+      .map(_.executeUpdateWith(Seq(bagName, depositId.toString)))
       .either
       .either
       .leftMap(_ => NoSuchDepositError(depositId))
@@ -129,17 +125,18 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
     } yield actualIds
   }
 
-  private def deleteFromAllTables(ids: NonEmptyList[DepositId]): Either[MutationError, Unit] = {
+  private def deleteFromAllTables(ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
+    // TODO get these names from foreign keys defined in the database schema?
     Stream("State", "Identifier", "Curation", "Springfield", "SimpleProperties", "Deposit")
       .map(delete(_, ids))
       .find(_.isLeft) // the stream makes it a fail fast
-      .getOrElse(Right())
+      .getOrElse(Right(1))
   }
 
-  private def delete(tableName: String, ids: NonEmptyList[DepositId]): Either[MutationError, Unit] = {
+  private def delete(tableName: String, ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
     val query = QueryGenerator.deleteByDepositId(tableName)(ids)
     managed(connection.prepareStatement(query))
-      .map(_.executeWith(ids))
+      .map(_.executeUpdateWith(ids.map(_.toString).toList))
       .either
       .either
       .leftMap(throwables => {
