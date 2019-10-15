@@ -28,6 +28,7 @@ package object register {
 
   abstract class ValidationImportError(val msg: String, cause: Option[Throwable] = none)
   case class PropertyNotFoundError(key: String) extends ValidationImportError(s"Mandatory property '$key' was not found.")
+  case class MissingPropertiesError(missing: Seq[String], present: Seq[String]) extends ValidationImportError(s"Properties '${missing.mkString("{", ", ", "}")}' were not found, while ${present.mkString("{", ", ", "}")} were found.")
   case class PropertyParseError(key: String, cause: Throwable) extends ValidationImportError(s"Property '$key' could not be parsed: ${ cause.getMessage }", cause.some)
 
   abstract class ImportError(val msg: String, cause: Option[Throwable] = none) extends Exception(msg, cause.orNull) with ApplicationError with UserFacingError

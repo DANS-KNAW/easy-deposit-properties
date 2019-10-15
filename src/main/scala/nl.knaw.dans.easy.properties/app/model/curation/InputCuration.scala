@@ -15,7 +15,6 @@
  */
 package nl.knaw.dans.easy.properties.app.model.curation
 
-import cats.syntax.option._
 import nl.knaw.dans.easy.properties.app.model.Timestamp
 
 case class InputCuration(isNewVersion: Option[Boolean],
@@ -28,17 +27,5 @@ case class InputCuration(isNewVersion: Option[Boolean],
 
   def toOutput(id: String): Curation = {
     Curation(id, isNewVersion, isRequired, isPerformed, datamanagerUserId, datamanagerEmail, timestamp)
-  }
-}
-
-object InputCuration {
-  def apply(isNewVersion: Boolean,
-            isRequired: Boolean,
-            isPerformed: Boolean,
-            datamanagerUserId: String,
-            datamanagerEmail: String,
-            timestamp: Timestamp,
-           ): InputCuration = {
-    InputCuration(isNewVersion.some, isRequired, isPerformed, datamanagerUserId, datamanagerEmail, timestamp)
   }
 }

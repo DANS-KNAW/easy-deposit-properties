@@ -19,6 +19,7 @@ import cats.data.Validated
 import cats.instances.list._
 import cats.instances.option._
 import cats.syntax.apply._
+import cats.syntax.option._
 import cats.syntax.traverse._
 import cats.syntax.validated._
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, InputContentType }
@@ -115,6 +116,14 @@ object DepositPropertiesValidator {
     getOptionalProp[enum.Value, NoSuchElementException](key)(s => enum withName s)
   }
 
+  private def requireAllOrNone(xs: (String, Option[_])*): ValidationImportErrorsOr[Unit] = {
+    val (defined, empty) = xs.partition { case (_, v) => v.isDefined }
+    if (empty.isEmpty || defined.isEmpty)
+      ().validNec
+    else
+      MissingPropertiesError(empty.map(_._1), defined.map(_._1)).invalidNec
+  }
+
   private def validateCreationTimestamp(implicit props: PropertiesConfiguration): ValidationImportErrorsOr[Timestamp] = {
     getMandatoryProp[DateTime, IllegalArgumentException](creationTimestampKey)(DateTime.parse)
   }
@@ -134,7 +143,15 @@ object DepositPropertiesValidator {
     (
       getOptionalEnumProp(stateLabelKey)(StateLabel),
       getOptionalStringProp(stateDescriptionKey),
-    ).tupled.map(_.mapN(InputState(_, _, timestamp)))
+    ).tupled
+      .andThen {
+        case tuple @ (label, description) =>
+          requireAllOrNone(
+            stateLabelKey -> label,
+            stateDescriptionKey -> description
+          ).map(_ => tuple)
+      }
+      .map(_.mapN(InputState(_, _, timestamp)))
     // @formatter:on
   }
 
@@ -165,13 +182,44 @@ object DepositPropertiesValidator {
 
   private def validateCuration(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Option[InputCuration]] = {
     // @formatter:off
-    (
-      getOptionalProp[Boolean, ConversionException](isNewVersionKey)(PropertyConverter.toBoolean),
-      getOptionalProp[Boolean, ConversionException](isCurationRequiredKey)(PropertyConverter.toBoolean),
-      getOptionalProp[Boolean, ConversionException](isCurationPerformedKey)(PropertyConverter.toBoolean),
+    val optionalDatamanager: ValidationImportErrorsOr[Option[(String, String)]] = (
       getOptionalStringProp(datamanagerUserIdKey),
       getOptionalStringProp(datamanagerEmailKey),
-    ).tupled.map(_.mapN(InputCuration(_, _, _, _, _, timestamp)))
+    ).tupled
+      .andThen {
+        case tuple @ (userId, email) => requireAllOrNone(
+          datamanagerUserIdKey -> userId,
+          datamanagerEmailKey -> email,
+        ).map(_ => tuple.mapN((_, _)))
+      }
+
+    val optionalCuration: ValidationImportErrorsOr[Option[(Boolean, Boolean)]] = (
+      getOptionalProp[Boolean, ConversionException](isCurationRequiredKey)(PropertyConverter.toBoolean),
+      getOptionalProp[Boolean, ConversionException](isCurationPerformedKey)(PropertyConverter.toBoolean),
+    ).tupled
+      .andThen {
+        case tuple @ (curationRequired, curationPerformed) => requireAllOrNone(
+          isCurationRequiredKey -> curationRequired,
+          isCurationPerformedKey -> curationPerformed,
+        ).map(_ => tuple.mapN((_, _)))
+      }
+
+    (
+      getOptionalProp[Boolean, ConversionException](isNewVersionKey)(PropertyConverter.toBoolean),
+      optionalCuration,
+      optionalDatamanager
+    ).mapN { 
+      case (newVersion, curation, datamanager) =>
+        curation
+          .fold(datamanager.fold(none[InputCuration]) {
+            case (userId, email) => InputCuration(newVersion, isRequired = false, isPerformed = false, userId, email, timestamp).some
+          }) {
+            case (curationRequired, curationPerformed) =>
+              datamanager.fold(InputCuration(newVersion, curationRequired, curationPerformed, "", "", timestamp).some) {
+                case (userId, email) => InputCuration(newVersion, curationRequired, curationPerformed, userId, email, timestamp).some
+              }
+          }
+    }
     // @formatter:on
   }
 
@@ -182,7 +230,17 @@ object DepositPropertiesValidator {
       getOptionalStringProp(springfieldUserKey),
       getOptionalStringProp(springfieldCollectionKey),
       getOptionalEnumProp(springfieldPlaymodeKey)(SpringfieldPlayMode),
-    ).tupled.map(_.mapN(InputSpringfield(_, _, _, _, timestamp)))
+    ).tupled
+      .andThen {
+        case tuple @ (domain, user, collection, playmode) =>
+          requireAllOrNone(
+            springfieldDomainKey -> domain,
+            springfieldUserKey -> user,
+            springfieldCollectionKey -> collection,
+            springfieldPlaymodeKey -> playmode
+          ).map(_ => tuple)
+      }
+      .map(_.mapN(InputSpringfield(_, _, _, _, timestamp)))
     // @formatter:on
   }
 

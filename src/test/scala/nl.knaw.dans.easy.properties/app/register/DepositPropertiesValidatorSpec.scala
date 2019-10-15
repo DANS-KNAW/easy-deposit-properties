@@ -21,6 +21,9 @@ import cats.data.Validated.Invalid
 import cats.scalatest.{ EitherMatchers, EitherValues, ValidatedMatchers, ValidatedValues }
 import cats.syntax.either._
 import cats.syntax.foldable._
+import cats.syntax.option._
+import nl.knaw.dans.easy.properties.app.model.curation.InputCuration
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, Origin }
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesImporter._
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesValidator._
 import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, InvalidValueError, Repository, SpringfieldDao, StateDao }
@@ -44,6 +47,52 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
   it should "parse the minimal example" in {
     val props = readDepositProperties(minimalDepositPropertiesBody).value
     validateDepositProperties(depositId)(props).value shouldBe minimalDepositProperties
+  }
+
+  it should "parse curation properties when only the datamanager is provided" in {
+    val props = readDepositProperties(
+      """bag-store.bag-name = bag
+        |creation.timestamp = 2019-01-01T00:00:00.000Z
+        |depositor.userId = user001
+        |deposit.origin = SWORD2
+        |
+        |curation.datamanager.userId = archie001
+        |curation.datamanager.email = does.not.exists@dans.knaw.nl""".stripMargin
+    ).value
+    validateDepositProperties(depositId)(props).value shouldBe DepositProperties(
+      deposit = Deposit(depositId, "bag".some, timestamp, "user001", Origin.SWORD2),
+      state = none,
+      ingestStep = none,
+      identifiers = Seq.empty,
+      doiAction = none,
+      doiRegistered = none,
+      curation = InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", timestamp).some,
+      springfield = none,
+      contentType = none,
+    )
+  }
+
+  it should "parse curation properties when only the required/performed is provided" in {
+    val props = readDepositProperties(
+      """bag-store.bag-name = bag
+        |creation.timestamp = 2019-01-01T00:00:00.000Z
+        |depositor.userId = user001
+        |deposit.origin = SWORD2
+        |
+        |curation.required = true
+        |curation.performed = false""".stripMargin
+    ).value
+    validateDepositProperties(depositId)(props).value shouldBe DepositProperties(
+      deposit = Deposit(depositId, "bag".some, timestamp, "user001", Origin.SWORD2),
+      state = none,
+      ingestStep = none,
+      identifiers = Seq.empty,
+      doiAction = none,
+      doiRegistered = none,
+      curation = InputCuration(isNewVersion = none, isRequired = true, isPerformed = false, "", "", timestamp).some,
+      springfield = none,
+      contentType = none,
+    )
   }
 
   it should "fail when creation.timestamp cannot be parsed" in {
@@ -98,6 +147,28 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
         doiActionError should matchPattern { case PropertyParseError("identifier.dans-doi.action", _: NoSuchElementException) => }
         playmodeError should matchPattern { case PropertyParseError("springfield.playmode", _: NoSuchElementException) => }
         contentTypeError should matchPattern { case PropertyParseError("easy-sword2.client-message.content-type", _: NoSuchElementException) => }
+    }
+  }
+
+  it should "fail when required combinations of values are missing" in {
+    val props = readDepositProperties(
+      """creation.timestamp = 2019-01-01T00:00:00.000+01:00
+        |depositor.userId = user001
+        |deposit.origin = SMD
+        |
+        |state.label = ARCHIVED
+        |
+        |curation.datamanager.userId = user001
+        |
+        |springfield.domain = foobar
+        |springfield.user = barfoo""".stripMargin
+    ).value
+
+    inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {
+      case Invalid(stateError :: datamanagerError :: springfieldError :: Nil) =>
+        stateError should matchPattern { case MissingPropertiesError(Seq("state.description"), Seq("state.label")) => }
+        datamanagerError should matchPattern { case MissingPropertiesError(Seq("curation.datamanager.email"), Seq("curation.datamanager.userId")) => }
+        springfieldError should matchPattern { case MissingPropertiesError(Seq("springfield.collection", "springfield.playmode"), Seq("springfield.domain", "springfield.user")) => }
     }
   }
 

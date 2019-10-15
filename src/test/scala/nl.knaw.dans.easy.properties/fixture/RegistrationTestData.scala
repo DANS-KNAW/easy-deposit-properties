@@ -69,7 +69,7 @@ trait RegistrationTestData {
       |depositor.userId = user001
       |deposit.origin = SWORD2""".stripMargin
 
-  private val timestamp = DateTime.parse("2019-01-01T00:00:00.000Z")
+  val timestamp: DateTime = DateTime.parse("2019-01-01T00:00:00.000Z")
   val validDepositProperties = DepositProperties(
     deposit = Deposit(UUID.fromString("9d507261-3b79-22e7-86d0-6fb9417d930d"), "bag".some, timestamp, "user001", Origin.SWORD2),
     state = InputState(StateLabel.SUBMITTED, "my description", timestamp).some,
@@ -82,7 +82,7 @@ trait RegistrationTestData {
     ),
     doiAction = DoiActionEvent(DoiAction.UPDATE, timestamp).some,
     doiRegistered = DoiRegisteredEvent(value = true, timestamp).some,
-    curation = InputCuration(isNewVersion = true, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", timestamp).some,
+    curation = InputCuration(isNewVersion = true.some, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", timestamp).some,
     springfield = InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, timestamp).some,
     contentType = InputContentType(ContentTypeValue.ZIP, timestamp).some,
   )
