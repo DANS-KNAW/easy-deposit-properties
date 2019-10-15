@@ -17,7 +17,7 @@ package nl.knaw.dans.easy.properties.app.repository
 
 import nl.knaw.dans.easy.properties.app.model.{ DepositId, DoiActionEvent }
 
-trait DoiActionDao {
+trait DoiActionDao extends Deletable {
 
   def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, DoiActionEvent)]]
 
