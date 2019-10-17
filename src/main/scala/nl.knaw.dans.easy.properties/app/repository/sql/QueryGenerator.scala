@@ -249,6 +249,7 @@ object QueryGenerator {
   def deleteByDepositId(tableName: String)(ids: NonEmptyList[DepositId]): String = {
     s"DELETE FROM $tableName WHERE depositId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
   }
+
   def deleteByDepositId(tableName: String, key: String)(ids: NonEmptyList[DepositId]): String = {
     s"DELETE FROM $tableName WHERE key = '$key' AND depositId IN (${ ids.toList.map(_ => "?").mkString(", ") });"
   }

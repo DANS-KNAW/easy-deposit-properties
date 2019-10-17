@@ -139,7 +139,7 @@ class SQLIdentifierDao(override implicit val connection: Connection, errorHandle
           case t if errorHandler.isUniquenessConstraintError(t) =>
             // we can't really decide which uniqueness constraint is violated here given the error returned from the database
             val msg = s"Cannot insert this identifier: identifier ${ identifier.idType } already exists for depositId $id with timestamp '${ identifier.timestamp }' or " +
-              s"${identifier.idType} '${ identifier.idValue }' is already associated with another deposit."
+              s"${ identifier.idType } '${ identifier.idValue }' is already associated with another deposit."
             MutationError(msg)
         }.getOrElse(MutationError(ts.head.getMessage))
       })

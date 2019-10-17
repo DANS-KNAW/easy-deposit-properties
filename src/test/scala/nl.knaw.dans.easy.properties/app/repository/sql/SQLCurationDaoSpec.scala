@@ -17,8 +17,8 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 
 import java.util.UUID
 
-import cats.syntax.option._
 import cats.scalatest.{ EitherMatchers, EitherValues }
+import cats.syntax.option._
 import nl.knaw.dans.easy.properties.app.model.curation.{ Curation, InputCuration }
 import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlreadyExistError, InvalidValueError, NoSuchDepositError }
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
@@ -59,9 +59,9 @@ class SQLCurationDaoSpec extends TestSupportFixture
   "getCurrent" should "return the current curation configurations of the given deposits" in {
     val curations = new SQLCurationDao
 
-    curations.getCurrent(Seq(depositId1, depositId2)).value should contain only(
+    curations.getCurrent(Seq(depositId1, depositId2)).value should contain only (
       depositId1 -> curation2,
-    )
+      )
   }
 
   it should "return an empty collection if the depositId is unknown" in {
