@@ -46,6 +46,8 @@ package object sql {
   def setInt(s: String): PrepStatementResolver = setInt(s.toInt)
 
   implicit class RichPreparedStatement(val preparedStatement: PreparedStatement) extends AnyVal {
+
+    /** @return rowCount */
     def executeUpdateWith(values: Seq[String]): Int = {
       values.zipWithIndex.toList.foreach { case (value, i) =>
         preparedStatement.setString(i + 1, value.toString)

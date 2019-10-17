@@ -30,6 +30,4 @@ trait DepositDao extends Deletable {
   def storeBagName(depositId: DepositId, bagName: String): MutationErrorOr[DepositId]
 
   def lastModified(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Timestamp)]]
-
-  def deleteBy(ids: Seq[DepositId]): MutationErrorOr[Seq[DepositId]]
 }

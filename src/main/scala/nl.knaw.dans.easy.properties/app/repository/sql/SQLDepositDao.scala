@@ -117,34 +117,4 @@ class SQLDepositDao(override implicit val connection: Connection) extends Deposi
       .map(executeQuery(parseLastModifiedResponse)(identity))
       .getOrElse(Seq.empty.asRight)
   }
-
-  override def deleteBy(ids: Seq[DepositId]): MutationErrorOr[Seq[DepositId]] = {
-    trace(ids)
-
-    for {
-      deposits <- find(ids).leftMap(error => MutationError(error.msg))
-      actualIds = deposits.map(_.id).toList
-      _ = NonEmptyList.fromList(actualIds).map(deleteFromAllTables)
-    } yield actualIds
-  }
-
-  private def deleteFromAllTables(ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
-    // TODO reuse DAOs? Perhaps move caller to MutationType? would conflict with #14
-    Stream("State", "Identifier", "Curation", "Springfield", "SimpleProperties", tableName)
-      .map(delete(_, ids))
-      .find(_.isLeft) // the stream makes it a fail fast
-      .getOrElse(1.asRight)
-  }
-
-  private def delete(tableName: String, ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
-    val query = QueryGenerator.deleteByDepositId(tableName)(ids)
-    managed(connection.prepareStatement(query))
-      .map(_.executeUpdateWith(ids.map(_.toString).toList))
-      .either
-      .either
-      .leftMap(throwables => {
-        assert(throwables.nonEmpty)
-        MutationError(throwables.map(_.getMessage).mkString("; "))
-      })
-  }
 }

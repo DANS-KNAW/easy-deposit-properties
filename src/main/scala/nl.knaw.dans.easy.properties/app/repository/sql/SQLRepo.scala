@@ -17,20 +17,23 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 
 import java.sql.Connection
 
+import cats.data.NonEmptyList
+import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.database.SQLErrorHandler
-import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, Repository, SpringfieldDao, StateDao }
+import nl.knaw.dans.easy.properties.app.model.DepositId
+import nl.knaw.dans.easy.properties.app.repository.{ MutationError, Repository }
 
 class SQLRepo(implicit connection: Connection, errorHandler: SQLErrorHandler) {
 
-  private val depositDao: DepositDao = new SQLDepositDao
-  private val stateDao: StateDao = new SQLStateDao
-  private val ingestStepDao: IngestStepDao = new SQLIngestStepDao
-  private val identifierDao: IdentifierDao = new SQLIdentifierDao
-  private val doiRegisteredDao: DoiRegisteredDao = new SQLDoiRegisteredDao
-  private val doiActionDao: DoiActionDao = new SQLDoiActionDao
-  private val curationDao: CurationDao = new SQLCurationDao
-  private val springfieldDao: SpringfieldDao = new SQLSpringfieldDao
-  private val contentTypeDao: ContentTypeDao = new SQLContentTypeDao
+  private val depositDao = new SQLDepositDao
+  private val stateDao = new SQLStateDao
+  private val ingestStepDao = new SQLIngestStepDao
+  private val identifierDao = new SQLIdentifierDao
+  private val doiRegisteredDao = new SQLDoiRegisteredDao
+  private val doiActionDao = new SQLDoiActionDao
+  private val curationDao = new SQLCurationDao
+  private val springfieldDao = new SQLSpringfieldDao
+  private val contentTypeDao = new SQLContentTypeDao
 
   def repository: Repository = Repository(
     depositDao,
@@ -43,4 +46,27 @@ class SQLRepo(implicit connection: Connection, errorHandler: SQLErrorHandler) {
     springfieldDao,
     contentTypeDao,
   )
+
+  def deleteDepositsBy(ids: Seq[DepositId]): Either[MutationError, Int] = {
+    NonEmptyList.fromList(ids.toList)
+      .map(deleteDeposits)
+      .getOrElse(0.asRight)
+  }
+
+  private def deleteDeposits(ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
+    Stream[SQLDeletable](
+      stateDao,
+      ingestStepDao,
+      identifierDao,
+      doiRegisteredDao,
+      doiActionDao,
+      curationDao,
+      springfieldDao,
+      contentTypeDao,
+      // TODO simpleProperties
+      depositDao, // last because of foreign keys by the others
+    ).map(_.delete(ids))
+      .find(_.isLeft) // the stream makes it a fail fast
+      .getOrElse(0.asRight)
+  }
 }

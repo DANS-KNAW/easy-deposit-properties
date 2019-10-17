@@ -12,12 +12,14 @@ trait SQLDeletable {
   implicit val connection: Connection
   private[sql] val tableName: String
 
-  def delete(ids: Seq[DepositId]): Either[MutationError, Int] = {
+  /** @return rowCount */
+  def deleteBy(ids: Seq[DepositId]): Either[MutationError, Int] = {
     NonEmptyList.fromList(ids.toList)
       .map(delete)
-      .getOrElse(1.asRight)
+      .getOrElse(0.asRight)
   }
 
+  /** @return rowCount */
   private[sql] def delete(ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
     val query = QueryGenerator.deleteByDepositId(tableName)(ids)
     managed(connection.prepareStatement(query))
