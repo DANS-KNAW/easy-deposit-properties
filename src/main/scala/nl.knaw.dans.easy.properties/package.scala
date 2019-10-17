@@ -19,7 +19,7 @@ package object properties {
 
   type ApplicationErrorOr[T] = Either[ApplicationError, T]
 
-  trait ApplicationError {
+  trait ApplicationError extends Exception {
     val msg: String
   }
 }

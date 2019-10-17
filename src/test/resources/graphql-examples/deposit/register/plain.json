@@ -1,0 +1,121 @@
+{
+  "data": {
+    "registerDeposit": {
+      "clientMutationId": "foobar",
+      "deposit": {
+        "depositId": "00000000-0000-0000-0000-000000000006",
+        "bagName": "bag",
+        "creationTimestamp": "2019-01-01T00:00:00.000Z",
+        "lastModified": "2019-01-01T00:00:00.000Z",
+        "depositor": {
+          "depositorId": "user001"
+        },
+        "origin": "SWORD2",
+        "states": {
+          "edges": [
+            {
+              "node": {
+                "label": "SUBMITTED",
+                "description": "my description",
+                "timestamp": "2019-01-01T00:00:00.000Z"
+              }
+            }
+          ]
+        },
+        "ingestSteps": {
+          "edges": [
+            {
+              "node": {
+                "step": "BAGSTORE",
+                "timestamp": "2019-01-01T00:00:00.000Z"
+              }
+            }
+          ]
+        },
+        "identifiers": [
+          {
+            "type": "BAG_STORE",
+            "value": "my-bag-store-value",
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          },
+          {
+            "type": "DOI",
+            "value": "my-doi-value",
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          },
+          {
+            "type": "FEDORA",
+            "value": "my-fedora-value",
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          },
+          {
+            "type": "URN",
+            "value": "my-urn-value",
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          }
+        ],
+        "doiRegistered": true,
+        "doiRegisteredEvents": [
+          {
+            "value": true,
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          }
+        ],
+        "doiAction": "UPDATE",
+        "doiActionEvents": [
+          {
+            "value": "UPDATE",
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          }
+        ],
+        "curators": {
+          "edges": [
+            {
+              "node": {
+                "userId": "archie001",
+                "email": "does.not.exists@dans.knaw.nl",
+                "timestamp": "2019-01-01T00:00:00.000Z"
+              }
+            }
+          ]
+        },
+        "isNewVersion": true,
+        "isNewVersionEvents": [
+          {
+            "value": true,
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          }
+        ],
+        "curationRequired": false,
+        "curationRequiredEvents": [
+          {
+            "value": false,
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          }
+        ],
+        "curationPerformed": false,
+        "curationPerformedEvents": [
+          {
+            "value": false,
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          }
+        ],
+        "springfields": [
+          {
+            "domain": "domain",
+            "user": "user",
+            "collection": "collection",
+            "playmode": "CONTINUOUS",
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          }
+        ],
+        "contentTypes": [
+          {
+            "value": "application/zip",
+            "timestamp": "2019-01-01T00:00:00.000Z"
+          }
+        ]
+      }
+    }
+  }
+}

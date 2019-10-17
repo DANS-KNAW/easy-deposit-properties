@@ -37,7 +37,7 @@
 
     <properties>
         <main-class>nl.knaw.dans.easy.properties.Command</main-class>
-        <easy.datacite.version>3.9.0</easy.datacite.version>
+        <easy.datacite.version>3.10.0</easy.datacite.version>
     </properties>
 
     <scm>

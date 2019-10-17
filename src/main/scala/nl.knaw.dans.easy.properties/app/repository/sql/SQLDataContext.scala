@@ -13,20 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.easy.properties.app.graphql
+package nl.knaw.dans.easy.properties.app.repository.sql
 
+import java.sql.Connection
+
+import nl.knaw.dans.easy.properties.app.graphql.DataContext
+import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
 import nl.knaw.dans.easy.properties.app.repository.Repository
 
 import scala.concurrent.ExecutionContext
 
-trait DataContext {
+case class SQLDataContext(private val connection: Connection,
+                          private val repoGen: Connection => Repository,
+                          private val auth: Option[Auth],
+                          private val expectedAuth: Auth,
+                         )(implicit val executionContext: ExecutionContext) extends DataContext {
 
-  val executionContext: ExecutionContext
+  def isLoggedIn: Boolean = auth contains expectedAuth
 
-  def isLoggedIn: Boolean
-
-  def repo: Repository
-
-  def registration: DepositPropertiesRegistration
+  lazy val repo: Repository = repoGen(connection)
+  lazy val registration: DepositPropertiesRegistration = new DepositPropertiesRegistration(repo)
 }

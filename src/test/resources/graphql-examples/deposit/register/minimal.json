@@ -1,0 +1,50 @@
+{
+  "data": {
+    "registerDeposit": {
+      "clientMutationId": "foobar",
+      "deposit": {
+        "depositId": "00000000-0000-0000-0000-000000000006",
+        "bagName": null,
+        "creationTimestamp": "2019-01-01T00:00:00.000Z",
+        "lastModified": "2019-01-01T00:00:00.000Z",
+        "depositor": {
+          "depositorId": "user001"
+        },
+        "origin": "SWORD2",
+        "states": {
+          "edges": [
+          ]
+        },
+        "ingestSteps": {
+          "edges": [
+          ]
+        },
+        "identifiers": [
+        ],
+        "doiRegistered": null,
+        "doiRegisteredEvents": [
+        ],
+        "doiAction": null,
+        "doiActionEvents": [
+        ],
+        "curators": {
+          "edges": [
+          ]
+        },
+        "isNewVersion": null,
+        "isNewVersionEvents": [
+        ],
+        "curationRequired": null,
+        "curationRequiredEvents": [
+        ],
+        "curationPerformed": null,
+        "curationPerformedEvents": [
+        ],
+        "springfields": [
+        ],
+        "contentTypes": [
+        ]
+      }
+    }
+  }
+}

@@ -19,10 +19,11 @@ import java.sql.Connection
 
 import cats.syntax.option._
 import nl.knaw.dans.easy.properties.app.database.DatabaseAccess
+import nl.knaw.dans.easy.properties.app.graphql.GraphQLSchema
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.app.graphql.middleware.{ Middlewares, ProfilingConfiguration }
-import nl.knaw.dans.easy.properties.app.graphql.{ DataContext, GraphQLSchema }
 import nl.knaw.dans.easy.properties.app.repository.Repository
+import nl.knaw.dans.easy.properties.app.repository.sql.SQLDataContext
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import nl.knaw.dans.lib.logging.servlet.{ LogResponseBodyOnError, MaskedLogFormatter, ServletLogger }
 import org.json4s.JsonDSL._
@@ -101,7 +102,7 @@ class GraphQLServlet(database: DatabaseAccess,
       Executor.execute(
         schema = GraphQLSchema.schema,
         queryAst = queryAst,
-        userContext = DataContext(repository(conn), auth, expectedAuth),
+        userContext = SQLDataContext(conn, repository, auth, expectedAuth),
         operationName = operation,
         variables = parseVariables(variables),
         deferredResolver = GraphQLSchema.deferredResolver,

@@ -1065,6 +1065,11 @@ type Mutation {
 
   """Set the content type for this deposit."""
   setContentType(input: SetContentTypeInput!): SetContentTypePayload
+
+  """
+  Register a new deposit with initial properties from a 'deposit.properties' string.
+  """
+  registerDeposit(input: RegisterDepositInput!): RegisterDepositPayload
 }
 
 """An object with an ID"""
@@ -1213,6 +1218,20 @@ type Query {
     """The IDs of objects"""
     ids: [ID!]!
   ): [Node]!
+}
+
+input RegisterDepositInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The 'deposit.properties' describing the deposit to be registered."""
+  depositProperties: String!
+  clientMutationId: String
+}
+
+type RegisterDepositPayload {
+  deposit: Deposit
+  clientMutationId: String
 }
 
 """
