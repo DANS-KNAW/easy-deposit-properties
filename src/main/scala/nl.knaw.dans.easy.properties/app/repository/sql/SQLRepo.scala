@@ -47,23 +47,25 @@ class SQLRepo(implicit connection: Connection, errorHandler: SQLErrorHandler) {
     contentTypeDao,
   )
 
-  def deleteDepositsBy(ids: Seq[DepositId]): Either[MutationError, Int] = {
-    NonEmptyList.fromList(ids.toList)
-      .map(deleteDeposits)
-      .getOrElse(0.asRight)
+  def deleteDepositsBy(ids: Seq[DepositId]): Either[MutationError, Seq[DepositId]] = {
+    for {
+      deposits <- depositDao.find(ids).leftMap(error => MutationError(error.msg))
+      actualIds = deposits.map(_.id).toList
+      _ = NonEmptyList.fromList(actualIds).map(deleteDeposits)
+    } yield actualIds
   }
 
   private def deleteDeposits(ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
     Stream[SQLDeletable](
       stateDao,
-      ingestStepDao,
+     // ingestStepDao, TODO need to filter ids with find on every DAO
       identifierDao,
       doiRegisteredDao,
-      doiActionDao,
+     // doiActionDao,
       curationDao,
       springfieldDao,
-      contentTypeDao,
-      // TODO simpleProperties
+     // contentTypeDao,
+      // TODO Dao for simpleProperties
       depositDao, // last because of foreign keys by the others
     ).map(_.delete(ids))
       .find(_.isLeft) // the stream makes it a fail fast
