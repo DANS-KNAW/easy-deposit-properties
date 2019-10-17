@@ -17,7 +17,6 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 
 import java.sql.Connection
 
-import cats.data.NonEmptyList
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.database.SQLErrorHandler
 import nl.knaw.dans.easy.properties.app.model.DepositId
@@ -51,23 +50,22 @@ class SQLRepo(implicit connection: Connection, errorHandler: SQLErrorHandler) {
     for {
       deposits <- depositDao.find(ids).leftMap(error => MutationError(error.msg))
       actualIds = deposits.map(_.id).toList
-      _ = NonEmptyList.fromList(actualIds).map(deleteDeposits)
+      _ = deleteDeposits(actualIds)
     } yield actualIds
   }
 
-  private def deleteDeposits(ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
+  private def deleteDeposits(ids: Seq[DepositId]): Either[MutationError, Int] = {
     Stream[SQLDeletable](
       stateDao,
-     // ingestStepDao, TODO need to filter ids with find on every DAO
       identifierDao,
-      doiRegisteredDao,
-     // doiActionDao,
       curationDao,
       springfieldDao,
-     // contentTypeDao,
-      // TODO Dao for simpleProperties
+      ingestStepDao,
+      doiRegisteredDao,
+      doiActionDao,
+      contentTypeDao,
       depositDao, // last because of foreign keys by the others
-    ).map(_.delete(ids))
+    ).map(_.deleteBy(ids))
       .find(_.isLeft) // the stream makes it a fail fast
       .getOrElse(0.asRight)
   }

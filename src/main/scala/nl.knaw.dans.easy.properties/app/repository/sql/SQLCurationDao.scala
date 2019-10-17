@@ -28,7 +28,7 @@ import resource.managed
 
 class SQLCurationDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends CurationDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[sql] val tableName = "Curation"
+  override private[sql] val daoName = "Curation"
 
   private def parseCuration(resultSet: ResultSet): Either[InvalidValueError, Curation] = {
     for {
@@ -65,19 +65,19 @@ class SQLCurationDao(override implicit val connection: Connection, errorHandler:
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[Curation]] = {
     trace(ids)
 
-    executeGetById(parseCuration)(QueryGenerator.getElementsById(tableName, "curationId"))(ids)
+    executeGetById(parseCuration)(QueryGenerator.getElementsById(daoName, "curationId"))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Curation)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndCuration)(QueryGenerator.getCurrentElementByDepositId(tableName))(ids)
+    executeGetCurrent(parseDepositIdAndCuration)(QueryGenerator.getCurrentElementByDepositId(daoName))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[Curation])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndCuration)(QueryGenerator.getAllElementsByDepositId(tableName))(ids)
+    executeGetAll(parseDepositIdAndCuration)(QueryGenerator.getAllElementsByDepositId(daoName))(ids)
   }
 
   override def store(id: DepositId, curation: InputCuration): MutationErrorOr[Curation] = {
@@ -108,7 +108,7 @@ class SQLCurationDao(override implicit val connection: Connection, errorHandler:
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, curation.timestamp, tableName)
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, curation.timestamp, daoName)
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)
@@ -118,6 +118,6 @@ class SQLCurationDao(override implicit val connection: Connection, errorHandler:
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseCurationIdAndDeposit)(QueryGenerator.getDepositsById(tableName, "curationId"))(ids)
+    executeGetDepositById(parseCurationIdAndDeposit)(QueryGenerator.getDepositsById(daoName, "curationId"))(ids)
   }
 }

@@ -3,9 +3,10 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 import java.util.UUID
 
 import cats.scalatest.EitherValues
+import cats.syntax.either._
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
 
-import scala.util.{ Failure, Try }
+import scala.util.{ Failure, Success, Try }
 
 class SQLRepoSpec extends TestSupportFixture
   with FileSystemSupport
@@ -48,5 +49,15 @@ class SQLRepoSpec extends TestSupportFixture
     Try(dao.deleteDepositsBy(uuids)) should matchPattern {
       case Failure(e) if e.isInstanceOf[NullPointerException] =>
     }
+  }
+
+  it should "succeed when one of the tables was empty" in {
+    val uuids = Seq(
+      UUID.fromString("00000000-0000-0000-0000-000000000005"),
+    )
+    val repo = new SQLRepo()
+    repo.repository.identifiers.deleteBy(uuids)
+
+    Try(repo.deleteDepositsBy(uuids)) shouldBe Success(uuids.toList.asRight)
   }
 }

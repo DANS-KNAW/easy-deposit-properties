@@ -25,9 +25,10 @@ import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlread
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLIngestStepDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends IngestStepDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLIngestStepDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends IngestStepDao with SQLDeletableProperty with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[sql] val tableName = "IngestStep"
+  override private[sql] val daoName = "IngestStep"
+  override private[sql] val key = "ingest-step"
 
   private def parseIngestStep(resultSet: ResultSet): Either[InvalidValueError, IngestStep] = {
     for {

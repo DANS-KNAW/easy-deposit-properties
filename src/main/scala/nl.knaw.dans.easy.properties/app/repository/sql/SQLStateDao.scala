@@ -27,7 +27,7 @@ import resource.managed
 
 class SQLStateDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends StateDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[sql] val tableName = "State"
+  override private[sql] val daoName = "State"
 
   private def parseState(resultSet: ResultSet): Either[InvalidValueError, State] = {
     for {
@@ -55,19 +55,19 @@ class SQLStateDao(override implicit val connection: Connection, errorHandler: SQ
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[State]] = {
     trace(ids)
 
-    executeGetById(parseState)(QueryGenerator.getElementsById(tableName, "stateId"))(ids)
+    executeGetById(parseState)(QueryGenerator.getElementsById(daoName, "stateId"))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, State)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndState)(QueryGenerator.getCurrentElementByDepositId(tableName))(ids)
+    executeGetCurrent(parseDepositIdAndState)(QueryGenerator.getCurrentElementByDepositId(daoName))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[State])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndState)(QueryGenerator.getAllElementsByDepositId(tableName))(ids)
+    executeGetAll(parseDepositIdAndState)(QueryGenerator.getAllElementsByDepositId(daoName))(ids)
   }
 
   override def store(id: DepositId, state: InputState): MutationErrorOr[State] = {
@@ -95,7 +95,7 @@ class SQLStateDao(override implicit val connection: Connection, errorHandler: SQ
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, state.timestamp, tableName)
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, state.timestamp, daoName)
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)
@@ -105,6 +105,6 @@ class SQLStateDao(override implicit val connection: Connection, errorHandler: SQ
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseStateIdAndDeposit)(QueryGenerator.getDepositsById(tableName, "stateId"))(ids)
+    executeGetDepositById(parseStateIdAndDeposit)(QueryGenerator.getDepositsById(daoName, "stateId"))(ids)
   }
 }
