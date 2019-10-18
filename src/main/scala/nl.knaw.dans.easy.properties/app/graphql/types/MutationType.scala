@@ -51,7 +51,7 @@ trait MutationType {
   case class SetSpringfieldPayload(clientMutationId: Option[String], objectId: String) extends Mutation
   case class SetContentTypePayload(clientMutationId: Option[String], objectId: String) extends Mutation
   case class RegisterDepositPayload(clientMutationId: Option[String], depositId: DepositId) extends Mutation
-  case class DeleteDeposits(clientMutationId: Option[String], depositIds: Seq[DepositId]) extends Mutation
+  case class DeleteDepositsPayload(clientMutationId: Option[String], depositIds: Seq[DepositId]) extends Mutation
 
   private val depositIdListInputField: InputField[Seq[DepositId]] = InputField(
     name = "depositId",
@@ -375,7 +375,7 @@ trait MutationType {
   )
 
   implicit val DepositIdType: ScalarType[DepositId] = UUIDType // TODO caused compiler errors in DepositType when placed in ScalarTypes
-  private val depositIdsFieldForDelete: Field[DataContext, DeleteDeposits] = Field(
+  private val depositIdsFieldForDelete: Field[DataContext, DeleteDepositsPayload] = Field(
     name = "depositId",
     fieldType = ListType[DepositId](DepositIdType),
     resolve = ctx => ctx.value.depositIds,
@@ -579,7 +579,7 @@ trait MutationType {
     mutateAndGetPayload = registerDeposit,
   )
 
-  private val deleteDepositsField: Field[DataContext, Unit] = Mutation.fieldWithClientMutationId[DataContext, Unit, DeleteDeposits, InputObjectType.DefaultInput](
+  private val deleteDepositsField: Field[DataContext, Unit] = Mutation.fieldWithClientMutationId[DataContext, Unit, DeleteDepositsPayload, InputObjectType.DefaultInput](
     fieldName = "deleteDeposits",
     typeName = "DeleteDeposits",
     tags = List(
@@ -774,12 +774,12 @@ trait MutationType {
       .toTry
   }
 
-  private def deleteDeposits(input: InputObjectType.DefaultInput, context: Context[DataContext, Unit]): Action[DataContext, DeleteDeposits] = {
+  private def deleteDeposits(input: InputObjectType.DefaultInput, context: Context[DataContext, Unit]): Action[DataContext, DeleteDepositsPayload] = {
     context.ctx.deleter
       .deleteDepositsBy(
         ids = input(depositIdListInputField.name).asInstanceOf[Seq[DepositId]],
       )
-      .map(depositId => DeleteDeposits(
+      .map(depositId => DeleteDepositsPayload(
         input.get(Mutation.ClientMutationIdFieldName).flatMap(_.asInstanceOf[Option[String]]),
         depositId,
       ))
