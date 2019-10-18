@@ -15,6 +15,7 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql
 
+import nl.knaw.dans.easy.properties.app.Deleter
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
 import nl.knaw.dans.easy.properties.app.repository.Repository
 
@@ -29,4 +30,6 @@ trait DataContext {
   def repo: Repository
 
   def registration: DepositPropertiesRegistration
+
+  def deleter: Deleter
 }

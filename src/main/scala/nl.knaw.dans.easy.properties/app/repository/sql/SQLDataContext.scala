@@ -17,6 +17,7 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 
 import java.sql.Connection
 
+import nl.knaw.dans.easy.properties.app.Deleter
 import nl.knaw.dans.easy.properties.app.graphql.DataContext
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
@@ -34,4 +35,5 @@ case class SQLDataContext(private val connection: Connection,
 
   lazy val repo: Repository = repoGen(connection)
   lazy val registration: DepositPropertiesRegistration = new DepositPropertiesRegistration(repo)
+  lazy val deleter: Deleter = new Deleter(repo)
 }

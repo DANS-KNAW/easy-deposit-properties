@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.easy.properties.app.repository.sql
+package nl.knaw.dans.easy.properties.app
 
 import java.util.UUID
 
@@ -21,9 +21,9 @@ import cats.scalatest.EitherValues
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
 
-import scala.util.{ Failure, Success, Try }
+import scala.util.{ Failure, Try }
 
-class SQLDeletableSpec extends TestSupportFixture
+class DeleterSpec extends TestSupportFixture
   with FileSystemSupport
   with DatabaseFixture
   with DatabaseDataFixture
@@ -33,54 +33,53 @@ class SQLDeletableSpec extends TestSupportFixture
   private val uuid6: UUID = UUID.fromString("00000000-0000-0000-0000-000000000006") // does not exist
 
   "delete" should "fail with a foreign key violation" in {
-    new SQLDepositDao().deleteBy(Seq(uuid5)).leftValue.msg shouldBe
+    repository.deposits.deleteBy(Seq(uuid5)).leftValue.msg shouldBe
       "integrity constraint violation: foreign key no action; SYS_FK_10153 table: STATE"
   }
 
   it should "fail with a NullPointerException" in {
     // TODO MutationError?
-    val repo = new SQLRepo()
-    Try(repo.deleteDepositsBy(Seq(null))) should matchPattern {
+    val deleter = new Deleter(repository)
+    Try(deleter.deleteDepositsBy(Seq(null))) should matchPattern {
       case Failure(e) if e.isInstanceOf[NullPointerException] =>
     }
   }
 
   it should "fail on a null as id" in {
-    new SQLStateDao().deleteBy(Seq(null)).leftValue.msg shouldBe "null"
+    repository.deposits.deleteBy(Seq(null)).leftValue.msg shouldBe "null"
   }
 
   it should "succeed with a mix of existing and non existing IDs" in {
     val uuids = Seq(uuid5, uuid6)
-    val repo = new SQLRepo()
-    val stateDao = repo.repository.states
+    val deleter = new Deleter(repository)
 
     // just sampling preconditions of one other table
-    stateDao.getAll(uuids).getOrElse(fail) should matchPattern {
-      case List((_, List(_, _, _, _)), (_, List())) => // 4 states were found
+    repository.states.getAll(uuids).getOrElse(fail) should matchPattern {
+      case List((_, List(_, _, _, _)), (_, List())) => // 4 states were found for the first ID
     }
 
-    repo.deleteDepositsBy(uuids) should matchPattern {
+    deleter.deleteDepositsBy(uuids) should matchPattern {
       case Right(List(_)) => // just one of the IDs is found in the deposits table
     }
-    repo.repository.deposits.find(uuids).getOrElse(fail) shouldBe empty
+    repository.deposits.find(uuids).getOrElse(fail) shouldBe empty
 
     // sampling post conditions of the same other table
-    stateDao.getAll(uuids).getOrElse(fail) should matchPattern {
-      case List((_, List()), (_, List())) => // no states were found
+    repository.states.getAll(uuids).getOrElse(fail) should matchPattern {
+      case List((_, List()), (_, List())) => // no states at all any more
     }
   }
 
   it should "succeed with a non existing ID" in {
-    new SQLRepo().deleteDepositsBy(Seq(uuid6)) should matchPattern {
+    new Deleter(repository).deleteDepositsBy(Seq(uuid6)) should matchPattern {
       case Right(List()) =>
     }
   }
 
   it should "succeed when one of the tables was empty" in {
     val uuids = Seq(uuid5)
-    val repo = new SQLRepo()
-    repo.repository.identifiers.deleteBy(uuids) // clear one of the DAOs
+    val deleter = new Deleter(repository)
+    repository.identifiers.deleteBy(uuids) // clear one of the DAOs
 
-    Try(repo.deleteDepositsBy(uuids)) shouldBe Success(uuids.toList.asRight)
+    deleter.deleteDepositsBy(uuids) shouldBe uuids.toList.asRight
   }
 }
