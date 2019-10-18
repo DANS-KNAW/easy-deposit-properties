@@ -27,7 +27,7 @@ import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, Sp
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, StateLabel }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DepositorId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin, Timestamp }
 import sangria.relay.Mutation
-import sangria.schema.{ Action, BooleanType, Context, Field, InputField, InputObjectType, ObjectType, OptionInputType, OptionType, StringType, fields }
+import sangria.schema.{ Action, BooleanType, Context, Field, InputField, InputObjectType, ListInputType, ListType, ObjectType, OptionInputType, OptionType, ScalarType, StringType, fields }
 
 trait MutationType {
   this: DepositType
@@ -51,7 +51,16 @@ trait MutationType {
   case class SetSpringfieldPayload(clientMutationId: Option[String], objectId: String) extends Mutation
   case class SetContentTypePayload(clientMutationId: Option[String], objectId: String) extends Mutation
   case class RegisterDepositPayload(clientMutationId: Option[String], depositId: DepositId) extends Mutation
+  case class DeleteDeposits(clientMutationId: Option[String], depositIds: Seq[DepositId]) extends Mutation
 
+  private val depositIdListInputField: InputField[Seq[DepositId]] = InputField(
+    name = "depositId",
+    description = Some("The identifiers of the deposits to delete."),
+    defaultValue = None,
+    fieldType = ListInputType(UUIDType),
+    astDirectives = Vector.empty,
+    astNodes = Vector.empty,
+  )
   private val depositIdInputField: InputField[DepositId] = InputField(
     name = "depositId",
     description = Some("The deposit's identifier."),
@@ -365,6 +374,13 @@ trait MutationType {
     resolve = ctx => DepositResolver.depositById(ctx.value.depositId)(ctx.ctx),
   )
 
+  implicit val DepositIdType: ScalarType[DepositId] = UUIDType // TODO caused compiler errors in DepositType when placed in ScalarTypes
+  private val depositIdsFieldForDelete: Field[DataContext, DeleteDeposits] = Field(
+    name = "depositId",
+    fieldType = ListType[DepositId](DepositIdType),
+    resolve = ctx => ctx.value.depositIds,
+  )
+
   private val addDepositField: Field[DataContext, Unit] = Mutation.fieldWithClientMutationId[DataContext, Unit, AddDepositPayload, InputObjectType.DefaultInput](
     fieldName = "addDeposit",
     typeName = "AddDeposit",
@@ -563,6 +579,22 @@ trait MutationType {
     mutateAndGetPayload = registerDeposit,
   )
 
+  private val deleteDepositsField: Field[DataContext, Unit] = Mutation.fieldWithClientMutationId[DataContext, Unit, DeleteDeposits, InputObjectType.DefaultInput](
+    fieldName = "deleteDeposits",
+    typeName = "DeleteDeposits",
+    tags = List(
+      RequiresAuthentication,
+    ),
+    fieldDescription = Some("Delete deposits."),
+    inputFields = List(
+      depositIdListInputField,
+    ),
+    outputFields = fields(
+      depositIdsFieldForDelete,
+    ),
+    mutateAndGetPayload = deleteDeposits,
+  )
+
   private def addDeposit(input: InputObjectType.DefaultInput, context: Context[DataContext, Unit]): Action[DataContext, AddDepositPayload] = {
     context.ctx.repo.deposits
       .store(Deposit(
@@ -742,6 +774,18 @@ trait MutationType {
       .toTry
   }
 
+  private def deleteDeposits(input: InputObjectType.DefaultInput, context: Context[DataContext, Unit]): Action[DataContext, DeleteDeposits] = {
+    context.ctx.deleter
+      .deleteDepositsBy(
+        ids = input(depositIdListInputField.name).asInstanceOf[Seq[DepositId]],
+      )
+      .map(depositId => DeleteDeposits(
+        input.get(Mutation.ClientMutationIdFieldName).flatMap(_.asInstanceOf[Option[String]]),
+        depositId,
+      ))
+      .toTry
+  }
+
   implicit val MutationType: ObjectType[DataContext, Unit] = ObjectType(
     name = "Mutation",
     description = "The root query for implementing GraphQL mutations.",
@@ -757,6 +801,7 @@ trait MutationType {
       setSpringfieldField,
       setContentTypeField,
       registerDepositField,
+      deleteDepositsField,
     ),
   )
 }
