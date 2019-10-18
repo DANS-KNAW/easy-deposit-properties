@@ -38,7 +38,7 @@ class DeleterSpec extends TestSupportFixture
   }
 
   it should "fail with a NullPointerException" in {
-    // TODO MutationError?
+    // TODO Would rather like an IlegalInputException and some additional info
     val deleter = new Deleter(repository)
     Try(deleter.deleteDepositsBy(Seq(null))) should matchPattern {
       case Failure(e) if e.isInstanceOf[NullPointerException] =>
