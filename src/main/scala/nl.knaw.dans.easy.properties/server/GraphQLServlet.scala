@@ -29,7 +29,7 @@ import nl.knaw.dans.lib.logging.servlet.{ LogResponseBodyOnError, MaskedLogForma
 import org.json4s.JsonAST.JObject
 import org.json4s.JsonDSL._
 import org.json4s.ext.UUIDSerializer
-import org.json4s.native.{ JsonMethods, Serialization }
+import org.json4s.native.Serialization
 import org.json4s.{ DefaultFormats, Formats, JValue }
 import org.scalatra._
 import org.scalatra.auth.strategy.BasicAuthStrategy.BasicAuthRequest
@@ -120,12 +120,6 @@ class GraphQLServlet(database: DatabaseAccess,
       .recover {
         case error => InternalServerError(Serialization.write(error.getMessage))
       }
-  }
-
-  private def parseVariables(optS: Option[String]): JValue = {
-    optS.filter(s => s.trim != "" && s.trim != "null")
-      .map(JsonMethods.parse(_))
-      .getOrElse(Nil)
   }
 
   private def syntaxError(error: SyntaxError): String = {
