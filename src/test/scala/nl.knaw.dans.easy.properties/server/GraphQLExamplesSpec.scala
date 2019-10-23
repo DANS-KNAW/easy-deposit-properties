@@ -156,6 +156,139 @@ class GraphQLExamplesSpec extends TestSupportFixture
     }
   }
 
+  it should "use variables as they are sent with the query" in {
+    val query =
+      """query GetDeposit($id: UUID!) {
+        |  deposit(id: $id) {
+        |    state {
+        |      label
+        |      description
+        |      timestamp
+        |    }
+        |  }
+        |}""".stripMargin
+
+    val json =
+      ("query" -> query) ~ {
+        "variables" -> {
+          "id" -> "00000000-0000-0000-0000-000000000001"
+        }
+      }
+    val queryBody = compact(render(json))
+
+    val expectedQueryOutput = writePretty {
+      "data" -> {
+        "deposit" -> {
+          "state" -> {
+            ("label" -> "ARCHIVED") ~
+              ("description" -> "deposit is archived") ~
+              ("timestamp" -> "2019-01-01T05:05:00.000Z")
+          }
+        }
+      }
+    }
+
+    post(uri = "/", body = queryBody.getBytes) {
+      body shouldBe expectedQueryOutput
+      status shouldBe 200
+    }
+  }
+
+  it should "use variables as they are sent with the 'query', 'mutation', 'query' sequence" in {
+    val query =
+      """query GetDeposit($id: UUID!) {
+        |  deposit(id: $id) {
+        |    state {
+        |      label
+        |      description
+        |      timestamp
+        |    }
+        |  }
+        |}""".stripMargin
+    val mutation =
+      """mutation UpdateState($input: UpdateStateInput!) {
+        |  updateState(input: $input) {
+        |    clientMutationId
+        |    state {
+        |      label
+        |      description
+        |      timestamp
+        |    }
+        |  }
+        |}""".stripMargin
+
+    val queryJson =
+      ("query" -> query) ~ {
+        "variables" -> {
+          "id" -> "00000000-0000-0000-0000-000000000001"
+        }
+      }
+    val mutationJson =
+      ("query" -> mutation) ~ {
+        "variables" -> {
+          "input" -> {
+            ("clientMutationId" -> "Hello Internet") ~
+              ("depositId" -> "00000000-0000-0000-0000-000000000001") ~
+              ("label" -> "FEDORA_ARCHIVED") ~
+              ("description" -> "the deposit is archived in Fedora as easy-dataset:13") ~
+              ("timestamp" -> "2019-07-02T08:15:00.000+02:00")
+          }
+        }
+      }
+    val queryBody = compact(render(queryJson))
+    val mutationBody = compact(render(mutationJson))
+
+    val expectedQueryOutput1 = writePretty {
+      "data" -> {
+        "deposit" -> {
+          "state" -> {
+            ("label" -> "ARCHIVED") ~
+              ("description" -> "deposit is archived") ~
+              ("timestamp" -> "2019-01-01T05:05:00.000Z")
+          }
+        }
+      }
+    }
+    val expectedMutationOutput = writePretty {
+      "data" -> {
+        "updateState" -> {
+          ("clientMutationId" -> "Hello Internet") ~
+            ("state" -> {
+              ("label" -> "FEDORA_ARCHIVED") ~
+                ("description" -> "the deposit is archived in Fedora as easy-dataset:13") ~
+                ("timestamp" -> "2019-07-02T06:15:00.000Z")
+            })
+        }
+      }
+    }
+    val expectedQueryOutput2 = writePretty {
+      "data" -> {
+        "deposit" -> {
+          "state" -> {
+            ("label" -> "FEDORA_ARCHIVED") ~
+              ("description" -> "the deposit is archived in Fedora as easy-dataset:13") ~
+              ("timestamp" -> "2019-07-02T06:15:00.000Z")
+          }
+        }
+      }
+    }
+
+    post(uri = "/", body = queryBody.getBytes) {
+      body shouldBe expectedQueryOutput1
+      status shouldBe 200
+    }
+
+    post(uri = "/", body = mutationBody.getBytes, headers = Seq(authHeader)) {
+      body shouldBe expectedMutationOutput
+      status shouldBe 200
+    }
+
+    post(uri = "/", body = queryBody.getBytes) {
+      body shouldBe expectedQueryOutput2
+      status shouldBe 200
+    }
+  }
+
   it should "return an error in the body when no authentication is given for a mutation" in {
     val mutation =
       """mutation {
