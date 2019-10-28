@@ -53,8 +53,8 @@ trait MutationType {
   case class RegisterDepositPayload(clientMutationId: Option[String], depositId: DepositId) extends Mutation
   case class DeleteDepositsPayload(clientMutationId: Option[String], depositIds: Seq[DepositId]) extends Mutation
 
-  private val depositIdListInputField: InputField[Seq[DepositId]] = InputField(
-    name = "depositId",
+  private val depositIdsListInputField: InputField[Seq[DepositId]] = InputField(
+    name = "depositIds",
     description = Some("A list of deposit identifiers."),
     defaultValue = None,
     fieldType = ListInputType(UUIDType),
@@ -587,7 +587,7 @@ trait MutationType {
     ),
     fieldDescription = Some("Delete deposits."),
     inputFields = List(
-      depositIdListInputField,
+      depositIdsListInputField,
     ),
     outputFields = fields(
       depositIdsFieldForDelete,
@@ -777,7 +777,7 @@ trait MutationType {
   private def deleteDeposits(input: InputObjectType.DefaultInput, context: Context[DataContext, Unit]): Action[DataContext, DeleteDepositsPayload] = {
     context.ctx.deleter
       .deleteDepositsBy(
-        ids = input(depositIdListInputField.name).asInstanceOf[Seq[DepositId]],
+        ids = input(depositIdsListInputField.name).asInstanceOf[Seq[DepositId]],
       )
       .map(depositId => DeleteDepositsPayload(
         input.get(Mutation.ClientMutationIdFieldName).flatMap(_.asInstanceOf[Option[String]]),
