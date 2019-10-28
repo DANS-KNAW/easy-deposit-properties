@@ -46,13 +46,13 @@ class SQLDoiActionDao(override implicit val connection: Connection, errorHandler
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, DoiActionEvent)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndDoiActionEvent)(QueryGenerator.getSimplePropsCurrentElementByDepositId("doi-action"))(ids)
+    executeGetCurrent(parseDepositIdAndDoiActionEvent)(QueryGenerator.getSimplePropsCurrentElementByDepositId(key))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[DoiActionEvent])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndDoiActionEvent)(QueryGenerator.getSimplePropsAllElementsByDepositId("doi-action"))(ids)
+    executeGetAll(parseDepositIdAndDoiActionEvent)(QueryGenerator.getSimplePropsAllElementsByDepositId(key))(ids)
   }
 
   override def store(id: DepositId, action: DoiActionEvent): MutationErrorOr[DoiActionEvent] = {
@@ -63,7 +63,7 @@ class SQLDoiActionDao(override implicit val connection: Connection, errorHandler
     managed(connection.prepareStatement(query))
       .map(prepStatement => {
         prepStatement.setString(1, id.toString)
-        prepStatement.setString(2, "doi-action")
+        prepStatement.setString(2, key)
         prepStatement.setString(3, action.value.toString)
         prepStatement.setTimestamp(4, action.timestamp, timeZone)
         prepStatement.executeUpdate()

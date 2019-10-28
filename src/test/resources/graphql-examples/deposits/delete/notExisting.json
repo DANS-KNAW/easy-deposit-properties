@@ -2,7 +2,7 @@
   "data": {
     "deleteDeposits": {
       "clientMutationId": null,
-      "depositId": []
+      "depositIds": []
     }
   }
 }

@@ -46,13 +46,13 @@ class SQLDoiRegisteredDao(override implicit val connection: Connection, errorHan
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, DoiRegisteredEvent)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsCurrentElementByDepositId("doi-registered"))(ids)
+    executeGetCurrent(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsCurrentElementByDepositId(key))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[DoiRegisteredEvent])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsAllElementsByDepositId("doi-registered"))(ids)
+    executeGetAll(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsAllElementsByDepositId(key))(ids)
   }
 
   override def store(id: DepositId, registered: DoiRegisteredEvent): MutationErrorOr[DoiRegisteredEvent] = {
@@ -63,7 +63,7 @@ class SQLDoiRegisteredDao(override implicit val connection: Connection, errorHan
     managed(connection.prepareStatement(query))
       .map(prepStatement => {
         prepStatement.setString(1, id.toString)
-        prepStatement.setString(2, "doi-registered")
+        prepStatement.setString(2, key)
         prepStatement.setString(3, registered.value.toString)
         prepStatement.setTimestamp(4, registered.timestamp, timeZone)
         prepStatement.executeUpdate()
