@@ -396,7 +396,7 @@ scalar DateTime
 
 input DeleteDepositsInput {
   """A list of deposit identifiers."""
-  depositId: [UUID!]!
+  depositIds: [UUID!]!
   clientMutationId: String
 }
 
