@@ -17,7 +17,7 @@ package nl.knaw.dans.easy.properties.app
 
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.model.DepositId
-import nl.knaw.dans.easy.properties.app.repository.{ Deletable, MutationError, Repository }
+import nl.knaw.dans.easy.properties.app.repository.{ MutationError, Repository }
 
 class Deleter(repository: => Repository) {
 
@@ -25,23 +25,15 @@ class Deleter(repository: => Repository) {
     for {
       deposits <- repository.deposits.find(ids).leftMap(error => MutationError(error.msg))
       actualIds = deposits.map(_.id).toList
-      _ = deleteDeposits(actualIds)
+      _ <- repository.states.deleteBy(actualIds)
+      _ <- repository.identifiers.deleteBy(actualIds)
+      _ <- repository.curation.deleteBy(actualIds)
+      _ <- repository.springfield.deleteBy(actualIds)
+      _ <- repository.ingestSteps.deleteBy(actualIds)
+      _ <- repository.doiRegistered.deleteBy(actualIds)
+      _ <- repository.doiAction.deleteBy(actualIds)
+      _ <- repository.contentType.deleteBy(actualIds)
+      _ <- repository.deposits.deleteBy(actualIds) // last because of foreign keys by the other.deleteBy(actualIds)
     } yield actualIds
-  }
-
-  private def deleteDeposits(ids: Seq[DepositId]): Either[MutationError, Int] = {
-    Stream[Deletable](
-      repository.states,
-      repository.identifiers,
-      repository.curation,
-      repository.springfield,
-      repository.ingestSteps,
-      repository.doiRegistered,
-      repository.doiAction,
-      repository.contentType,
-      repository.deposits, // last because of foreign keys by the others
-    ).map(_.deleteBy(ids))
-      .find(_.isLeft) // the stream makes it a fail fast
-      .getOrElse(0.asRight)
   }
 }

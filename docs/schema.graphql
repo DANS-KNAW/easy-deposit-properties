@@ -1,0 +1,1595 @@
+input AddBagNameInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The name of the deposited bag."""
+  bagName: String!
+  clientMutationId: String
+}
+
+type AddBagNamePayload {
+  deposit: Deposit
+  clientMutationId: String
+}
+
+input AddDepositInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The name of the deposited bag."""
+  bagName: String
+
+  """The timestamp at which this deposit was created."""
+  creationTimestamp: DateTime!
+
+  """The depositor that submits this deposit."""
+  depositorId: String!
+
+  """The origin of the deposited bag."""
+  origin: Origin!
+  clientMutationId: String
+}
+
+type AddDepositPayload {
+  deposit: Deposit
+  clientMutationId: String
+}
+
+input AddIdentifierInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The type of identifier."""
+  type: IdentifierType!
+
+  """The value of the identifier."""
+  value: String!
+
+  """The timestamp at which the identifier got added to this deposit."""
+  timestamp: DateTime!
+  clientMutationId: String
+}
+
+type AddIdentifierPayload {
+  identifier: Identifier
+  clientMutationId: String
+}
+
+"""
+A SWORD2 internal property to record the type of messages sent by a client to create the deposit.
+"""
+type ContentType implements Node {
+  """
+  The timestamp at which this springfield configuration was associated with the deposit.
+  """
+  timestamp: DateTime!
+
+  """
+  Returns the deposit that is associated with this particular content type.
+  """
+  deposit: Deposit
+
+  """List all deposits with the same current content type."""
+  deposits(
+    """
+    Determine whether to search in current content types (`LATEST`, default) or all current and past content types (`ALL`).
+    """
+    contentTypeFilter: SeriesFilter! = LATEST
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection
+
+  """The ID of an object"""
+  id: ID!
+
+  """The content type associated with this deposit."""
+  value: String
+}
+
+"""Ordering options for content types"""
+input ContentTypeOrder {
+  """The field to order content types by"""
+  field: ContentTypeOrderField!
+
+  """The ordering direction"""
+  direction: OrderDirection!
+}
+
+"""Properties by which content types can be ordered"""
+enum ContentTypeOrderField {
+  """Order content types by timestamp"""
+  TIMESTAMP
+
+  """Order content types by value"""
+  VALUE
+}
+
+"""
+A SWORD2 internal property to record the type of messages sent by a client to create the deposit.
+"""
+enum ContentTypeValue {
+  """content type 'application/octet-stream'"""
+  OCTET
+
+  """content type 'application/zip'"""
+  ZIP
+}
+
+"""
+Curation event containing the data manager and status of curation for this deposit.
+"""
+type Curation implements Node {
+  """True if the deposit is a new version."""
+  isNewVersion: Boolean
+
+  """True if curation by a data manager is required."""
+  curationRequired: Boolean!
+
+  """True if curation by the data manager has been performed."""
+  curationPerformed: Boolean!
+
+  """The data manager's username in EASY."""
+  datamanagerUserId: String!
+
+  """The data manager's email address."""
+  datamanagerEmail: String!
+
+  """
+  The timestamp at which this curation event was assigned to this deposit.
+  """
+  timestamp: DateTime!
+
+  """
+  Returns the deposit that is associated with this particular curation object.
+  """
+  deposit: Deposit
+
+  """List all deposits with the same data manager."""
+  deposits(
+    """
+    Determine whether to search in current curators (`LATEST`, default) only or
+    all current and past curators (`ALL`) of this deposit.
+    """
+    curatorFilter: SeriesFilter! = LATEST
+
+    """Find only those deposits that have this specified bag name."""
+    bagName: String
+
+    """Find only those deposits that have this specified origin."""
+    origin: Origin
+
+    """List only those deposits that have this specified state label."""
+    state: DepositStateFilter
+
+    """List only those deposits that have this specified ingest step label."""
+    ingestStep: DepositIngestStepFilter
+
+    """
+    List only those deposits that have this specified value for DOI registered.
+    """
+    doiRegistered: DepositDoiRegisteredFilter
+
+    """
+    List only those deposits that have this specified value for DOI action.
+    """
+    doiAction: DepositDoiActionFilter
+
+    """
+    List only those deposits that have this specified value for 'is-new-version'.
+    """
+    isNewVersion: DepositIsNewVersionFilter
+
+    """
+    List only those deposits that have this specified value for 'curation required'.
+    """
+    curationRequired: DepositCurationRequiredFilter
+
+    """
+    List only those deposits that have this specified value for 'curation performed'.
+    """
+    curationPerformed: DepositCurationPerformedFilter
+
+    """List only those deposits that have this specified content type."""
+    contentType: DepositContentTypeFilter
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection
+
+  """The ID of an object"""
+  id: ID!
+}
+
+"""Whether the deposit has been curated by the data manager."""
+type CurationPerformedEvent {
+  """True if curation by the data manager has been performed."""
+  value: Boolean!
+
+  """The timestamp at which the curation was completed."""
+  timestamp: DateTime!
+}
+
+"""Whether curation by data manager is required."""
+type CurationRequiredEvent {
+  """True if curation by a data manager is required."""
+  value: Boolean!
+
+  """
+  The timestamp at which was decided that this deposit requires curation.
+  """
+  timestamp: DateTime!
+}
+
+"""Data manager responsible for curating this deposit."""
+type Curator implements Node {
+  """The data manager's username in EASY."""
+  userId: String!
+
+  """The data manager's email address."""
+  email: String!
+
+  """The timestamp at which the data manager was assigned to this deposit."""
+  timestamp: DateTime!
+
+  """
+  Returns the deposit that is associated with this particular curator object.
+  """
+  deposit: Deposit
+
+  """List all deposits with the same data manager."""
+  deposits(
+    """
+    Determine whether to search in current curators (`LATEST`, default) only or
+    all current and past curators (`ALL`) of this deposit.
+    """
+    curatorFilter: SeriesFilter! = LATEST
+
+    """Find only those deposits that have this specified bag name."""
+    bagName: String
+
+    """Find only those deposits that have this specified origin."""
+    origin: Origin
+
+    """List only those deposits that have this specified state label."""
+    state: DepositStateFilter
+
+    """List only those deposits that have this specified ingest step label."""
+    ingestStep: DepositIngestStepFilter
+
+    """
+    List only those deposits that have this specified value for DOI registered.
+    """
+    doiRegistered: DepositDoiRegisteredFilter
+
+    """
+    List only those deposits that have this specified value for DOI action.
+    """
+    doiAction: DepositDoiActionFilter
+
+    """
+    List only those deposits that have this specified value for 'is-new-version'.
+    """
+    isNewVersion: DepositIsNewVersionFilter
+
+    """
+    List only those deposits that have this specified value for 'curation required'.
+    """
+    curationRequired: DepositCurationRequiredFilter
+
+    """
+    List only those deposits that have this specified value for 'curation performed'.
+    """
+    curationPerformed: DepositCurationPerformedFilter
+
+    """List only those deposits that have this specified content type."""
+    contentType: DepositContentTypeFilter
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection
+
+  """The ID of an object"""
+  id: ID!
+}
+
+"""A connection to a list of items."""
+type CuratorConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [CuratorEdge]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type CuratorEdge {
+  """The item at the end of the edge."""
+  node: Curator!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""Ordering options for curators"""
+input CuratorOrder {
+  """The field to order curators by"""
+  field: CuratorOrderField!
+
+  """The ordering direction"""
+  direction: OrderDirection!
+}
+
+"""Properties by which curators can be ordered"""
+enum CuratorOrderField {
+  """Order curators by timestamp"""
+  TIMESTAMP
+
+  """Order curators by step"""
+  USERID
+}
+
+"""
+A DateTime scalar type represents textual data, formatted as an ISO8601 date-time.
+"""
+scalar DateTime
+
+input DeleteDepositsInput {
+  """A list of deposit identifiers."""
+  depositId: [UUID!]!
+  clientMutationId: String
+}
+
+type DeleteDepositsPayload {
+  depositIds: [UUID!]!
+  clientMutationId: String
+}
+
+"""Contains all technical metadata about this deposit."""
+type Deposit implements Node {
+  """The identifier of the deposit."""
+  depositId: UUID!
+
+  """The moment this deposit was created."""
+  creationTimestamp: DateTime!
+
+  """The ID of an object"""
+  id: ID!
+
+  """The current state of the deposit."""
+  state: State
+
+  """List all states of the deposit."""
+  states(
+    """Ordering options for the returned states."""
+    orderBy: StateOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): StateConnection
+
+  """
+  Get the timestamp at which this deposit was last modified. If the dataset was
+  only created, the creation timestamp is returned.
+  """
+  lastModified: DateTime
+
+  """The current ingest step of the deposit."""
+  ingestStep: IngestStep
+
+  """List all ingest steps of the deposit."""
+  ingestSteps(
+    """Ordering options for the returned ingest steps."""
+    orderBy: IngestStepOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): IngestStepConnection
+
+  """Return the identifier of the given type related to this deposit"""
+  identifier(
+    """Find the identifier with this specific type."""
+    type: IdentifierType!
+  ): Identifier
+
+  """List the identifiers related to this deposit"""
+  identifiers: [Identifier!]!
+
+  """Returns whether the DOI is registered in DataCite."""
+  doiRegistered: Boolean
+
+  """
+  Lists all state changes related to the registration of the DOI in DataCite
+  """
+  doiRegisteredEvents: [DoiRegisteredEvent!]!
+
+  """
+  Returns whether the DOI should be 'created' or 'updated' on registration in DataCite
+  """
+  doiAction: DoiAction
+
+  """
+  Lists all state changes related to whether the DOI should be 'created' or 'updated' on registration in DataCite
+  """
+  doiActionEvents: [DoiActionEvent!]!
+
+  """The data manager currently assigned to this deposit"""
+  curator: Curator
+
+  """List all data manager that were ever assigned to this deposit."""
+  curators(
+    """Ordering options for the returned curators."""
+    orderBy: CuratorOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): CuratorConnection
+
+  """Whether this deposit is a new version."""
+  isNewVersion: Boolean
+
+  """List the present and past values for 'is-new-version'."""
+  isNewVersionEvents: [IsNewVersionEvent!]!
+
+  """Whether this deposit requires curation."""
+  curationRequired: Boolean
+
+  """List the present and past values for 'curation-required'."""
+  curationRequiredEvents: [CurationRequiredEvent!]!
+
+  """Whether curation on this deposit has been performed."""
+  curationPerformed: Boolean
+
+  """List the present and past values for 'curation-performed'."""
+  curationPerformedEvents: [CurationPerformedEvent!]!
+
+  """The springfield configuration currently associated with this deposit."""
+  springfield: Springfield
+
+  """List the present and past values for springfield configuration."""
+  springfields(
+    """Ordering options for the returned springfields."""
+    orderBy: SpringfieldOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+  ): [Springfield!]!
+
+  """The content type currently associated with this deposit."""
+  contentType: ContentType
+
+  """List the present and past values of content types."""
+  contentTypes(
+    """Ordering options for the returned content types."""
+    orderBy: ContentTypeOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+  ): [ContentType!]!
+
+  """The name of the deposited bag."""
+  bagName: String
+
+  """The origin of the deposit."""
+  origin: Origin
+
+  """Information about the depositor that submitted this deposit."""
+  depositor: Depositor!
+}
+
+"""A connection to a list of items."""
+type DepositConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [DepositEdge]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""
+The label and filter to be used in searching for deposits by content type.
+"""
+input DepositContentTypeFilter {
+  """If provided, only show deposits with this content type."""
+  value: ContentTypeValue!
+
+  """
+  Determine whether to search in current content types (`LATEST`, default) or all current and past content types (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""
+The value and filter to be used in searching for deposits by 'curation-performed'.
+"""
+input DepositCurationPerformedFilter {
+  """
+  If provided, only show deposits with this value for 'curation-performed'.
+  """
+  value: Boolean!
+
+  """
+  Determine whether to search in current values (`LATEST`, default) or all current and past values (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""
+The value and filter to be used in searching for deposits by 'curation-required'.
+"""
+input DepositCurationRequiredFilter {
+  """
+  If provided, only show deposits with this value for 'curation-required'.
+  """
+  value: Boolean!
+
+  """
+  Determine whether to search in current values (`LATEST`, default) or all current and past values (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""The label and filter to be used in searching for deposits by curator."""
+input DepositCuratorFilter {
+  """If provided, only show deposits with this curator."""
+  userId: String!
+
+  """
+  Determine whether to search in current curator (`LATEST`, default) only or all
+  current and past curators (`ALL`) of this deposit.
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""
+The label and filter to be used in searching for deposits by DOI registration action.
+"""
+input DepositDoiActionFilter {
+  """If provided, only show deposits with the same value for DOI action."""
+  value: DoiAction!
+
+  """
+  Determine whether to search in current value for DOI action (`LATEST`, default) or all current and past values (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""
+The label and filter to be used in searching for deposits by whether the DOI is registered.
+"""
+input DepositDoiRegisteredFilter {
+  """
+  If provided, only show deposits with the same value for DOI registered.
+  """
+  value: Boolean!
+
+  """
+  Determine whether to search in current value for DOI registered (`LATEST`,
+  default) or all current and past values (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""An edge in a connection."""
+type DepositEdge {
+  """The item at the end of the edge."""
+  node: Deposit!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""
+The label and filter to be used in searching for deposits by ingest step
+"""
+input DepositIngestStepFilter {
+  """If provided, only show deposits with this state."""
+  label: IngestStepLabel!
+
+  """
+  Determine whether to search in current states (`LATEST`, default) or all current and past states (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""
+The value and filter to be used in searching for deposits by 'is-new-version'.
+"""
+input DepositIsNewVersionFilter {
+  """If provided, only show deposits with this value for 'is-new-version'."""
+  value: Boolean!
+
+  """
+  Determine whether to search in current values (`LATEST`, default) or all current and past values (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""Information about the depositor that submitted this deposit."""
+type Depositor {
+  """The EASY account of the depositor."""
+  depositorId: String!
+
+  """List all deposits originating from the same depositor."""
+  deposits(
+    """Find only those deposits that have this specified bag name."""
+    bagName: String
+
+    """Find only those deposits that have this specified origin."""
+    origin: Origin
+
+    """List only those deposits that have this specified state label."""
+    state: DepositStateFilter
+
+    """List only those deposits that have this specified ingest step label."""
+    ingestStep: DepositIngestStepFilter
+
+    """
+    List only those deposits that have this specified value for DOI registered.
+    """
+    doiRegistered: DepositDoiRegisteredFilter
+
+    """
+    List only those deposits that have this specified value for DOI action.
+    """
+    doiAction: DepositDoiActionFilter
+
+    """
+    List only those deposits that have this specified value for 'is-new-version'.
+    """
+    isNewVersion: DepositIsNewVersionFilter
+
+    """
+    List only those deposits that have this specified value for 'curation required'.
+    """
+    curationRequired: DepositCurationRequiredFilter
+
+    """
+    List only those deposits that have this specified value for 'curation performed'.
+    """
+    curationPerformed: DepositCurationPerformedFilter
+
+    """List only those deposits that have this specified data manager."""
+    curator: DepositCuratorFilter
+
+    """List only those deposits that have this specified content type."""
+    contentType: DepositContentTypeFilter
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection
+}
+
+"""Ordering options for deposits"""
+input DepositOrder {
+  """The field to order deposit by"""
+  field: DepositOrderField!
+
+  """The ordering direction"""
+  direction: OrderDirection!
+}
+
+"""Properties by which deposits can be ordered"""
+enum DepositOrderField {
+  """Order deposits by origin"""
+  ORIGIN
+
+  """Order deposits by creation timestamp"""
+  CREATION_TIMESTAMP
+
+  """Order deposits by bag name"""
+  BAG_NAME
+
+  """Order deposits by depositId"""
+  DEPOSIT_ID
+}
+
+"""The label and filter to be used in searching for deposits by state"""
+input DepositStateFilter {
+  """If provided, only show deposits with this state."""
+  label: StateLabel!
+
+  """
+  Determine whether to search in current states (`LATEST`, default) or all current and past states (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""
+Whether the DANS-DOI must be created or updated in the DataCite resolver.
+"""
+enum DoiAction {
+  """None action must be taken for this DANS-DOI in the DataCite resolver."""
+  NONE
+
+  """The DANS-DOI must be updated in the DataCite resolver."""
+  UPDATE
+
+  """The DANS-DOI must be created in the DataCite resolver."""
+  CREATE
+}
+
+"""A DOI action event related to a deposit"""
+type DoiActionEvent {
+  """
+  Whether the DOI must be 'created' or 'updated' when registering in DataCite.
+  """
+  value: DoiAction!
+
+  """The timestamp at which this value was added."""
+  timestamp: DateTime!
+}
+
+"""A DOI registration event related to a deposit"""
+type DoiRegisteredEvent {
+  """Whether the DOI is registered in DataCite."""
+  value: Boolean!
+
+  """The timestamp at which the DOI was registered in DataCite."""
+  timestamp: DateTime!
+}
+
+"""An identifier related to a deposit."""
+type Identifier implements Node {
+  """The type of identifier."""
+  type: IdentifierType!
+
+  """The value of the identifier."""
+  value: String!
+
+  """The timestamp at which the identifier got added to this deposit."""
+  timestamp: DateTime!
+
+  """
+  Returns the deposit that is associated with this particular identifier.
+  """
+  deposit: Deposit
+
+  """The ID of an object"""
+  id: ID!
+}
+
+"""The type of the identifier."""
+enum IdentifierType {
+  """The bagstore identifier."""
+  BAG_STORE
+
+  """The Fedora identifier."""
+  FEDORA
+
+  """The 'urn:nbn' identifier."""
+  URN
+
+  """The doi identifier."""
+  DOI
+}
+
+"""The ingest step of the deposit."""
+type IngestStep implements Node {
+  """The label of the ingest step."""
+  step: IngestStepLabel!
+
+  """The timestamp at which the deposit got into this ingest step."""
+  timestamp: DateTime!
+
+  """
+  Returns the deposit that is associated with this particular ingest step
+  """
+  deposit: Deposit
+
+  """List all deposits with the same current ingest step."""
+  deposits(
+    """
+    Determine whether to search in current ingest steps (`LATEST`, default) or all current and past ingest steps (`ALL`).
+    """
+    ingestStepFilter: SeriesFilter! = LATEST
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection
+
+  """The ID of an object"""
+  id: ID!
+}
+
+"""A connection to a list of items."""
+type IngestStepConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [IngestStepEdge]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type IngestStepEdge {
+  """The item at the end of the edge."""
+  node: IngestStep!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""The label identifying the ingest step."""
+enum IngestStepLabel {
+  """The ingest process of this deposit has completed."""
+  COMPLETED
+
+  """The file content of the deposit's payload is being index."""
+  SOLR4FILES
+
+  """Creating an archival copy of the deposit for storage in the vault."""
+  BAGSTORE
+
+  """
+  Dissemination copies of the audio/video files in the deposit are being made in Springfield.
+  """
+  SPRINGFIELD
+
+  """A dissemination copy of the deposit is being made in Fedora."""
+  FEDORA
+
+  """Persistent identifiers are being generated for this deposit."""
+  PID_GENERATOR
+
+  """Started validating the deposit."""
+  VALIDATE
+}
+
+"""Ordering options for ingest steps"""
+input IngestStepOrder {
+  """The field to order ingest steps by"""
+  field: IngestStepOrderField!
+
+  """The ordering direction"""
+  direction: OrderDirection!
+}
+
+"""Properties by which ingest steps can be ordered"""
+enum IngestStepOrderField {
+  """Order ingest steps by timestamp"""
+  TIMESTAMP
+
+  """Order ingest steps by step"""
+  STEP
+}
+
+"""
+State whether this deposit is a new version, requiring a new DOI and deposit agreement to be generated by easy-ingest-flow.
+"""
+type IsNewVersionEvent {
+  """True if the deposit is a new version."""
+  value: Boolean
+
+  """The timestamp at which was decided that this is a new version."""
+  timestamp: DateTime!
+}
+
+"""The root query for implementing GraphQL mutations."""
+type Mutation {
+  """
+  Register a new deposit with 'id', 'creationTimestamp', 'depositId' and 'origin'.
+  """
+  addDeposit(input: AddDepositInput!): AddDepositPayload
+
+  """Register the bag's name for the deposit identified by 'id'."""
+  addBagName(input: AddBagNameInput!): AddBagNamePayload
+
+  """Update the state of the deposit identified by 'id'."""
+  updateState(input: UpdateStateInput!): UpdateStatePayload
+
+  """Update the ingest step of the deposit identified by 'id'."""
+  updateIngestStep(input: UpdateIngestStepInput!): UpdateIngestStepPayload
+
+  """Add an identifier to the deposit identified by 'id'."""
+  addIdentifier(input: AddIdentifierInput!): AddIdentifierPayload
+
+  """Set whether the DOI has been registered in DataCite."""
+  setDoiRegistered(input: SetDoiRegisteredInput!): SetDoiRegisteredPayload
+
+  """
+  Set whether the DOI should be 'created' or 'updated' on registration in DataCite.
+  """
+  setDoiAction(input: SetDoiActionInput!): SetDoiActionPayload
+
+  """Assign a curation event to the deposit identified by 'id'."""
+  setCuration(input: SetCurationInput!): SetCurationPayload
+
+  """Set the springfield configuration for this deposit."""
+  setSpringfield(input: SetSpringfieldInput!): SetSpringfieldPayload
+
+  """Set the content type for this deposit."""
+  setContentType(input: SetContentTypeInput!): SetContentTypePayload
+
+  """
+  Register a new deposit with initial properties from a 'deposit.properties' string.
+  """
+  registerDeposit(input: RegisterDepositInput!): RegisterDepositPayload
+
+  """Delete deposits."""
+  deleteDeposits(input: DeleteDepositsInput!): DeleteDepositsPayload
+}
+
+"""An object with an ID"""
+interface Node {
+  """The id of the object."""
+  id: ID!
+}
+
+"""
+Possible directions in which to order a list of items when provided an orderBy argument
+"""
+enum OrderDirection {
+  """Specifies a descending order for a given orderBy argument"""
+  DESC
+
+  """Specifies an ascending order for a given orderBy argumen."""
+  ASC
+}
+
+"""The origin of the deposit."""
+enum Origin {
+  """easy-split-multi-deposit"""
+  SMD
+
+  """easy-deposit-api"""
+  API
+
+  """easy-sword2"""
+  SWORD2
+}
+
+"""Information about pagination in a connection."""
+type PageInfo {
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+"""The query root of easy-deposit-properties' GraphQL interface."""
+type Query {
+  """Get the technical metadata of the deposit identified by 'id'."""
+  deposit(
+    """The id for which to find the deposit"""
+    id: UUID!
+  ): Deposit
+
+  """List all registered deposits."""
+  deposits(
+    """Find only those deposits that have this specified bag name."""
+    bagName: String
+
+    """Find only those deposits that have this specified origin."""
+    origin: Origin
+
+    """List only those deposits that have this specified state label."""
+    state: DepositStateFilter
+
+    """List only those deposits that have this specified ingest step label."""
+    ingestStep: DepositIngestStepFilter
+
+    """
+    List only those deposits that have this specified value for DOI registered.
+    """
+    doiRegistered: DepositDoiRegisteredFilter
+
+    """
+    List only those deposits that have this specified value for DOI action.
+    """
+    doiAction: DepositDoiActionFilter
+
+    """List only those deposits that have this specified data manager."""
+    curator: DepositCuratorFilter
+
+    """
+    List only those deposits that have this specified value for 'is-new-version'.
+    """
+    isNewVersion: DepositIsNewVersionFilter
+
+    """
+    List only those deposits that have this specified value for 'curation required'.
+    """
+    curationRequired: DepositCurationRequiredFilter
+
+    """
+    List only those deposits that have this specified value for 'curation performed'.
+    """
+    curationPerformed: DepositCurationPerformedFilter
+
+    """List only those deposits that have this specified content type."""
+    contentType: DepositContentTypeFilter
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection
+
+  """Get the technical metadata related to this depositor."""
+  depositor(
+    """If provided, only show deposits from this depositor."""
+    id: String
+  ): Depositor
+
+  """Find an identifier with the given type and value."""
+  identifier(
+    """The type of identifier to be found."""
+    type: IdentifierType!
+
+    """The value of the identifier to be found."""
+    value: String!
+  ): Identifier
+
+  """Fetches an object given its ID"""
+  node(
+    """The ID of an object"""
+    id: ID!
+  ): Node
+
+  """Fetches objects given their IDs"""
+  nodes(
+    """The IDs of objects"""
+    ids: [ID!]!
+  ): [Node]!
+}
+
+input RegisterDepositInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The 'deposit.properties' describing the deposit to be registered."""
+  depositProperties: String!
+  clientMutationId: String
+}
+
+type RegisterDepositPayload {
+  deposit: Deposit
+  clientMutationId: String
+}
+
+"""
+Mark a query to only search through current states, or also to include past states.
+"""
+enum SeriesFilter {
+  """Search through both current and past states."""
+  ALL
+
+  """Only search through current states."""
+  LATEST
+}
+
+input SetContentTypeInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The content type associated with this deposit."""
+  value: ContentTypeValue!
+
+  """
+  The timestamp at which this springfield configuration was associated with the deposit.
+  """
+  timestamp: DateTime!
+  clientMutationId: String
+}
+
+type SetContentTypePayload {
+  contentType: ContentType
+  clientMutationId: String
+}
+
+input SetCurationInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The data manager's username in EASY."""
+  datamanagerUserId: String!
+
+  """The data manager's email address."""
+  datamanagerEmail: String!
+
+  """True if the deposit is a new version."""
+  isNewVersion: Boolean
+
+  """True if curation by a data manager is required."""
+  isCurationRequired: Boolean!
+
+  """True if curation by the data manager has been performed."""
+  isCurationPerformed: Boolean!
+
+  """
+  The timestamp at which the curation event was assigned to this deposit.
+  """
+  timestamp: DateTime!
+  clientMutationId: String
+}
+
+type SetCurationPayload {
+  curation: Curation
+  clientMutationId: String
+}
+
+input SetDoiActionInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """
+  Whether the DOI must be 'created' or 'updated' when registering in DataCite.
+  """
+  value: DoiAction!
+
+  """The timestamp at which this value was added."""
+  timestamp: DateTime!
+  clientMutationId: String
+}
+
+type SetDoiActionPayload {
+  doiAction: DoiActionEvent
+  clientMutationId: String
+}
+
+input SetDoiRegisteredInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """Whether the DOI is registered in DataCite."""
+  value: Boolean!
+
+  """The timestamp at which the DOI was registered in DataCite."""
+  timestamp: DateTime!
+  clientMutationId: String
+}
+
+type SetDoiRegisteredPayload {
+  doiRegistered: DoiRegisteredEvent
+  clientMutationId: String
+}
+
+input SetSpringfieldInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The domain of Springfield."""
+  domain: String!
+
+  """The user of Springfield."""
+  user: String!
+
+  """The collection of Springfield."""
+  collection: String!
+
+  """The playmode used in Springfield."""
+  playmode: SpringfieldPlayMode!
+
+  """
+  The timestamp at which this springfield configuration was associated with the deposit.
+  """
+  timestamp: DateTime!
+  clientMutationId: String
+}
+
+type SetSpringfieldPayload {
+  springfield: Springfield
+  clientMutationId: String
+}
+
+"""Springfield configuration associated with this deposit."""
+type Springfield implements Node {
+  """The domain of Springfield."""
+  domain: String!
+
+  """The user of Springfield."""
+  user: String!
+
+  """The collection of Springfield."""
+  collection: String!
+
+  """The playmode used in Springfield."""
+  playmode: SpringfieldPlayMode!
+
+  """
+  The timestamp at which this springfield configuration was associated with the deposit.
+  """
+  timestamp: DateTime!
+
+  """
+  Returns the deposit that is associated with this particular springfield configuration.
+  """
+  deposit: Deposit
+
+  """The ID of an object"""
+  id: ID!
+}
+
+"""Ordering options for springfields"""
+input SpringfieldOrder {
+  """The field to order springfields by"""
+  field: SpringfieldOrderField!
+
+  """The ordering direction"""
+  direction: OrderDirection!
+}
+
+"""Properties by which springfields can be ordered"""
+enum SpringfieldOrderField {
+  """Order springfields by timestamp"""
+  TIMESTAMP
+}
+
+"""The playmode in Springfield for this deposit."""
+enum SpringfieldPlayMode {
+  """Play audio/video in Springfield as selected in a menu."""
+  MENU
+
+  """Play audio/video continuously in Springfield."""
+  CONTINUOUS
+}
+
+"""The state of the deposit."""
+type State implements Node {
+  """The state label of the deposit."""
+  label: StateLabel!
+
+  """Additional information about the state."""
+  description: String!
+
+  """The timestamp at which the deposit got into this state."""
+  timestamp: DateTime!
+
+  """Returns the deposit that is associated with this particular state"""
+  deposit: Deposit
+
+  """List all deposits with the same current state label."""
+  deposits(
+    """
+    Determine whether to search in current states (`LATEST`, default) or all current and past states (`ALL`).
+    """
+    stateFilter: SeriesFilter! = LATEST
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection
+
+  """The ID of an object"""
+  id: ID!
+}
+
+"""A connection to a list of items."""
+type StateConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [StateEdge]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type StateEdge {
+  """The item at the end of the edge."""
+  node: State!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+"""The label identifying the state of a deposit."""
+enum StateLabel {
+  """Was successfully archived in the Fedora Archive."""
+  FEDORA_ARCHIVED
+
+  """Was successfully archived in the data vault."""
+  ARCHIVED
+
+  """Currently undergoing curation by the datamanagers."""
+  IN_REVIEW
+
+  """
+  Failed to be archived because of some unexpected condition. It may be possible to manually fix this.
+  """
+  FAILED
+
+  """
+  Did not meet the requirements set by easy-ingest-flow for this type of deposit.
+  """
+  REJECTED
+
+  """
+  Valid and waiting for processing by easy-ingest-flow, or being processed in it.
+  """
+  SUBMITTED
+
+  """Does not contain a valid bag."""
+  INVALID
+
+  """Closed and being checked for validity."""
+  FINALIZING
+
+  """Deposit uploaded, waiting to be finalized."""
+  UPLOADED
+
+  """Open for additional data."""
+  DRAFT
+}
+
+"""Ordering options for states"""
+input StateOrder {
+  """The field to order state by"""
+  field: StateOrderField!
+
+  """The ordering direction"""
+  direction: OrderDirection!
+}
+
+"""Properties by which states can be ordered"""
+enum StateOrderField {
+  """Order states by timestamp"""
+  TIMESTAMP
+
+  """Order states by label"""
+  LABEL
+}
+
+input UpdateIngestStepInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The label of the ingest step."""
+  step: IngestStepLabel!
+
+  """The timestamp at which the deposit got into this ingest step."""
+  timestamp: DateTime!
+  clientMutationId: String
+}
+
+type UpdateIngestStepPayload {
+  ingestStep: IngestStep
+  clientMutationId: String
+}
+
+input UpdateStateInput {
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """The state label of the deposit."""
+  label: StateLabel!
+
+  """Additional information about the state."""
+  description: String!
+
+  """The timestamp at which the deposit got into this state."""
+  timestamp: DateTime!
+  clientMutationId: String
+}
+
+type UpdateStatePayload {
+  state: State
+  clientMutationId: String
+}
+
+"""
+The UUID scalar type represents textual data, formatted as a universally unique identifier.
+"""
+scalar UUID
+

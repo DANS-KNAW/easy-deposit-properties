@@ -55,7 +55,7 @@ trait MutationType {
 
   private val depositIdListInputField: InputField[Seq[DepositId]] = InputField(
     name = "depositId",
-    description = Some("The identifiers of the deposits to delete."),
+    description = Some("A list of deposit identifiers."),
     defaultValue = None,
     fieldType = ListInputType(UUIDType),
     astDirectives = Vector.empty,
@@ -376,9 +376,9 @@ trait MutationType {
 
   implicit val DepositIdType: ScalarType[DepositId] = UUIDType // TODO caused compiler errors in DepositType when placed in ScalarTypes
   private val depositIdsFieldForDelete: Field[DataContext, DeleteDepositsPayload] = Field(
-    name = "depositId",
+    name = "depositIds",
     fieldType = ListType[DepositId](DepositIdType),
-    resolve = ctx => ctx.value.depositIds,
+    resolve = _.value.depositIds,
   )
 
   private val addDepositField: Field[DataContext, Unit] = Mutation.fieldWithClientMutationId[DataContext, Unit, AddDepositPayload, InputObjectType.DefaultInput](

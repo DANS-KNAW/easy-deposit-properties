@@ -27,7 +27,7 @@ trait SQLDeletable extends Deletable {
   implicit val connection: Connection
   private[sql] val daoName: String
 
-  /** @return rowCount */
+  /** @return number of delete rows */
   def deleteBy(ids: Seq[DepositId]): Either[MutationError, Int] = {
     NonEmptyList.fromList(ids.toList)
       .map(delete)

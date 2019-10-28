@@ -1,5 +1,5 @@
 mutation {
-  deleteDeposits(input: {depositId: "00000000-0000-0000-0000-000000000006"}){
+  deleteDeposits(input: {depositIds: "00000000-0000-0000-0000-000000000006"}){
     clientMutationId
     depositId
   }

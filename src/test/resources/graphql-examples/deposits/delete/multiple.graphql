@@ -1,5 +1,5 @@
 mutation {
-    deleteDeposits(input: {depositId: [
+    deleteDeposits(input: {depositIds: [
         "00000000-0000-0000-0000-000000000004"
         "00000000-0000-0000-0000-000000000005"
         "00000000-0000-0000-0000-000000000006"

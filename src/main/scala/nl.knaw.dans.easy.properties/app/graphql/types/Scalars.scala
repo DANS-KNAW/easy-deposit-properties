@@ -30,7 +30,7 @@ trait Scalars {
 
   private def parseUUID(s: String): Either[Violation, UUID] = {
     Either.catchNonFatal { UUID.fromString(s) }
-      .fold(_ => Left(UUIDCoercionViolation), _.asRight)
+      .fold(_ => UUIDCoercionViolation.asLeft, _.asRight)
   }
 
   implicit val UUIDType: ScalarType[UUID] = ScalarType("UUID",
@@ -39,11 +39,11 @@ trait Scalars {
     coerceOutput = (value, _) => value.toString,
     coerceUserInput = {
       case s: String => parseUUID(s)
-      case _ => Left(StringCoercionViolation)
+      case _ => StringCoercionViolation.asLeft
     },
     coerceInput = {
       case StringValue(s, _, _, _, _) => parseUUID(s)
-      case _ => Left(StringCoercionViolation)
+      case _ => StringCoercionViolation.asLeft
     }
   )
 
@@ -51,7 +51,7 @@ trait Scalars {
 
   private def parseDate(s: String): Either[Violation, DateTime] = {
     Either.catchNonFatal { DateTime.parse(s) }
-      .fold(_ => Left(DateCoercionViolation), _.asRight)
+      .fold(_ => DateCoercionViolation.asLeft, _.asRight)
   }
 
   implicit val DateTimeType: ScalarType[DateTime] = ScalarType("DateTime",
@@ -60,11 +60,11 @@ trait Scalars {
     coerceOutput = (value, _) => ISODateTimeFormat.dateTime() print value,
     coerceUserInput = {
       case s: String => parseDate(s)
-      case _ => Left(DateCoercionViolation)
+      case _ => DateCoercionViolation.asLeft
     },
     coerceInput = {
       case StringValue(s, _, _, _, _) => parseDate(s)
-      case _ => Left(DateCoercionViolation)
+      case _ => DateCoercionViolation.asLeft
     }
   )
 }
