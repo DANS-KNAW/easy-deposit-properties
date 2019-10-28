@@ -17,11 +17,11 @@ package nl.knaw.dans.easy.properties.app
 
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.model.DepositId
-import nl.knaw.dans.easy.properties.app.repository.{ MutationError, Repository }
+import nl.knaw.dans.easy.properties.app.repository.{ MutationError, MutationErrorOr, Repository }
 
 class Deleter(repository: => Repository) {
 
-  def deleteDepositsBy(ids: Seq[DepositId]): Either[MutationError, Seq[DepositId]] = {
+  def deleteDepositsBy(ids: Seq[DepositId]): MutationErrorOr[Seq[DepositId]] = {
     for {
       deposits <- repository.deposits.find(ids).leftMap(error => MutationError(error.msg))
       actualIds = deposits.map(_.id).toList

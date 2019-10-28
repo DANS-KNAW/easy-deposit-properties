@@ -20,7 +20,7 @@ import java.sql.Connection
 import cats.data.NonEmptyList
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.model.DepositId
-import nl.knaw.dans.easy.properties.app.repository.{ Deletable, MutationError }
+import nl.knaw.dans.easy.properties.app.repository.{ Deletable, MutationError, MutationErrorOr }
 import resource.managed
 
 trait SQLDeletable extends Deletable {
@@ -28,14 +28,14 @@ trait SQLDeletable extends Deletable {
   private[sql] val daoName: String
 
   /** @return number of delete rows */
-  def deleteBy(ids: Seq[DepositId]): Either[MutationError, Int] = {
+  def deleteBy(ids: Seq[DepositId]): MutationErrorOr[Int] = {
     NonEmptyList.fromList(ids.toList)
       .map(delete)
       .getOrElse(0.asRight)
   }
 
   /** @return rowCount */
-  private def delete(ids: NonEmptyList[DepositId]): Either[MutationError, Int] = {
+  private def delete(ids: NonEmptyList[DepositId]): MutationErrorOr[Int] = {
     managed(connection.prepareStatement(getQuery(ids)))
       .map(statement =>
         statement.executeUpdateWith(ids.map(_.toString).toList)
