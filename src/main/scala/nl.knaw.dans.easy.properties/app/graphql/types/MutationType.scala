@@ -779,9 +779,9 @@ trait MutationType {
       .deleteDepositsBy(
         ids = input(depositIdsListInputField.name).asInstanceOf[Seq[DepositId]],
       )
-      .map(depositId => DeleteDepositsPayload(
+      .map(depositIds => DeleteDepositsPayload(
         input.get(Mutation.ClientMutationIdFieldName).flatMap(_.asInstanceOf[Option[String]]),
-        depositId,
+        depositIds,
       ))
       .toTry
   }
