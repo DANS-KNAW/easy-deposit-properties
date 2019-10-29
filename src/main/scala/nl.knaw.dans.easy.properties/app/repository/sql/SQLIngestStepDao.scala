@@ -77,7 +77,7 @@ class SQLIngestStepDao(override implicit val connection: Connection, errorHandle
 
     val managedResultSet = for {
       prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.executeUpdateWith(Seq(id.toString, key, step.step.toString, step.timestamp))
+      _ = prepStatement.executeUpdateWith(Seq(id, key, step.step, step.timestamp))
       resultSetForKey <- managed(prepStatement.getGeneratedKeys)
     } yield resultSetForKey
 

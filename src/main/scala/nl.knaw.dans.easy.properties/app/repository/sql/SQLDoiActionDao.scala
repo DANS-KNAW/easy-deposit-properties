@@ -61,7 +61,7 @@ class SQLDoiActionDao(override implicit val connection: Connection, errorHandler
     val query = QueryGenerator.storeSimpleProperty
 
     managed(connection.prepareStatement(query))
-      .map(_.executeUpdateWith(Seq(id.toString, key, action.value.toString, action.timestamp)))
+      .map(_.executeUpdateWith(Seq(id, key, action.value, action.timestamp)))
       .either
       .either
       .leftMap(ts => {

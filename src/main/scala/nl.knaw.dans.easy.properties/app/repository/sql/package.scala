@@ -50,12 +50,13 @@ package object sql {
     /** @return rowCount */
     def executeUpdateWith(values: Seq[Any]): Int = {
       values.zipWithIndex.toList.foreach {
-        case (value: String, i) => preparedStatement.setString(i + 1, value)
-        case (value: Boolean, i) => preparedStatement.setBoolean(i + 1, value)
-        case (value: DateTime, i) => preparedStatement.setTimestamp(i + 1, value, timeZone)
         case (None, i) => preparedStatement.setString(i + 1, null)
         case (Some(value: String), i) => preparedStatement.setString(i + 1, value)
-        case (value, i) => throw new NotImplementedError(s"Type of $value not implemented for parameter $i")
+        case (Some(value), i) => preparedStatement.setString(i + 1, value.toString)
+        case (value: Boolean, i) => preparedStatement.setBoolean(i + 1, value)
+        case (value: DateTime, i) => preparedStatement.setTimestamp(i + 1, value, timeZone)
+        case (value: String, i) => preparedStatement.setString(i + 1, value)
+        case (value, i) => preparedStatement.setString(i + 1, value.toString)
       }
       preparedStatement.executeUpdate()
     }
