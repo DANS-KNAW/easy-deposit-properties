@@ -48,11 +48,9 @@ package object sql {
   implicit class RichPreparedStatement(val preparedStatement: PreparedStatement) extends AnyVal {
 
     /** @return rowCount */
-    def executeUpdateWith(values: Seq[Any]): Int = {
-      values.zipWithIndex.toList.foreach {
-        case (None, i) => preparedStatement.setString(i + 1, null)
-        case (Some(value: String), i) => preparedStatement.setString(i + 1, value)
-        case (Some(value), i) => preparedStatement.setString(i + 1, value.toString)
+    def executeUpdateWith(values: Any*): Int = {
+      values.zipWithIndex.foreach {
+        case (null, i) => preparedStatement.setString(i + 1, null)
         case (value: Boolean, i) => preparedStatement.setBoolean(i + 1, value)
         case (value: DateTime, i) => preparedStatement.setTimestamp(i + 1, value, timeZone)
         case (value: String, i) => preparedStatement.setString(i + 1, value)
