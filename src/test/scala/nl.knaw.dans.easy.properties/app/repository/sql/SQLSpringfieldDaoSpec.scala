@@ -127,7 +127,7 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
     val inputSpringfield2 = InputSpringfield("domain2", "user2", "collection2", SpringfieldPlayMode.MENU, timestamp)
 
     springfields.store(depositId, inputSpringfield1) shouldBe right
-    springfields.store(depositId, inputSpringfield2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, "Springfield")
+    springfields.store(depositId, inputSpringfield2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, "springfield")
   }
 
   "getDepositsById" should "find deposits identified by these springfieldIds" in {
