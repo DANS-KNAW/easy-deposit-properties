@@ -61,13 +61,7 @@ class SQLDoiRegisteredDao(override implicit val connection: Connection, errorHan
     val query = QueryGenerator.storeSimpleProperty
 
     managed(connection.prepareStatement(query))
-      .map(prepStatement => {
-        prepStatement.setString(1, id.toString)
-        prepStatement.setString(2, key)
-        prepStatement.setString(3, registered.value.toString)
-        prepStatement.setTimestamp(4, registered.timestamp, timeZone)
-        prepStatement.executeUpdate()
-      })
+      .map(_.executeUpdateWith(Seq(id.toString, key, registered.value.toString, registered.timestamp)))
       .either
       .either
       .leftMap(ts => {

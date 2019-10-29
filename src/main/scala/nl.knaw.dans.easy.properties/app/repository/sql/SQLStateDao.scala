@@ -76,11 +76,7 @@ class SQLStateDao(override implicit val connection: Connection, errorHandler: SQ
 
     val managedResultSet = for {
       prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.setString(1, id.toString)
-      _ = prepStatement.setString(2, state.label.toString)
-      _ = prepStatement.setString(3, state.description)
-      _ = prepStatement.setTimestamp(4, state.timestamp, timeZone)
-      _ = prepStatement.executeUpdate()
+      _ = prepStatement.executeUpdateWith(Seq(id.toString, state.label.toString, state.description, state.timestamp))
       resultSetForKey <- managed(prepStatement.getGeneratedKeys)
     } yield resultSetForKey
 

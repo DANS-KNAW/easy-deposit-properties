@@ -77,11 +77,7 @@ class SQLContentTypeDao(override implicit val connection: Connection, errorHandl
 
     val managedResultSet = for {
       prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.setString(1, id.toString)
-      _ = prepStatement.setString(2, key)
-      _ = prepStatement.setString(3, contentType.value.toString)
-      _ = prepStatement.setTimestamp(4, contentType.timestamp, timeZone)
-      _ = prepStatement.executeUpdate()
+      _ = prepStatement.executeUpdateWith(Seq( id.toString, key, contentType.value.toString, contentType.timestamp))
       resultSetForKey <- managed(prepStatement.getGeneratedKeys)
     } yield resultSetForKey
 

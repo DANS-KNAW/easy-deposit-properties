@@ -71,14 +71,7 @@ class SQLDepositDao(override implicit val connection: Connection) extends Deposi
     val query = QueryGenerator.storeDeposit
 
     managed(connection.prepareStatement(query))
-      .map(prepStatement => {
-        prepStatement.setString(1, deposit.id.toString)
-        prepStatement.setString(2, deposit.bagName.orNull)
-        prepStatement.setTimestamp(3, deposit.creationTimestamp, timeZone)
-        prepStatement.setString(4, deposit.depositorId)
-        prepStatement.setString(5, deposit.origin.toString)
-        prepStatement.executeUpdate()
-      })
+      .map(_.executeUpdateWith(Seq( deposit.id.toString, deposit.bagName, deposit.creationTimestamp, deposit.depositorId, deposit.origin.toString)))
       .either
       .either
       .leftMap(_ => DepositAlreadyExistsError(deposit.id))

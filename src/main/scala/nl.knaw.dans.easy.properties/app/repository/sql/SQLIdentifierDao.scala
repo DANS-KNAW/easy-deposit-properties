@@ -117,11 +117,7 @@ class SQLIdentifierDao(override implicit val connection: Connection, errorHandle
 
     val managedResultSet = for {
       prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.setString(1, id.toString)
-      _ = prepStatement.setString(2, identifier.idType.toString)
-      _ = prepStatement.setString(3, identifier.idValue)
-      _ = prepStatement.setTimestamp(4, identifier.timestamp, timeZone)
-      _ = prepStatement.executeUpdate()
+      _ = prepStatement.executeUpdateWith(Seq(id.toString, identifier.idType.toString, identifier.idValue, identifier.timestamp))
       resultSetForKey <- managed(prepStatement.getGeneratedKeys)
     } yield resultSetForKey
 
