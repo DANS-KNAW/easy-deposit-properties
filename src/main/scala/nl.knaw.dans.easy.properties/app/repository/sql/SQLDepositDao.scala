@@ -23,8 +23,8 @@ import cats.instances.vector._
 import cats.syntax.either._
 import cats.syntax.functor._
 import cats.syntax.traverse._
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, Timestamp }
-import nl.knaw.dans.easy.properties.app.repository.{ BagNameAlreadySetError, DepositAlreadyExistsError, DepositDao, DepositFilters, InvalidValueError, MutationError, MutationErrorOr, NoSuchDepositError, QueryErrorOr }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DepositorId, Timestamp }
+import nl.knaw.dans.easy.properties.app.repository.{ BagNameAlreadySetError, DepositAlreadyExistsError, DepositDao, DepositFilters, DepositorIdFilters, InvalidValueError, MutationError, MutationErrorOr, NoSuchDepositError, QueryErrorOr }
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
@@ -41,6 +41,18 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
     trace(())
 
     executeQuery(parseDeposit)(_.toList)(QueryGenerator.getAllDeposits -> List.empty)
+  }
+
+  private def searchDepositors(filters: DepositorIdFilters): QueryErrorOr[Seq[DepositorId]] = {
+    executeQuery(_.getString("depositorId").asRight)(_.toList)(QueryGenerator.searchDepositors(filters))
+  }
+
+  override def getDepositors(filters: Seq[DepositorIdFilters]): QueryErrorOr[Seq[(DepositorIdFilters, Seq[DepositorId])]] = {
+    trace(filters)
+    // ideally this would be implemented with one query,
+    // but that would be quite difficult (if not impossible) to do.
+    // Also, 'filters' will usually have one element and can only get larger with deep nesting.
+    filters.toVector.traverse(fs => searchDepositors(fs).tupleLeft(fs))
   }
 
   override def find(ids: Seq[DepositId]): QueryErrorOr[Seq[Deposit]] = {

@@ -1,0 +1,12 @@
+query {
+    depositors {
+        edges {
+            node {
+                depositorId
+                deposits {
+                    totalCount
+                }
+            }
+        }
+    }
+}

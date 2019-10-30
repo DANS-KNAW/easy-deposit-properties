@@ -20,7 +20,7 @@ import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ DepositResolver, executionContext }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositorId }
 import nl.knaw.dans.easy.properties.app.repository.DepositFilters
-import sangria.relay.{ Connection, ConnectionArgs }
+import sangria.relay.{ Connection, ConnectionArgs, ConnectionDefinition }
 import sangria.schema.{ Context, DeferredValue, Field, ObjectType, OptionType, StringType, fields }
 
 trait DepositorType {
@@ -86,5 +86,11 @@ trait DepositorType {
       depositorIdField,
       depositsField,
     ),
+  )
+
+  // lazy because we need it before being declared
+  lazy val ConnectionDefinition(_, depositorConnectionType) = ExtendedConnection.definition[DataContext, ExtendedConnection, DepositorId](
+    name = "DepositorId",
+    nodeType = DepositorType,
   )
 }

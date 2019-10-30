@@ -1,0 +1,9 @@
+query {
+    depositors {
+        edges {
+            node {
+                depositorId
+            }
+        }
+    }
+}

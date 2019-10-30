@@ -1,0 +1,9 @@
+query {
+    depositors(origin: SWORD2) {
+        edges {
+            node {
+                depositorId
+            }
+        }
+    }
+}

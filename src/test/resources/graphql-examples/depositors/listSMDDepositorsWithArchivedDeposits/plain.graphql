@@ -1,0 +1,9 @@
+query {
+    depositors(origin: SMD, state: {label: ARCHIVED, filter: LATEST}) {
+        edges {
+            node {
+                depositorId
+            }
+        }
+    }
+}

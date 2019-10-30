@@ -16,8 +16,8 @@
 package nl.knaw.dans.easy.properties.app.graphql.resolvers
 
 import nl.knaw.dans.easy.properties.app.graphql.DataContext
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, Timestamp }
-import nl.knaw.dans.easy.properties.app.repository.DepositFilters
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DepositorId, Timestamp }
+import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
 import sangria.execution.deferred.Fetcher
 import sangria.schema.DeferredValue
 
@@ -25,10 +25,12 @@ object DepositResolver {
 
   type DepositByIdFetcher = Fetcher[DataContext, Deposit, Deposit, DepositId]
   type DepositFetcher = Fetcher[DataContext, (DepositFilters, Seq[Deposit]), (DepositFilters, Seq[Deposit]), DepositFilters]
+  type DepositorFetcher = Fetcher[DataContext, (DepositorIdFilters, Seq[DepositorId]), (DepositorIdFilters, Seq[DepositorId]), DepositorIdFilters]
 
   val byIdFetcher: DepositByIdFetcher = Fetcher.caching(_.repo.deposits.find(_).toFuture)
   val depositsFetcher: DepositFetcher = Fetcher.caching(_.repo.deposits.search(_).toFuture)
   val lastModifiedFetcher: CurrentFetcher[Timestamp] = fetchCurrent(_.repo.deposits.lastModified)
+  val depositorFetcher: DepositorFetcher = Fetcher.caching(_.repo.deposits.getDepositors(_).toFuture)
 
   def depositById(id: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
     DeferredValue(byIdFetcher.deferOpt(id))
@@ -42,5 +44,10 @@ object DepositResolver {
   def lastModified(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Timestamp]] = {
     DeferredValue(lastModifiedFetcher.deferOpt(depositId))
       .map(_.map { case (_, lastModified) => lastModified })
+  }
+
+  def listDepositors(depositorFilters: DepositorIdFilters)(implicit ctx: DataContext): DeferredValue[DataContext, Seq[DepositorId]] = {
+    DeferredValue(depositorFetcher.defer(depositorFilters))
+      .map { case (_, depositors) => depositors }
   }
 }

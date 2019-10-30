@@ -1,0 +1,24 @@
+{
+  "data": {
+    "depositors": {
+      "edges": [
+        {
+          "node": {
+            "depositorId": "user001",
+            "deposits": {
+              "totalCount": 3
+            }
+          }
+        },
+        {
+          "node": {
+            "depositorId": "user002",
+            "deposits": {
+              "totalCount": 2
+            }
+          }
+        }
+      ]
+    }
+  }
+}

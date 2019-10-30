@@ -827,6 +827,27 @@ enum DepositOrderField {
   DEPOSIT_ID
 }
 
+"""A connection to a list of items."""
+type DepositorIdConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [DepositorIdEdge]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
+}
+
+"""An edge in a connection."""
+type DepositorIdEdge {
+  """The item at the end of the edge."""
+  node: Depositor!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
 """The label and filter to be used in searching for deposits by state"""
 input DepositStateFilter {
   """If provided, only show deposits with this state."""
@@ -1197,6 +1218,53 @@ type Query {
     """If provided, only show deposits from this depositor."""
     id: String
   ): Depositor
+
+  """List all depositors."""
+  depositors(
+    """Find only those deposits that have this specified origin."""
+    origin: Origin
+
+    """List only those deposits that have this specified state label."""
+    state: DepositStateFilter
+
+    """List only those deposits that have this specified ingest step label."""
+    ingestStep: DepositIngestStepFilter
+
+    """
+    List only those deposits that have this specified value for DOI registered.
+    """
+    doiRegistered: DepositDoiRegisteredFilter
+
+    """
+    List only those deposits that have this specified value for DOI action.
+    """
+    doiAction: DepositDoiActionFilter
+
+    """List only those deposits that have this specified data manager."""
+    curator: DepositCuratorFilter
+
+    """
+    List only those deposits that have this specified value for 'is-new-version'.
+    """
+    isNewVersion: DepositIsNewVersionFilter
+
+    """
+    List only those deposits that have this specified value for 'curation required'.
+    """
+    curationRequired: DepositCurationRequiredFilter
+
+    """
+    List only those deposits that have this specified value for 'curation performed'.
+    """
+    curationPerformed: DepositCurationPerformedFilter
+
+    """List only those deposits that have this specified content type."""
+    contentType: DepositContentTypeFilter
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositorIdConnection
 
   """Find an identifier with the given type and value."""
   identifier(

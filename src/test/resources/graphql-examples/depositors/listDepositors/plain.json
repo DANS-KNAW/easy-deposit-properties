@@ -1,0 +1,18 @@
+{
+  "data": {
+    "depositors": {
+      "edges": [
+        {
+          "node": {
+            "depositorId": "user001"
+          }
+        },
+        {
+          "node": {
+            "depositorId": "user002"
+          }
+        }
+      ]
+    }
+  }
+}

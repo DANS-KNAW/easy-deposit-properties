@@ -15,11 +15,13 @@
  */
 package nl.knaw.dans.easy.properties.app.repository
 
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, Timestamp }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DepositorId, Timestamp }
 
 trait DepositDao {
 
   def getAll: QueryErrorOr[Seq[Deposit]]
+
+  def getDepositors(filters: Seq[DepositorIdFilters]): QueryErrorOr[Seq[(DepositorIdFilters, Seq[DepositorId])]]
 
   def find(ids: Seq[DepositId]): QueryErrorOr[Seq[Deposit]]
 

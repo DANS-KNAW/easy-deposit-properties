@@ -20,7 +20,7 @@ import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ DepositResolver, IdentifierResolver, executionContext }
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DepositorId }
-import nl.knaw.dans.easy.properties.app.repository.DepositFilters
+import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
 import sangria.marshalling.FromInput.coercedScalaInput
 import sangria.relay.{ Connection, ConnectionArgs }
 import sangria.schema.{ Argument, Context, DeferredValue, Field, ObjectType, OptionInputType, OptionType, StringType, fields }
@@ -113,6 +113,24 @@ trait QueryType {
     fieldType = OptionType(DepositorType),
     resolve = getDepositor(_),
   )
+  private val depositorsField: Field[DataContext, Unit] = Field(
+    name = "depositors",
+    description = Some("List all depositors."),
+    arguments = List(
+      depositOriginFilterArgument,
+      depositStateFilterArgument,
+      depositIngestStepFilterArgument,
+      depositDoiRegisteredFilterArgument,
+      depositDoiActionFilterArgument,
+      depositCuratorFilterArgument,
+      depositIsNewVersionFilterArgument,
+      depositCurationRequiredFilterArgument,
+      depositCurationPerformedFilterArgument,
+      depositContentTypeFilterArgument,
+    ) ::: Connection.Args.All,
+    fieldType = OptionType(depositorConnectionType),
+    resolve = getDepositors(_),
+  )
   private val identifierField: Field[DataContext, Unit] = Field(
     name = "identifier",
     description = Some("Find an identifier with the given type and value."),
@@ -149,6 +167,21 @@ trait QueryType {
     context.arg(depositorIdArgument)
   }
 
+  private def getDepositors(implicit context: Context[DataContext, Unit]): DeferredValue[DataContext, ExtendedConnection[DepositorId]] = {
+    DepositResolver.listDepositors(DepositorIdFilters(
+      originFilter = context.arg(depositOriginFilterArgument),
+      stateFilter = context.arg(depositStateFilterArgument),
+      ingestStepFilter = context.arg(depositIngestStepFilterArgument),
+      doiRegisteredFilter = context.arg(depositDoiRegisteredFilterArgument),
+      doiActionFilter = context.arg(depositDoiActionFilterArgument),
+      curatorFilter = context.arg(depositCuratorFilterArgument),
+      isNewVersionFilter = context.arg(depositIsNewVersionFilterArgument),
+      curationRequiredFilter = context.arg(depositCurationRequiredFilterArgument),
+      curationPerformedFilter = context.arg(depositCurationPerformedFilterArgument),
+      contentTypeFilter = context.arg(depositContentTypeFilterArgument),
+    )).map(ExtendedConnection.connectionFromSeq(_, ConnectionArgs(context)))
+  }
+
   private def getIdentifier(implicit context: Context[DataContext, Unit]): DeferredValue[DataContext, Option[Identifier]] = {
     IdentifierResolver.identifierByTypeAndValue(
       idType = context.arg(identifierTypeArgument),
@@ -163,6 +196,7 @@ trait QueryType {
       depositField,
       depositsField,
       depositorField,
+      depositorsField,
       identifierField,
       nodeField,
       nodesField,
