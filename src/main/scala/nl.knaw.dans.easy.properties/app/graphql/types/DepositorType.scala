@@ -88,8 +88,7 @@ trait DepositorType {
     ),
   )
 
-  // lazy because we need it before being declared
-  lazy val ConnectionDefinition(_, depositorConnectionType) = ExtendedConnection.definition[DataContext, ExtendedConnection, DepositorId](
+  val ConnectionDefinition(_, depositorConnectionType) = ExtendedConnection.definition[DataContext, ExtendedConnection, DepositorId](
     name = "DepositorId",
     nodeType = DepositorType,
   )
