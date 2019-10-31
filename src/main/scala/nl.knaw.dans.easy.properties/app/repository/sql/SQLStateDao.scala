@@ -86,7 +86,7 @@ class SQLStateDao(override implicit val connection: Connection, errorHandler: SQ
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, state.timestamp, "state")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, state.timestamp, objName = "state")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)

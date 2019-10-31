@@ -128,7 +128,7 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
     val inputContentType2 = InputContentType(ContentTypeValue.ZIP, timestamp)
 
     contentTypes.store(depositId, inputContentType1) shouldBe right
-    contentTypes.store(depositId, inputContentType2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, "content type")
+    contentTypes.store(depositId, inputContentType2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, objName = "content type")
   }
 
   "getDepositsById" should "find deposits identified by these contentTypeIds" in {

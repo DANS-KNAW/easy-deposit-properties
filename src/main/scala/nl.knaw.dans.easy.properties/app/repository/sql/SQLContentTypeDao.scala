@@ -87,7 +87,7 @@ class SQLContentTypeDao(override implicit val connection: Connection, errorHandl
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, contentType.timestamp, "content type")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, contentType.timestamp, objName = "content type")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)

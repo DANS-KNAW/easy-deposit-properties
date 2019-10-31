@@ -87,7 +87,7 @@ class SQLIngestStepDao(override implicit val connection: Connection, errorHandle
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, step.timestamp, "ingest step")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, step.timestamp, objName = "ingest step")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)

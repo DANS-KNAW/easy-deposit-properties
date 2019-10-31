@@ -138,7 +138,7 @@ class SQLCurationDaoSpec extends TestSupportFixture
     val inputCuration2 = InputCuration(isNewVersion = false.some, isRequired = false, isPerformed = true, "foo", "foo@bar.com", timestamp)
 
     curations.store(depositId, inputCuration1) shouldBe right
-    curations.store(depositId, inputCuration2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, "curation")
+    curations.store(depositId, inputCuration2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, objName = "curation")
   }
 
   "getDepositsById" should "find deposits identified by these curationIds" in {

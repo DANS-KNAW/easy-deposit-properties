@@ -66,7 +66,7 @@ class SQLDoiRegisteredDao(override implicit val connection: Connection, errorHan
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, registered.timestamp, "doi registered event")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, registered.timestamp, objName = "doi registered event")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .map(_ => registered)

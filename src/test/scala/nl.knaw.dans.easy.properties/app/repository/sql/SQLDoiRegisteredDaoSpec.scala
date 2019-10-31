@@ -98,6 +98,6 @@ class SQLDoiRegisteredDaoSpec extends TestSupportFixture
     val doiRegisteredEvent2 = DoiRegisteredEvent(value = false, timestamp)
 
     doiRegistereds.store(depositId, doiRegisteredEvent1) shouldBe right
-    doiRegistereds.store(depositId, doiRegisteredEvent2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, "doi registered event")
+    doiRegistereds.store(depositId, doiRegisteredEvent2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, objName = "doi registered event")
   }
 }

@@ -66,7 +66,7 @@ class SQLDoiActionDao(override implicit val connection: Connection, errorHandler
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, action.timestamp, "doi action event")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, action.timestamp, objName = "doi action event")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .map(_ => action)

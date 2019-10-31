@@ -88,7 +88,7 @@ class SQLSpringfieldDao(override implicit val connection: Connection, errorHandl
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, springfield.timestamp, "springfield")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, springfield.timestamp, objName = "springfield")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)
