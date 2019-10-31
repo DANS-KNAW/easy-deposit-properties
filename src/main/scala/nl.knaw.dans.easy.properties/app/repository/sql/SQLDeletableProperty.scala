@@ -22,6 +22,6 @@ trait SQLDeletableProperty extends SQLDeletable {
   private[sql] val key: String
 
   override private[sql] def getQuery(ids: NonEmptyList[DepositId]) = {
-    QueryGenerator.deleteByDepositId("SimpleProperties", key)(ids)
+    QueryGenerator.deleteByDepositId(tableName, key)(ids)
   }
 }

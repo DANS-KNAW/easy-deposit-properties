@@ -26,7 +26,7 @@ import resource.managed
 
 class SQLDoiActionDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends DoiActionDao with SQLDeletableProperty with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[sql] val daoName = "DoiAction"
+  override private[sql] val tableName = "SimpleProperties"
   override private[sql] val key = "doi-action"
 
   private def parseDoiActionEvent(resultSet: ResultSet): Either[InvalidValueError, DoiActionEvent] = {

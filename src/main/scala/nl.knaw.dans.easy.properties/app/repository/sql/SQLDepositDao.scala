@@ -30,7 +30,7 @@ import resource.managed
 
 class SQLDepositDao(override implicit val connection: Connection) extends DepositDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
-  override private[sql] val daoName = "Deposit"
+  override private[sql] val tableName = "Deposit"
 
   private def parseLastModifiedResponse(resultSet: ResultSet): Either[InvalidValueError, (DepositId, Timestamp)] = {
     for {

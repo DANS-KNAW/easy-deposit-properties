@@ -25,7 +25,7 @@ import resource.managed
 
 trait SQLDeletable extends Deletable {
   implicit val connection: Connection
-  private[sql] val daoName: String
+  private[sql] val tableName: String
 
   def deleteBy(ids: Seq[DepositId]): MutationErrorOr[Unit] = {
     NonEmptyList.fromList(ids.toList)
@@ -46,6 +46,6 @@ trait SQLDeletable extends Deletable {
   }
 
   private[sql] def getQuery(ids: NonEmptyList[DepositId]): String = {
-    QueryGenerator.deleteByDepositId(daoName)(ids)
+    QueryGenerator.deleteByDepositId(tableName)(ids)
   }
 }
