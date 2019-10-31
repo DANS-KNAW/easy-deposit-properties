@@ -394,6 +394,17 @@ A DateTime scalar type represents textual data, formatted as an ISO8601 date-tim
 """
 scalar DateTime
 
+input DeleteDepositsInput {
+  """A list of deposit identifiers."""
+  depositIds: [UUID!]!
+  clientMutationId: String
+}
+
+type DeleteDepositsPayload {
+  depositIds: [UUID!]!
+  clientMutationId: String
+}
+
 """Contains all technical metadata about this deposit."""
 type Deposit implements Node {
   """The identifier of the deposit."""
@@ -1091,6 +1102,9 @@ type Mutation {
   Register a new deposit with initial properties from a 'deposit.properties' string.
   """
   registerDeposit(input: RegisterDepositInput!): RegisterDepositPayload
+
+  """Delete deposits."""
+  deleteDeposits(input: DeleteDepositsInput!): DeleteDepositsPayload
 }
 
 """An object with an ID"""

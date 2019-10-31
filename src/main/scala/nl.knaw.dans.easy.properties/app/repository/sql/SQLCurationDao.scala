@@ -26,7 +26,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ CurationDao, DepositIdAndTi
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLCurationDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends CurationDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLCurationDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends CurationDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[sql] val tableName = "Curation"
 
   private def parseCuration(resultSet: ResultSet): Either[InvalidValueError, Curation] = {
     for {
@@ -63,39 +65,31 @@ class SQLCurationDao(implicit connection: Connection, errorHandler: SQLErrorHand
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[Curation]] = {
     trace(ids)
 
-    executeGetById(parseCuration)(QueryGenerator.getElementsById("Curation", "curationId"))(ids)
+    executeGetById(parseCuration)(QueryGenerator.getElementsById(tableName, "curationId"))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Curation)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndCuration)(QueryGenerator.getCurrentElementByDepositId("Curation"))(ids)
+    executeGetCurrent(parseDepositIdAndCuration)(QueryGenerator.getCurrentElementByDepositId(tableName))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[Curation])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndCuration)(QueryGenerator.getAllElementsByDepositId("Curation"))(ids)
+    executeGetAll(parseDepositIdAndCuration)(QueryGenerator.getAllElementsByDepositId(tableName))(ids)
   }
 
   override def store(id: DepositId, curation: InputCuration): MutationErrorOr[Curation] = {
     trace(id, curation)
     val query = QueryGenerator.storeCuration(isNewVersionDefined = curation.isNewVersion.isDefined)
 
-    val managedResultSet = for {
-      prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.setString(1, id.toString)
-      _ = prepStatement.setBoolean(2, curation.isRequired)
-      _ = prepStatement.setBoolean(3, curation.isPerformed)
-      _ = prepStatement.setString(4, curation.datamanagerUserId)
-      _ = prepStatement.setString(5, curation.datamanagerEmail)
-      _ = prepStatement.setTimestamp(6, curation.timestamp, timeZone)
-      _ = curation.isNewVersion.foreach(prepStatement.setBoolean(7, _)) // only include this parameter if isNewVersion is defined; the query keeps this optional parameter into account
-      _ = prepStatement.executeUpdate()
-      resultSetForKey <- managed(prepStatement.getGeneratedKeys)
-    } yield resultSetForKey
+    val mandatoryParams = Seq(id, curation.isRequired, curation.isPerformed, curation.datamanagerUserId, curation.datamanagerEmail, curation.timestamp)
+    // only include this parameter if isNewVersion is defined; the query keeps this optional parameter into account
+    val params = curation.isNewVersion.fold(mandatoryParams)(mandatoryParams :+ _)
 
-    managedResultSet
+    managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
+      .getResultSetForUpdateWith(params: _*)
       .map {
         case resultSet if resultSet.next() => resultSet.getLong(1).toString.asRight
         case _ => throw new Exception(s"not able to insert curation data (isNewVersion = ${ curation.isNewVersion.getOrElse("none") }, curation required = ${ curation.isRequired }, curation performed = ${ curation.isPerformed }, datamanager userId = ${ curation.datamanagerUserId }, datamanager email = ${ curation.datamanagerEmail }, timestamp = ${ curation.timestamp })")
@@ -106,7 +100,7 @@ class SQLCurationDao(implicit connection: Connection, errorHandler: SQLErrorHand
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, curation.timestamp, "curation")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, curation.timestamp, objName = "curation")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)
@@ -116,6 +110,6 @@ class SQLCurationDao(implicit connection: Connection, errorHandler: SQLErrorHand
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseCurationIdAndDeposit)(QueryGenerator.getDepositsById("Curation", "curationId"))(ids)
+    executeGetDepositById(parseCurationIdAndDeposit)(QueryGenerator.getDepositsById(tableName, "curationId"))(ids)
   }
 }

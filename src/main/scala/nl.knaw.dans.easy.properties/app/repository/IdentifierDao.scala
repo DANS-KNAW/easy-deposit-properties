@@ -19,7 +19,7 @@ import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.Identifi
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, InputIdentifier }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
 
-trait IdentifierDao {
+trait IdentifierDao extends Deletable {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[Identifier]]
 

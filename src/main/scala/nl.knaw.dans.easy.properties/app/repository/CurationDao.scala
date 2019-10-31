@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository
 import nl.knaw.dans.easy.properties.app.model.curation.{ Curation, InputCuration }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
 
-trait CurationDao {
+trait CurationDao extends Deletable {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[Curation]]
 

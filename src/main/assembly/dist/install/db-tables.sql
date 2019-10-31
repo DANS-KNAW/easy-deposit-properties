@@ -62,10 +62,10 @@ CREATE TABLE IF NOT EXISTS SimpleProperties (
     UNIQUE (depositId, key, timestamp)
 );
 
-GRANT INSERT, UPDATE, SELECT ON Deposit TO easy_deposit_properties;
-GRANT INSERT, SELECT ON State TO easy_deposit_properties;
-GRANT INSERT, SELECT ON Identifier TO easy_deposit_properties;
-GRANT INSERT, SELECT ON Curation TO easy_deposit_properties;
-GRANT INSERT, SELECT ON Springfield TO easy_deposit_properties;
-GRANT INSERT, SELECT ON SimpleProperties TO easy_deposit_properties;
+GRANT INSERT, SELECT, DELETE, UPDATE ON Deposit TO easy_deposit_properties;
+GRANT INSERT, SELECT, DELETE ON State TO easy_deposit_properties;
+GRANT INSERT, SELECT, DELETE ON Identifier TO easy_deposit_properties;
+GRANT INSERT, SELECT, DELETE ON Curation TO easy_deposit_properties;
+GRANT INSERT, SELECT, DELETE ON Springfield TO easy_deposit_properties;
+GRANT INSERT, SELECT, DELETE ON SimpleProperties TO easy_deposit_properties;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO easy_deposit_properties;

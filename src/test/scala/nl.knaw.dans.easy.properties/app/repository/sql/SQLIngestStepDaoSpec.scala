@@ -127,7 +127,7 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
     val inputIngestStep2 = InputIngestStep(IngestStepLabel.SOLR4FILES, timestamp)
 
     ingestSteps.store(depositId, inputIngestStep1) shouldBe right
-    ingestSteps.store(depositId, inputIngestStep2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, "ingest step")
+    ingestSteps.store(depositId, inputIngestStep2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, objName = "ingest step")
   }
 
   "getDepositsById" should "find deposits identified by these ingestStepIds" in {

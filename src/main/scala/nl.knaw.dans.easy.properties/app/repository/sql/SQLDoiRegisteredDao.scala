@@ -24,7 +24,10 @@ import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlread
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLDoiRegisteredDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends DoiRegisteredDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLDoiRegisteredDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends DoiRegisteredDao with SQLDeletableProperty with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[sql] val tableName = "SimpleProperties"
+  override private[sql] val key = "doi-registered"
 
   private def parseDoiRegisteredEvent(resultSet: ResultSet): Either[InvalidValueError, DoiRegisteredEvent] = {
     for {
@@ -43,13 +46,13 @@ class SQLDoiRegisteredDao(implicit connection: Connection, errorHandler: SQLErro
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, DoiRegisteredEvent)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsCurrentElementByDepositId("doi-registered"))(ids)
+    executeGetCurrent(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsCurrentElementByDepositId(key))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[DoiRegisteredEvent])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsAllElementsByDepositId("doi-registered"))(ids)
+    executeGetAll(parseDepositIdAndDoiRegisteredEvent)(QueryGenerator.getSimplePropsAllElementsByDepositId(key))(ids)
   }
 
   override def store(id: DepositId, registered: DoiRegisteredEvent): MutationErrorOr[DoiRegisteredEvent] = {
@@ -58,20 +61,12 @@ class SQLDoiRegisteredDao(implicit connection: Connection, errorHandler: SQLErro
     val query = QueryGenerator.storeSimpleProperty
 
     managed(connection.prepareStatement(query))
-      .map(prepStatement => {
-        prepStatement.setString(1, id.toString)
-        prepStatement.setString(2, "doi-registered")
-        prepStatement.setString(3, registered.value.toString)
-        prepStatement.setTimestamp(4, registered.timestamp, timeZone)
-        prepStatement.executeUpdate()
-      })
-      .either
-      .either
+      .executeUpdateWith(id, key, registered.value.toString, registered.timestamp)
       .leftMap(ts => {
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, registered.timestamp, "doi registered event")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, registered.timestamp, objName = "doi registered event")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .map(_ => registered)

@@ -128,7 +128,7 @@ class SQLStateDaoSpec extends TestSupportFixture
     val inputState2 = InputState(StateLabel.FEDORA_ARCHIVED, "deposit is archived in Fedora", timestamp)
 
     states.store(depositId, inputState1) shouldBe right
-    states.store(depositId, inputState2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, "state")
+    states.store(depositId, inputState2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, objName = "state")
   }
 
   "getDepositsById" should "find deposits identified by these stateIds" in {

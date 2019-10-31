@@ -13,23 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.easy.properties.app.graphql
+package nl.knaw.dans.easy.properties.app.repository.sql
 
-import nl.knaw.dans.easy.properties.app.Deleter
-import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
-import nl.knaw.dans.easy.properties.app.repository.Repository
+import cats.data.NonEmptyList
+import nl.knaw.dans.easy.properties.app.model.DepositId
 
-import scala.concurrent.ExecutionContext
+trait SQLDeletableProperty extends SQLDeletable {
+  private[sql] val key: String
 
-trait DataContext {
-
-  val executionContext: ExecutionContext
-
-  def isLoggedIn: Boolean
-
-  def repo: Repository
-
-  def registration: DepositPropertiesRegistration
-
-  def deleter: Deleter
+  override private[sql] def getQuery(ids: NonEmptyList[DepositId]) = {
+    QueryGenerator.deleteByDepositId(tableName, key)(ids)
+  }
 }

@@ -75,10 +75,10 @@ class SQLDepositDaoSpec extends TestSupportFixture
 
     deposits.find(Seq(depositId6)).value shouldBe empty
   }
-  
+
   it should "return an empty collection when the input collection is empty" in {
     val deposits = new SQLDepositDao
-    
+
     deposits.find(Seq.empty).value shouldBe empty
   }
 
@@ -248,7 +248,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
 
     deposits.storeBagName(depositId6, "bag6").leftValue shouldBe NoSuchDepositError(depositId6)
   }
-  
+
   it should "fail to set the bagName when the deposit exists and the bagName is already set" in {
     val deposits = new SQLDepositDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
@@ -259,7 +259,7 @@ class SQLDepositDaoSpec extends TestSupportFixture
     deposits.storeBagName(depositId6, "another name").leftValue shouldBe BagNameAlreadySetError(depositId6)
     deposits.find(Seq(depositId6)).value should contain only deposit6
   }
-  
+
   "lastModified" should "find the 'last modified' timestamp for each of the given depositIds" in {
     val deposits = new SQLDepositDao
 

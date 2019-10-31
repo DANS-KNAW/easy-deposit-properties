@@ -25,7 +25,10 @@ import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlread
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends IngestStepDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLIngestStepDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends IngestStepDao with SQLDeletableProperty with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[sql] val tableName = "SimpleProperties"
+  override private[sql] val key = "ingest-step"
 
   private def parseIngestStep(resultSet: ResultSet): Either[InvalidValueError, IngestStep] = {
     for {
@@ -52,19 +55,19 @@ class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[IngestStep]] = {
     trace(ids)
 
-    executeGetById(parseIngestStep)(QueryGenerator.getSimplePropsElementsById("ingest-step"))(ids)
+    executeGetById(parseIngestStep)(QueryGenerator.getSimplePropsElementsById(key))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, IngestStep)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndIngestStep)(QueryGenerator.getSimplePropsCurrentElementByDepositId("ingest-step"))(ids)
+    executeGetCurrent(parseDepositIdAndIngestStep)(QueryGenerator.getSimplePropsCurrentElementByDepositId(key))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[IngestStep])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndIngestStep)(QueryGenerator.getSimplePropsAllElementsByDepositId("ingest-step"))(ids)
+    executeGetAll(parseDepositIdAndIngestStep)(QueryGenerator.getSimplePropsAllElementsByDepositId(key))(ids)
   }
 
   override def store(id: DepositId, step: InputIngestStep): MutationErrorOr[IngestStep] = {
@@ -72,17 +75,8 @@ class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHa
 
     val query = QueryGenerator.storeSimpleProperty
 
-    val managedResultSet = for {
-      prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.setString(1, id.toString)
-      _ = prepStatement.setString(2, "ingest-step")
-      _ = prepStatement.setString(3, step.step.toString)
-      _ = prepStatement.setTimestamp(4, step.timestamp, timeZone)
-      _ = prepStatement.executeUpdate()
-      resultSetForKey <- managed(prepStatement.getGeneratedKeys)
-    } yield resultSetForKey
-
-    managedResultSet
+    managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
+      .getResultSetForUpdateWith(id, key, step.step, step.timestamp)
       .map {
         case resultSet if resultSet.next() => resultSet.getLong(1).toString.asRight
         case _ => throw new Exception(s"not able to insert ingest step (${ step.step }, ${ step.timestamp })")
@@ -93,7 +87,7 @@ class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHa
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, step.timestamp, "ingest step")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, step.timestamp, objName = "ingest step")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)
@@ -103,6 +97,6 @@ class SQLIngestStepDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseIngestStepIdAndDeposit)(QueryGenerator.getSimplePropsDepositsById("ingest-step"))(ids)
+    executeGetDepositById(parseIngestStepIdAndDeposit)(QueryGenerator.getSimplePropsDepositsById(key))(ids)
   }
 }

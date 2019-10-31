@@ -25,7 +25,10 @@ import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, DepositIdAn
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends ContentTypeDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLContentTypeDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends ContentTypeDao with SQLDeletableProperty with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[sql] val tableName = "SimpleProperties"
+  override private[sql] val key = "content-type"
 
   private def parseContentType(resultSet: ResultSet): Either[InvalidValueError, ContentType] = {
     for {
@@ -52,19 +55,19 @@ class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorH
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[ContentType]] = {
     trace(ids)
 
-    executeGetById(parseContentType)(QueryGenerator.getSimplePropsElementsById("content-type"))(ids)
+    executeGetById(parseContentType)(QueryGenerator.getSimplePropsElementsById(key))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, ContentType)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndContentType)(QueryGenerator.getSimplePropsCurrentElementByDepositId("content-type"))(ids)
+    executeGetCurrent(parseDepositIdAndContentType)(QueryGenerator.getSimplePropsCurrentElementByDepositId(key))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[ContentType])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndContentType)(QueryGenerator.getSimplePropsAllElementsByDepositId("content-type"))(ids)
+    executeGetAll(parseDepositIdAndContentType)(QueryGenerator.getSimplePropsAllElementsByDepositId(key))(ids)
   }
 
   override def store(id: DepositId, contentType: InputContentType): MutationErrorOr[ContentType] = {
@@ -72,17 +75,8 @@ class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorH
 
     val query = QueryGenerator.storeSimpleProperty
 
-    val managedResultSet = for {
-      prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.setString(1, id.toString)
-      _ = prepStatement.setString(2, "content-type")
-      _ = prepStatement.setString(3, contentType.value.toString)
-      _ = prepStatement.setTimestamp(4, contentType.timestamp, timeZone)
-      _ = prepStatement.executeUpdate()
-      resultSetForKey <- managed(prepStatement.getGeneratedKeys)
-    } yield resultSetForKey
-
-    managedResultSet
+    managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
+      .getResultSetForUpdateWith(id, key, contentType.value, contentType.timestamp)
       .map {
         case resultSet if resultSet.next() => resultSet.getLong(1).toString.asRight
         case _ => throw new Exception(s"not able to insert content type (${ contentType.value }, ${ contentType.timestamp })")
@@ -93,7 +87,7 @@ class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorH
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, contentType.timestamp, "content type")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, contentType.timestamp, objName = "content type")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)
@@ -103,6 +97,6 @@ class SQLContentTypeDao(implicit connection: Connection, errorHandler: SQLErrorH
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseContentTypeIdAndDeposit)(QueryGenerator.getSimplePropsDepositsById("content-type"))(ids)
+    executeGetDepositById(parseContentTypeIdAndDeposit)(QueryGenerator.getSimplePropsDepositsById(key))(ids)
   }
 }

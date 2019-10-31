@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository
 import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, Springfield }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
 
-trait SpringfieldDao {
+trait SpringfieldDao extends Deletable {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[Springfield]]
 

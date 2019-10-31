@@ -17,7 +17,7 @@ package nl.knaw.dans.easy.properties.app.repository
 
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DepositorId, Timestamp }
 
-trait DepositDao {
+trait DepositDao extends Deletable {
 
   def getAll: QueryErrorOr[Seq[Deposit]]
 

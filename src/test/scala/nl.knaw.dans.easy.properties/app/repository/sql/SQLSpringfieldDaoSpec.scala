@@ -58,9 +58,7 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
   "getCurrent" should "return the current springfield configurations of the given deposits" in {
     val springfields = new SQLSpringfieldDao
 
-    springfields.getCurrent(Seq(depositId1, depositId5)).value should contain only(
-      depositId1 -> springfield0,
-    )
+    springfields.getCurrent(Seq(depositId1, depositId5)).value should contain only (depositId1 -> springfield0)
   }
 
   it should "return an empty collection if the depositId is unknown" in {
@@ -127,7 +125,7 @@ class SQLSpringfieldDaoSpec extends TestSupportFixture
     val inputSpringfield2 = InputSpringfield("domain2", "user2", "collection2", SpringfieldPlayMode.MENU, timestamp)
 
     springfields.store(depositId, inputSpringfield1) shouldBe right
-    springfields.store(depositId, inputSpringfield2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, "springfield")
+    springfields.store(depositId, inputSpringfield2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, objName = "springfield")
   }
 
   "getDepositsById" should "find deposits identified by these springfieldIds" in {

@@ -28,7 +28,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ IdentifierDao, InvalidValue
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends IdentifierDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLIdentifierDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends IdentifierDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[sql] val tableName = "Identifier"
 
   private def parseIdentifier(resultSet: ResultSet): Either[InvalidValueError, Identifier] = {
     for {
@@ -56,7 +58,7 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[Identifier]] = {
     trace(ids)
 
-    executeGetById(parseIdentifier)(QueryGenerator.getElementsById("Identifier", "identifierId"))(ids)
+    executeGetById(parseIdentifier)(QueryGenerator.getElementsById(tableName, "identifierId"))(ids)
   }
 
   override def getByType(ids: Seq[(DepositId, IdentifierType)]): QueryErrorOr[Seq[((DepositId, IdentifierType), Identifier)]] = {
@@ -106,24 +108,15 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[Identifier])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndIdentifier)(QueryGenerator.getAllElementsByDepositId("Identifier"))(ids)
+    executeGetAll(parseDepositIdAndIdentifier)(QueryGenerator.getAllElementsByDepositId(tableName))(ids)
   }
 
   override def store(id: DepositId, identifier: InputIdentifier): MutationErrorOr[Identifier] = {
     trace(id, identifier)
     val query = QueryGenerator.storeIdentifier
 
-    val managedResultSet = for {
-      prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.setString(1, id.toString)
-      _ = prepStatement.setString(2, identifier.idType.toString)
-      _ = prepStatement.setString(3, identifier.idValue)
-      _ = prepStatement.setTimestamp(4, identifier.timestamp, timeZone)
-      _ = prepStatement.executeUpdate()
-      resultSetForKey <- managed(prepStatement.getGeneratedKeys)
-    } yield resultSetForKey
-
-    managedResultSet
+    managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
+      .getResultSetForUpdateWith(id, identifier.idType, identifier.idValue, identifier.timestamp)
       .map {
         case resultSet if resultSet.next() => resultSet.getLong(1).toString.asRight
         case _ => throw new Exception(s"not able to insert identifier (${ identifier.idType }, ${ identifier.idValue }, ${ identifier.timestamp })")
@@ -137,7 +130,7 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
           case t if errorHandler.isUniquenessConstraintError(t) =>
             // we can't really decide which uniqueness constraint is violated here given the error returned from the database
             val msg = s"Cannot insert this identifier: identifier ${ identifier.idType } already exists for depositId $id with timestamp '${ identifier.timestamp }' or " +
-              s"${identifier.idType} '${ identifier.idValue }' is already associated with another deposit."
+              s"${ identifier.idType } '${ identifier.idValue }' is already associated with another deposit."
             MutationError(msg)
         }.getOrElse(MutationError(ts.head.getMessage))
       })
@@ -148,6 +141,6 @@ class SQLIdentifierDao(implicit connection: Connection, errorHandler: SQLErrorHa
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseIdentifierIdAndDeposit)(QueryGenerator.getDepositsById("Identifier", "identifierId"))(ids)
+    executeGetDepositById(parseIdentifierIdAndDeposit)(QueryGenerator.getDepositsById(tableName, "identifierId"))(ids)
   }
 }

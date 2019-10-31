@@ -13,23 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.easy.properties.app.graphql
+package nl.knaw.dans.easy.properties.app.repository
 
-import nl.knaw.dans.easy.properties.app.Deleter
-import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
-import nl.knaw.dans.easy.properties.app.repository.Repository
+import nl.knaw.dans.easy.properties.app.model.DepositId
 
-import scala.concurrent.ExecutionContext
+trait Deletable {
 
-trait DataContext {
-
-  val executionContext: ExecutionContext
-
-  def isLoggedIn: Boolean
-
-  def repo: Repository
-
-  def registration: DepositPropertiesRegistration
-
-  def deleter: Deleter
+  def deleteBy(ids: Seq[DepositId]): MutationErrorOr[Unit]
 }

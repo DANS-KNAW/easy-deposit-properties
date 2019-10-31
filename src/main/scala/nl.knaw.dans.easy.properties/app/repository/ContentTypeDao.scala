@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, InputContentType }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
 
-trait ContentTypeDao {
+trait ContentTypeDao extends Deletable {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[ContentType]]
 

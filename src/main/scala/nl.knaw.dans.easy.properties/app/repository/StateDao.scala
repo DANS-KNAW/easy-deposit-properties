@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, State }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
 
-trait StateDao {
+trait StateDao extends Deletable {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[State]]
 

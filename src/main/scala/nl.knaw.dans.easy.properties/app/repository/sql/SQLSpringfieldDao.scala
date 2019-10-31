@@ -25,7 +25,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlread
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends SpringfieldDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLSpringfieldDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends SpringfieldDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[sql] val tableName = "Springfield"
 
   private def parseSpringfield(resultSet: ResultSet): Either[InvalidValueError, Springfield] = {
     for {
@@ -55,38 +57,27 @@ class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorH
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[Springfield]] = {
     trace(ids)
 
-    executeGetById(parseSpringfield)(QueryGenerator.getElementsById("Springfield", "springfieldId"))(ids)
+    executeGetById(parseSpringfield)(QueryGenerator.getElementsById(tableName, "springfieldId"))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Springfield)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndSpringfield)(QueryGenerator.getCurrentElementByDepositId("Springfield"))(ids)
+    executeGetCurrent(parseDepositIdAndSpringfield)(QueryGenerator.getCurrentElementByDepositId(tableName))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[Springfield])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndSpringfield)(QueryGenerator.getAllElementsByDepositId("Springfield"))(ids)
+    executeGetAll(parseDepositIdAndSpringfield)(QueryGenerator.getAllElementsByDepositId(tableName))(ids)
   }
 
   override def store(id: DepositId, springfield: InputSpringfield): MutationErrorOr[Springfield] = {
     trace(id, springfield)
     val query = QueryGenerator.storeSpringfield
 
-    val managedResultSet = for {
-      prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.setString(1, id.toString)
-      _ = prepStatement.setString(2, springfield.domain)
-      _ = prepStatement.setString(3, springfield.user)
-      _ = prepStatement.setString(4, springfield.collection)
-      _ = prepStatement.setString(5, springfield.playmode.toString)
-      _ = prepStatement.setTimestamp(6, springfield.timestamp, timeZone)
-      _ = prepStatement.executeUpdate()
-      resultSetForKey <- managed(prepStatement.getGeneratedKeys)
-    } yield resultSetForKey
-
-    managedResultSet
+    managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
+      .getResultSetForUpdateWith(id, springfield.domain, springfield.user, springfield.collection, springfield.playmode, springfield.timestamp)
       .map {
         case resultSet if resultSet.next() => resultSet.getLong(1).toString.asRight
         case _ => throw new Exception(s"not able to insert springfield configuration (${ springfield.domain }, ${ springfield.user }, ${ springfield.collection }, ${ springfield.playmode }, ${ springfield.timestamp })")
@@ -97,7 +88,7 @@ class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorH
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, springfield.timestamp, "springfield")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, springfield.timestamp, objName = "springfield")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)
@@ -107,6 +98,6 @@ class SQLSpringfieldDao(implicit connection: Connection, errorHandler: SQLErrorH
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseSpringfieldIdAndDeposit)(QueryGenerator.getDepositsById("Springfield", "springfieldId"))(ids)
+    executeGetDepositById(parseSpringfieldIdAndDeposit)(QueryGenerator.getDepositsById(tableName, "springfieldId"))(ids)
   }
 }

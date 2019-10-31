@@ -25,7 +25,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlread
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLStateDao(implicit connection: Connection, errorHandler: SQLErrorHandler) extends StateDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLStateDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends StateDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[sql] val tableName = "State"
 
   private def parseState(resultSet: ResultSet): Either[InvalidValueError, State] = {
     for {
@@ -53,36 +55,27 @@ class SQLStateDao(implicit connection: Connection, errorHandler: SQLErrorHandler
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[State]] = {
     trace(ids)
 
-    executeGetById(parseState)(QueryGenerator.getElementsById("State", "stateId"))(ids)
+    executeGetById(parseState)(QueryGenerator.getElementsById(tableName, "stateId"))(ids)
   }
 
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, State)]] = {
     trace(ids)
 
-    executeGetCurrent(parseDepositIdAndState)(QueryGenerator.getCurrentElementByDepositId("State"))(ids)
+    executeGetCurrent(parseDepositIdAndState)(QueryGenerator.getCurrentElementByDepositId(tableName))(ids)
   }
 
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[State])]] = {
     trace(ids)
 
-    executeGetAll(parseDepositIdAndState)(QueryGenerator.getAllElementsByDepositId("State"))(ids)
+    executeGetAll(parseDepositIdAndState)(QueryGenerator.getAllElementsByDepositId(tableName))(ids)
   }
 
   override def store(id: DepositId, state: InputState): MutationErrorOr[State] = {
     trace(id, state)
     val query = QueryGenerator.storeState
 
-    val managedResultSet = for {
-      prepStatement <- managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
-      _ = prepStatement.setString(1, id.toString)
-      _ = prepStatement.setString(2, state.label.toString)
-      _ = prepStatement.setString(3, state.description)
-      _ = prepStatement.setTimestamp(4, state.timestamp, timeZone)
-      _ = prepStatement.executeUpdate()
-      resultSetForKey <- managed(prepStatement.getGeneratedKeys)
-    } yield resultSetForKey
-
-    managedResultSet
+    managed(connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS))
+      .getResultSetForUpdateWith(id, state.label, state.description, state.timestamp)
       .map {
         case resultSet if resultSet.next() => resultSet.getLong(1).toString.asRight
         case _ => throw new Exception(s"not able to insert state (${ state.label }, ${ state.description }, ${ state.timestamp })")
@@ -93,7 +86,7 @@ class SQLStateDao(implicit connection: Connection, errorHandler: SQLErrorHandler
         assert(ts.nonEmpty)
         ts.collectFirst {
           case t if errorHandler.isForeignKeyError(t) => NoSuchDepositError(id)
-          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, state.timestamp, "state")
+          case t if errorHandler.isUniquenessConstraintError(t) => DepositIdAndTimestampAlreadyExistError(id, state.timestamp, objName = "state")
         }.getOrElse(MutationError(ts.head.getMessage))
       })
       .flatMap(identity)
@@ -103,6 +96,6 @@ class SQLStateDao(implicit connection: Connection, errorHandler: SQLErrorHandler
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 
-    executeGetDepositById(parseStateIdAndDeposit)(QueryGenerator.getDepositsById("State", "stateId"))(ids)
+    executeGetDepositById(parseStateIdAndDeposit)(QueryGenerator.getDepositsById(tableName, "stateId"))(ids)
   }
 }

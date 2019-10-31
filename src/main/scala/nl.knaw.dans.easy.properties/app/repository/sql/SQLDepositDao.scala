@@ -28,7 +28,9 @@ import nl.knaw.dans.easy.properties.app.repository.{ BagNameAlreadySetError, Dep
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
-class SQLDepositDao(implicit connection: Connection) extends DepositDao with CommonResultSetParsers with DebugEnhancedLogging {
+class SQLDepositDao(override implicit val connection: Connection) extends DepositDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
+
+  override private[sql] val tableName = "Deposit"
 
   private def parseLastModifiedResponse(resultSet: ResultSet): Either[InvalidValueError, (DepositId, Timestamp)] = {
     for {
@@ -81,16 +83,7 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
     val query = QueryGenerator.storeDeposit
 
     managed(connection.prepareStatement(query))
-      .map(prepStatement => {
-        prepStatement.setString(1, deposit.id.toString)
-        prepStatement.setString(2, deposit.bagName.orNull)
-        prepStatement.setTimestamp(3, deposit.creationTimestamp, timeZone)
-        prepStatement.setString(4, deposit.depositorId)
-        prepStatement.setString(5, deposit.origin.toString)
-        prepStatement.executeUpdate()
-      })
-      .either
-      .either
+      .executeUpdateWith(deposit.id, deposit.bagName.orNull, deposit.creationTimestamp, deposit.depositorId, deposit.origin)
       .leftMap(_ => DepositAlreadyExistsError(deposit.id))
       .map(_ => deposit)
   }
@@ -100,13 +93,7 @@ class SQLDepositDao(implicit connection: Connection) extends DepositDao with Com
     val query = QueryGenerator.storeBagName
 
     managed(connection.prepareStatement(query))
-      .map(prepStatement => {
-        prepStatement.setString(1, bagName)
-        prepStatement.setString(2, depositId.toString)
-        prepStatement.executeUpdate()
-      })
-      .either
-      .either
+      .executeUpdateWith(bagName, depositId)
       .leftMap(_ => NoSuchDepositError(depositId))
       .flatMap {
         case 0 =>

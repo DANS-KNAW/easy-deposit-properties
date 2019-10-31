@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, InputIngestStep }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
 
-trait IngestStepDao {
+trait IngestStepDao extends Deletable {
 
   def getById(ids: Seq[String]): QueryErrorOr[Seq[IngestStep]]
 
