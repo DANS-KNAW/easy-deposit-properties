@@ -32,15 +32,15 @@ object QueryGenerator {
 
   private type TableName = String
   private type KeyName = String
-  private type LabelName = String
+  private type ColumnName = String
   private type Query = String
 
-  private def createSearchSubQuery[T <: DepositFilter](filter: T)(tableName: TableName, labelName: LabelName, labelValue: T => String): (TableName, Query, List[PrepStatementResolver]) = {
+  private def createSearchSubQuery[T <: DepositFilter](filter: T)(tableName: TableName, columnName: ColumnName, labelValue: T => String): (TableName, Query, List[PrepStatementResolver]) = {
     val query = filter.filter match {
       case SeriesFilter.ALL =>
-        s"SELECT DISTINCT depositId FROM $tableName WHERE $labelName = ?"
+        s"SELECT DISTINCT depositId FROM $tableName WHERE $columnName = ?"
       case SeriesFilter.LATEST =>
-        s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE $labelName = ?"
+        s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE $columnName = ?"
     }
 
     (tableName, query, setString(labelValue(filter)) :: Nil)
