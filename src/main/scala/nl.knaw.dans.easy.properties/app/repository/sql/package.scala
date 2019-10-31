@@ -46,7 +46,7 @@ package object sql {
 
   def setInt(s: String): PrepStatementResolver = setInt(s.toInt)
 
-  implicit class RichManagedStatement(val statement: ManagedResource[PreparedStatement]) extends AnyVal {
+  implicit class UpdateExecutor(val statement: ManagedResource[PreparedStatement]) extends AnyVal {
 
     /** @return rowCount */
     def executeUpdateWith(values: Any*): Either[Seq[Throwable], Int] = {
