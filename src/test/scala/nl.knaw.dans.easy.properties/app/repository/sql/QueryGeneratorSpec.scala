@@ -687,4 +687,14 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
   "storeState" should "yield the query for inserting a State into the database" in {
     QueryGenerator.storeState shouldBe "INSERT INTO State (depositId, label, description, timestamp) VALUES (?, ?, ?, ?);"
   }
+
+  "deleteByDepositId" should "yield the query for deleting a State from the database" in {
+    QueryGenerator.deleteByDepositId(tableName = "State")(NonEmptyList.of(UUID.randomUUID(), UUID.randomUUID())) shouldBe
+      "DELETE FROM State WHERE depositId IN (?, ?);"
+  }
+
+  it should "yield the query for deleting a ContentType from the database" in {
+    QueryGenerator.deleteByDepositId(tableName = "SimpleProperty", key ="contentType")(NonEmptyList.of(UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID())) shouldBe
+      "DELETE FROM SimpleProperty WHERE key = 'contentType' AND depositId IN (?, ?, ?);"
+  }
 }
