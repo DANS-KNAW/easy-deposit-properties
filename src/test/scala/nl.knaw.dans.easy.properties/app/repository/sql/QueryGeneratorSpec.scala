@@ -22,8 +22,8 @@ import cats.data.NonEmptyList
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStepLabel }
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ DepositId, SeriesFilter }
-import nl.knaw.dans.easy.properties.app.repository.DepositFilters
+import nl.knaw.dans.easy.properties.app.model.{ DepositId, Origin, SeriesFilter }
+import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
 import nl.knaw.dans.easy.properties.fixture.TestSupportFixture
 import org.scalactic.{ AbstractStringUniformity, Uniformity }
 import org.scalamock.scalatest.MockFactory
@@ -286,7 +286,8 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
         |  FROM SimpleProperties
         |  WHERE key = ?
         |  AND value = ?
-        |) AS SimplePropertiesSearchResult ON Deposit.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
+        |) AS SimplePropertiesSearchResult
+        |ON Deposit.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
     val expectedSize = List("ingest-step", IngestStepLabel.FEDORA.toString)
 
     query should equal(expectedQuery)(after being whiteSpaceNormalised)
@@ -323,7 +324,8 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
         |  FROM SimpleProperties
         |  WHERE key = ?
         |  AND value = ?
-        |) AS SimplePropertiesSearchResult ON Deposit.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
+        |) AS SimplePropertiesSearchResult
+        |ON Deposit.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
     val expectedSize = List(StateLabel.SUBMITTED.toString, "ingest-step", IngestStepLabel.FEDORA.toString)
 
     query should equal(expectedQuery)(after being whiteSpaceNormalised)
@@ -367,8 +369,251 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
         |  FROM SimpleProperties
         |  WHERE key = ?
         |  AND value = ?
-        |) AS SimplePropertiesSearchResult ON SelectedDeposits.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
+        |) AS SimplePropertiesSearchResult
+        |ON SelectedDeposits.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
     val expectedSize = List("user001", "my-bag", StateLabel.SUBMITTED.toString, "ingest-step", IngestStepLabel.FEDORA.toString)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedSize.size
+    forEvery(values zip expectedSize) { case (value, expectedValue) =>
+      setStringMock(value, expectedValue)
+    }
+  }
+
+  "searchDepositors" should "render a query that selects all depositors when no filters are set" in {
+    val filter = DepositorIdFilters()
+    val (query, values) = QueryGenerator.searchDepositors(filter)
+
+    query shouldBe "SELECT DISTINCT depositorId FROM Deposit;"
+    values shouldBe empty
+  }
+
+  it should "render a query that searches for depositors that have deposited data via a certain origin" in {
+    val filter = DepositorIdFilters(originFilter = Some(Origin.SWORD2))
+    val (query, values) = QueryGenerator.searchDepositors(filter)
+
+    val expectedQuery =
+      """SELECT DISTINCT depositorId
+        |FROM Deposit
+        |WHERE origin = ?;""".stripMargin
+    val expectedValues = List(Origin.SWORD2.toString)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValues.size
+    forEvery(values zip expectedValues) { case (value, expectedValue) =>
+      setStringMock(value, expectedValue)
+    }
+  }
+
+  it should "render a query that searches for depositors that deposited deposits with a certain 'latest state'" in {
+    val filter = DepositorIdFilters(stateFilter = Some(DepositStateFilter(StateLabel.ARCHIVED, SeriesFilter.LATEST)))
+    val (query, values) = QueryGenerator.searchDepositors(filter)
+
+    val expectedQuery =
+      """SELECT DISTINCT depositorId
+        |FROM Deposit
+        |INNER JOIN (
+        |  SELECT State.depositId
+        |  FROM State
+        |  INNER JOIN (
+        |    SELECT depositId, max(timestamp) AS max_timestamp
+        |    FROM State
+        |    GROUP BY depositId
+        |  ) AS StateWithMaxTimestamp
+        |  ON State.timestamp = StateWithMaxTimestamp.max_timestamp
+        |  WHERE label = ?
+        |) AS StateSearchResult
+        |ON Deposit.depositId = StateSearchResult.depositId;""".stripMargin
+    val expectedValues = List(StateLabel.ARCHIVED.toString)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValues.size
+    forEvery(values zip expectedValues) { case (value, expectedValue) =>
+      setStringMock(value, expectedValue)
+    }
+  }
+
+  it should "render a query that searches for depositors that deposited deposits that at some time had this certain state label" in {
+    val filter = DepositorIdFilters(stateFilter = Some(DepositStateFilter(StateLabel.SUBMITTED, SeriesFilter.ALL)))
+    val (query, values) = QueryGenerator.searchDepositors(filter)
+
+    val expectedQuery =
+      """SELECT DISTINCT depositorId
+        |FROM Deposit
+        |INNER JOIN (
+        |  SELECT DISTINCT depositId
+        |  FROM State
+        |  WHERE label = ?
+        |) AS StateSearchResult
+        |ON Deposit.depositId = StateSearchResult.depositId;""".stripMargin
+    val expectedValues = List(StateLabel.SUBMITTED.toString)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValues.size
+    forEvery(values zip expectedValues) { case (value, expectedValue) =>
+      setStringMock(value, expectedValue)
+    }
+  }
+
+  it should "render a query that searches for depositors that deposited deposits with a certain origin and with a certain 'latest state'" in {
+    val filter = DepositorIdFilters(
+      originFilter = Some(Origin.API),
+      stateFilter = Some(DepositStateFilter(StateLabel.SUBMITTED, SeriesFilter.LATEST)),
+    )
+    val (query, values) = QueryGenerator.searchDepositors(filter)
+
+    val expectedQuery =
+      """SELECT DISTINCT depositorId
+        |FROM (
+        |  SELECT depositId, depositorId
+        |  FROM Deposit
+        |  WHERE origin = ?
+        |) AS SelectedDeposits
+        |INNER JOIN (
+        |  SELECT State.depositId
+        |  FROM State
+        |  INNER JOIN (
+        |    SELECT depositId, max(timestamp) AS max_timestamp
+        |    FROM State
+        |    GROUP BY depositId
+        |  ) AS StateWithMaxTimestamp
+        |  ON State.timestamp = StateWithMaxTimestamp.max_timestamp
+        |  WHERE label = ?
+        |) AS StateSearchResult
+        |ON SelectedDeposits.depositId = StateSearchResult.depositId;""".stripMargin
+    val expectedValues = List(Origin.API.toString, StateLabel.SUBMITTED.toString)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValues.size
+    forEvery(values zip expectedValues) { case (value, expectedValue) =>
+      setStringMock(value, expectedValue)
+    }
+  }
+
+  it should "render a query that searches for depositors that deposited deposits with a certain 'latest ingest step'" in {
+    val filter = DepositorIdFilters(ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.LATEST)))
+    val (query, values) = QueryGenerator.searchDepositors(filter)
+
+    val expectedQuery =
+      """SELECT DISTINCT depositorId
+        |FROM Deposit
+        |INNER JOIN (
+        |  SELECT SimpleProperties.depositId
+        |  FROM SimpleProperties
+        |  INNER JOIN (
+        |    SELECT depositId, max(timestamp) AS max_timestamp
+        |    FROM SimpleProperties
+        |    WHERE key = ?
+        |    GROUP BY depositId
+        |  ) AS SimplePropertiesWithMaxTimestamp
+        |  ON SimpleProperties.timestamp = SimplePropertiesWithMaxTimestamp.max_timestamp
+        |  WHERE value = ?
+        |) AS SimplePropertiesSearchResult
+        |ON Deposit.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
+    val expectedSize = List("ingest-step", IngestStepLabel.FEDORA.toString)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedSize.size
+    forEvery(values zip expectedSize) { case (value, expectedValue) =>
+      setStringMock(value, expectedValue)
+    }
+  }
+
+  it should "render a query that searches for depositors that deposited deposits that sometime had this certain ingest step" in {
+    val filter = DepositorIdFilters(ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)))
+    val (query, values) = QueryGenerator.searchDepositors(filter)
+
+    val expectedQuery =
+      """SELECT DISTINCT depositorId
+        |FROM Deposit
+        |INNER JOIN (
+        |  SELECT DISTINCT depositId
+        |  FROM SimpleProperties
+        |  WHERE key = ?
+        |  AND value = ?
+        |) AS SimplePropertiesSearchResult
+        |ON Deposit.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
+    val expectedSize = List("ingest-step", IngestStepLabel.FEDORA.toString)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedSize.size
+    forEvery(values zip expectedSize) { case (value, expectedValue) =>
+      setStringMock(value, expectedValue)
+    }
+  }
+
+  it should "render a query that searches for depositors that deposited deposits with a certain 'latest state' and that sometime had this certain ingest step" in {
+    val filter = DepositorIdFilters(
+      stateFilter = Some(DepositStateFilter(StateLabel.SUBMITTED, SeriesFilter.LATEST)),
+      ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)),
+    )
+    val (query, values) = QueryGenerator.searchDepositors(filter)
+
+    val expectedQuery =
+      """SELECT DISTINCT depositorId
+        |FROM Deposit
+        |INNER JOIN (
+        |  SELECT State.depositId
+        |  FROM State
+        |  INNER JOIN (
+        |    SELECT depositId, max(timestamp) AS max_timestamp
+        |    FROM State
+        |    GROUP BY depositId
+        |  ) AS StateWithMaxTimestamp
+        |  ON State.timestamp = StateWithMaxTimestamp.max_timestamp
+        |  WHERE label = ?
+        |) AS StateSearchResult
+        |ON Deposit.depositId = StateSearchResult.depositId
+        |INNER JOIN (
+        |  SELECT DISTINCT depositId
+        |  FROM SimpleProperties
+        |  WHERE key = ?
+        |  AND value = ?
+        |) AS SimplePropertiesSearchResult ON Deposit.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
+    val expectedSize = List(StateLabel.SUBMITTED.toString, "ingest-step", IngestStepLabel.FEDORA.toString)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedSize.size
+    forEvery(values zip expectedSize) { case (value, expectedValue) =>
+      setStringMock(value, expectedValue)
+    }
+  }
+
+  it should "render a query that searches for depositors that deposited deposits, with a certain origin, with a certain 'latest state' and that sometime had this certain ingest step" in {
+    val filter = DepositorIdFilters(
+      originFilter = Some(Origin.SMD),
+      stateFilter = Some(DepositStateFilter(StateLabel.SUBMITTED, SeriesFilter.LATEST)),
+      ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)),
+    )
+    val (query, values) = QueryGenerator.searchDepositors(filter)
+
+    val expectedQuery =
+      """SELECT DISTINCT depositorId
+        |FROM (
+        |  SELECT depositId, depositorId
+        |  FROM Deposit
+        |  WHERE origin = ?
+        |) AS SelectedDeposits
+        |INNER JOIN (
+        |  SELECT State.depositId
+        |  FROM State
+        |  INNER JOIN (
+        |    SELECT depositId, max(timestamp) AS max_timestamp
+        |    FROM State
+        |    GROUP BY depositId
+        |  ) AS StateWithMaxTimestamp
+        |  ON State.timestamp = StateWithMaxTimestamp.max_timestamp
+        |  WHERE label = ?
+        |) AS StateSearchResult
+        |ON SelectedDeposits.depositId = StateSearchResult.depositId
+        |INNER JOIN (
+        |  SELECT DISTINCT depositId
+        |  FROM SimpleProperties
+        |  WHERE key = ?
+        |  AND value = ?
+        |) AS SimplePropertiesSearchResult
+        |ON SelectedDeposits.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
+    val expectedSize = List(Origin.SMD.toString, StateLabel.SUBMITTED.toString, "ingest-step", IngestStepLabel.FEDORA.toString)
 
     query should equal(expectedQuery)(after being whiteSpaceNormalised)
     values should have size expectedSize.size

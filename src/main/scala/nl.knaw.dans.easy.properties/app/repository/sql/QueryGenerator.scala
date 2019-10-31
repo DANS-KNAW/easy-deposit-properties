@@ -30,35 +30,35 @@ object QueryGenerator {
     query -> ids.map(setDepositId).toList
   }
 
+  private type TableName = String
+  private type KeyName = String
+  private type LabelName = String
+  private type Query = String
+
+  private def createSearchSubQuery[T <: DepositFilter](filter: T)(tableName: TableName, labelName: LabelName, labelValue: T => String): (TableName, Query, List[PrepStatementResolver]) = {
+    val query = filter.filter match {
+      case SeriesFilter.ALL =>
+        s"SELECT DISTINCT depositId FROM $tableName WHERE $labelName = ?"
+      case SeriesFilter.LATEST =>
+        s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE $labelName = ?"
+    }
+
+    (tableName, query, setString(labelValue(filter)) :: Nil)
+  }
+
+  private def createSearchSimplePropertiesSubQuery[T <: DepositFilter](filter: T)(keyValue: String, labelValue: T => String): (TableName, Query, List[PrepStatementResolver]) = {
+    val tableName = "SimpleProperties"
+    val query = filter.filter match {
+      case SeriesFilter.ALL =>
+        s"SELECT DISTINCT depositId FROM $tableName WHERE key = ? AND value = ?"
+      case SeriesFilter.LATEST =>
+        s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName WHERE key = ? GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE value = ?"
+    }
+
+    (tableName, query, setString(labelValue(filter)) :: setString(keyValue) :: Nil)
+  }
+
   def searchDeposits(filters: DepositFilters): (String, Seq[PrepStatementResolver]) = {
-    type TableName = String
-    type KeyName = String
-    type LabelName = String
-    type Query = String
-
-    def createSubQuery[T <: DepositFilter](filter: T)(tableName: TableName, labelName: LabelName, labelValue: T => String): (TableName, Query, List[PrepStatementResolver]) = {
-      val query = filter.filter match {
-        case SeriesFilter.ALL =>
-          s"SELECT DISTINCT depositId FROM $tableName WHERE $labelName = ?"
-        case SeriesFilter.LATEST =>
-          s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE $labelName = ?"
-      }
-
-      (tableName, query, setString(labelValue(filter)) :: Nil)
-    }
-
-    def createSimplePropertiesSubQuery[T <: DepositFilter](filter: T)(keyValue: String, labelValue: T => String): (TableName, Query, List[PrepStatementResolver]) = {
-      val tableName = "SimpleProperties"
-      val query = filter.filter match {
-        case SeriesFilter.ALL =>
-          s"SELECT DISTINCT depositId FROM $tableName WHERE key = ? AND value = ?"
-        case SeriesFilter.LATEST =>
-          s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName WHERE key = ? GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE value = ?"
-      }
-
-      (tableName, query, setString(labelValue(filter)) :: setString(keyValue) :: Nil)
-    }
-
     val (queryWherePart, whereValues) = List(
       filters.depositorId.map("depositorId" -> _),
       filters.bagName.map("bagName" -> _),
@@ -73,15 +73,15 @@ object QueryGenerator {
         case ((q, vs), (subQuery, values)) => s"$q AND $subQuery" -> (values ::: vs)
       }
     val (queryJoinPart, joinValues) = List(
-      filters.stateFilter.map(createSubQuery(_)("State", "label", _.label.toString)),
-      filters.ingestStepFilter.map(createSimplePropertiesSubQuery(_)("ingest-step", _.label.toString)),
-      filters.doiRegisteredFilter.map(createSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
-      filters.doiActionFilter.map(createSimplePropertiesSubQuery(_)("doi-action", _.value.toString)),
-      filters.curatorFilter.map(createSubQuery(_)("Curation", "datamanagerUserId", _.curator)),
-      filters.isNewVersionFilter.map(createSubQuery(_)("Curation", "isNewVersion", _.isNewVersion.toString)),
-      filters.curationRequiredFilter.map(createSubQuery(_)("Curation", "isRequired", _.curationRequired.toString)),
-      filters.curationPerformedFilter.map(createSubQuery(_)("Curation", "isPerformed", _.curationPerformed.toString)),
-      filters.contentTypeFilter.map(createSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
+      filters.stateFilter.map(createSearchSubQuery(_)("State", "label", _.label.toString)),
+      filters.ingestStepFilter.map(createSearchSimplePropertiesSubQuery(_)("ingest-step", _.label.toString)),
+      filters.doiRegisteredFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
+      filters.doiActionFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-action", _.value.toString)),
+      filters.curatorFilter.map(createSearchSubQuery(_)("Curation", "datamanagerUserId", _.curator)),
+      filters.isNewVersionFilter.map(createSearchSubQuery(_)("Curation", "isNewVersion", _.isNewVersion.toString)),
+      filters.curationRequiredFilter.map(createSearchSubQuery(_)("Curation", "isRequired", _.curationRequired.toString)),
+      filters.curationPerformedFilter.map(createSearchSubQuery(_)("Curation", "isPerformed", _.curationPerformed.toString)),
+      filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
     )
       .collect {
         case Some((tableName, q, values)) if queryWherePart.isEmpty => s"INNER JOIN ($q) AS ${ tableName }SearchResult ON Deposit.depositId = ${ tableName }SearchResult.depositId" -> values
@@ -109,34 +109,6 @@ object QueryGenerator {
   }
 
   def searchDepositors(filters: DepositorIdFilters): (String, Seq[PrepStatementResolver]) = {
-    type TableName = String
-    type KeyName = String
-    type LabelName = String
-    type Query = String
-
-    def createSubQuery[T <: DepositFilter](filter: T)(tableName: TableName, labelName: LabelName, labelValue: T => String): (TableName, Query, List[PrepStatementResolver]) = {
-      val query = filter.filter match {
-        case SeriesFilter.ALL =>
-          s"SELECT DISTINCT depositId FROM $tableName WHERE $labelName = ?"
-        case SeriesFilter.LATEST =>
-          s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE $labelName = ?"
-      }
-
-      (tableName, query, setString(labelValue(filter)) :: Nil)
-    }
-
-    def createSimplePropertiesSubQuery[T <: DepositFilter](filter: T)(keyValue: String, labelValue: T => String): (TableName, Query, List[PrepStatementResolver]) = {
-      val tableName = "SimpleProperties"
-      val query = filter.filter match {
-        case SeriesFilter.ALL =>
-          s"SELECT DISTINCT depositId FROM $tableName WHERE key = ? AND value = ?"
-        case SeriesFilter.LATEST =>
-          s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName WHERE key = ? GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE value = ?"
-      }
-
-      (tableName, query, setString(labelValue(filter)) :: setString(keyValue) :: Nil)
-    }
-
     val (queryWherePart, whereValues) = List(
       filters.originFilter.map("origin" -> _.toString),
     )
@@ -149,15 +121,15 @@ object QueryGenerator {
         case ((q, vs), (subQuery, values)) => s"$q AND $subQuery" -> (values ::: vs)
       }
     val (queryJoinPart, joinValues) = List(
-      filters.stateFilter.map(createSubQuery(_)("State", "label", _.label.toString)),
-      filters.ingestStepFilter.map(createSimplePropertiesSubQuery(_)("ingest-step", _.label.toString)),
-      filters.doiRegisteredFilter.map(createSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
-      filters.doiActionFilter.map(createSimplePropertiesSubQuery(_)("doi-action", _.value.toString)),
-      filters.curatorFilter.map(createSubQuery(_)("Curation", "datamanagerUserId", _.curator)),
-      filters.isNewVersionFilter.map(createSubQuery(_)("Curation", "isNewVersion", _.isNewVersion.toString)),
-      filters.curationRequiredFilter.map(createSubQuery(_)("Curation", "isRequired", _.curationRequired.toString)),
-      filters.curationPerformedFilter.map(createSubQuery(_)("Curation", "isPerformed", _.curationPerformed.toString)),
-      filters.contentTypeFilter.map(createSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
+      filters.stateFilter.map(createSearchSubQuery(_)("State", "label", _.label.toString)),
+      filters.ingestStepFilter.map(createSearchSimplePropertiesSubQuery(_)("ingest-step", _.label.toString)),
+      filters.doiRegisteredFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
+      filters.doiActionFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-action", _.value.toString)),
+      filters.curatorFilter.map(createSearchSubQuery(_)("Curation", "datamanagerUserId", _.curator)),
+      filters.isNewVersionFilter.map(createSearchSubQuery(_)("Curation", "isNewVersion", _.isNewVersion.toString)),
+      filters.curationRequiredFilter.map(createSearchSubQuery(_)("Curation", "isRequired", _.curationRequired.toString)),
+      filters.curationPerformedFilter.map(createSearchSubQuery(_)("Curation", "isPerformed", _.curationPerformed.toString)),
+      filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
     )
       .collect {
         case Some((tableName, q, values)) if queryWherePart.isEmpty => s"INNER JOIN ($q) AS ${ tableName }SearchResult ON Deposit.depositId = ${ tableName }SearchResult.depositId" -> values

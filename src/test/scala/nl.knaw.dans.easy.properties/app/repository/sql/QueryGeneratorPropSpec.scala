@@ -24,7 +24,7 @@ import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.Identifi
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStepLabel }
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, StateLabel }
 import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, DoiAction, Origin, SeriesFilter }
-import nl.knaw.dans.easy.properties.app.repository.DepositFilters
+import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
 import org.scalacheck.Arbitrary._
 import org.scalacheck.{ Arbitrary, Gen }
 import org.scalatest.prop.GeneratorDrivenPropertyChecks
@@ -79,6 +79,22 @@ class QueryGeneratorPropSpec extends PropSpec with GeneratorDrivenPropertyChecks
       .map(DepositFilters.tupled)
   }
 
+  implicit val arbitraryDepositorFilters: Arbitrary[DepositorIdFilters] = Arbitrary {
+    arbitrary[(
+      Option[DepositStateFilter],
+        Option[DepositIngestStepFilter],
+        Option[DepositDoiRegisteredFilter],
+        Option[DepositDoiActionFilter],
+        Option[DepositCuratorFilter],
+        Option[DepositIsNewVersionFilter],
+        Option[DepositCurationRequiredFilter],
+        Option[DepositCurationPerformedFilter],
+        Option[DepositContentTypeFilter],
+        Option[Origin.Origin],
+      )]
+      .map(DepositorIdFilters.tupled)
+  }
+
   implicit def arbitraryNonEmptyList[T: Arbitrary]: Arbitrary[NonEmptyList[T]] = Arbitrary {
     arbitrary[(T, List[T])].map { case (t, ts) => NonEmptyList(t, ts) }
   }
@@ -96,6 +112,10 @@ class QueryGeneratorPropSpec extends PropSpec with GeneratorDrivenPropertyChecks
 
   property("searchDeposits") {
     testNumberOfQuestionMarks(QueryGenerator.searchDeposits)
+  }
+
+  property("searchDepositors") {
+    testNumberOfQuestionMarks(QueryGenerator.searchDepositors)
   }
 
   property("getLastModifiedDate") {
