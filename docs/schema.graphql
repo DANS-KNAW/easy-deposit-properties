@@ -1221,44 +1221,44 @@ type Query {
 
   """List all depositors."""
   depositors(
-    """Find only those deposits that have this specified origin."""
+    """
+    Find only those depositors that have deposited data by this specific origin.
+    """
     origin: Origin
 
-    """List only those deposits that have this specified state label."""
+    """Find only those depositors that have deposits with this state"""
     state: DepositStateFilter
 
-    """List only those deposits that have this specified ingest step label."""
+    """Find only those depositors that have deposits with this ingest step."""
     ingestStep: DepositIngestStepFilter
 
     """
-    List only those deposits that have this specified value for DOI registered.
+    Find only those depositors that have deposits with this registered value.
     """
     doiRegistered: DepositDoiRegisteredFilter
 
-    """
-    List only those deposits that have this specified value for DOI action.
-    """
+    """Find only those depositors that have deposits with this action value."""
     doiAction: DepositDoiActionFilter
 
-    """List only those deposits that have this specified data manager."""
+    """Find only those depositors that have deposits with this curator."""
     curator: DepositCuratorFilter
 
     """
-    List only those deposits that have this specified value for 'is-new-version'.
+    Find only those depositors that have deposits with this 'new version' value.
     """
     isNewVersion: DepositIsNewVersionFilter
 
     """
-    List only those deposits that have this specified value for 'curation required'.
+    Find only those depositors that have deposits with this 'curation required' value.
     """
     curationRequired: DepositCurationRequiredFilter
 
     """
-    List only those deposits that have this specified value for 'curation performed'.
+    Find only those depositors that have deposits with this 'curation performed' value.
     """
     curationPerformed: DepositCurationPerformedFilter
 
-    """List only those deposits that have this specified content type."""
+    """Find only those depositors that have deposits with this content type."""
     contentType: DepositContentTypeFilter
     before: String
     after: String
