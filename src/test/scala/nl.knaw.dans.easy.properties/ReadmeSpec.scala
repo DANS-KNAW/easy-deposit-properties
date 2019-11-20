@@ -58,11 +58,11 @@ class ReadmeSpec extends FlatSpec with Matchers with CustomMatchers {
   }
 
   "synopsis in help info" should "be part of README.md" in {
-    File("README.md") should containTrimmed(clo.synopsis)
+    File("docs/index.md") should containTrimmed(clo.synopsis)
   }
 
   "description line(s) in help info" should "be part of README.md and pom.xml" in {
-    File("README.md") should containTrimmed(clo.description)
+    File("docs/index.md") should containTrimmed(clo.description)
     File("pom.xml") should containTrimmed(clo.description)
   }
 }
