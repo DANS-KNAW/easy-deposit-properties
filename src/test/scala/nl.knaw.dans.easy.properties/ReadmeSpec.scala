@@ -54,7 +54,7 @@ class ReadmeSpec extends FlatSpec with Matchers with CustomMatchers {
     val lineSeparators = s"(${ System.lineSeparator() })+"
     val options = helpInfo.split(s"${ lineSeparators }Options:$lineSeparators")(1)
     options.trim should not be empty
-    File("README.md") should containTrimmed(options)
+    File("docs/index.md") should containTrimmed(options)
   }
 
   "synopsis in help info" should "be part of README.md" in {
