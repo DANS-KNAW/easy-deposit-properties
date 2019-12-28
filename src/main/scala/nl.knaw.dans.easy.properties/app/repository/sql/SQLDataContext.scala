@@ -19,6 +19,7 @@ import java.sql.Connection
 
 import nl.knaw.dans.easy.properties.app.Deleter
 import nl.knaw.dans.easy.properties.app.graphql.DataContext
+import nl.knaw.dans.easy.properties.app.graphql.annotated.{ Mutation, Query }
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
 import nl.knaw.dans.easy.properties.app.repository.Repository
@@ -29,11 +30,13 @@ case class SQLDataContext(private val connection: Connection,
                           private val repoGen: Connection => Repository,
                           private val auth: Option[Auth],
                           private val expectedAuth: Auth,
-                         )(implicit val executionContext: ExecutionContext) extends DataContext {
+                         )(override implicit val executionContext: ExecutionContext) extends DataContext {
 
-  def isLoggedIn: Boolean = auth contains expectedAuth
+  override def isLoggedIn: Boolean = auth contains expectedAuth
 
-  lazy val repo: Repository = repoGen(connection)
-  lazy val registration: DepositPropertiesRegistration = new DepositPropertiesRegistration(repo)
-  lazy val deleter: Deleter = new Deleter(repo)
+  override val query: Query = new Query
+  override val mutation: Mutation = new Mutation
+  override lazy val repo: Repository = repoGen(connection)
+  override lazy val registration: DepositPropertiesRegistration = new DepositPropertiesRegistration(repo)
+  override lazy val deleter: Deleter = new Deleter(repo)
 }

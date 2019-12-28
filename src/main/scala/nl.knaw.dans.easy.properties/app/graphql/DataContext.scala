@@ -16,6 +16,7 @@
 package nl.knaw.dans.easy.properties.app.graphql
 
 import nl.knaw.dans.easy.properties.app.Deleter
+import nl.knaw.dans.easy.properties.app.graphql.annotated.{ Mutation, Query }
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
 import nl.knaw.dans.easy.properties.app.repository.Repository
 
@@ -23,6 +24,8 @@ import scala.concurrent.ExecutionContext
 
 trait DataContext {
 
+  val query: Query
+  val mutation: Mutation
   val executionContext: ExecutionContext
 
   def isLoggedIn: Boolean
