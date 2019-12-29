@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.graphql.types
 import nl.knaw.dans.easy.properties.app.model.{ CurationRequiredEvent, Timestamp }
 import sangria.macros.derive.{ GraphQLDescription, GraphQLField, GraphQLName }
 
-@GraphQLName("CurationRequired")
+@GraphQLName("CurationRequiredEvent")
 @GraphQLDescription("Whether curation by data manager is required.")
 class GraphQLCurationRequired(curationRequired: CurationRequiredEvent) {
 

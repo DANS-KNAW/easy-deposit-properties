@@ -20,14 +20,16 @@ import nl.knaw.dans.easy.properties.app.graphql.ordering.DepositOrder
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ CurationResolver, DepositResolver }
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
+import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.contentType.DepositContentTypeFilter
 import nl.knaw.dans.easy.properties.app.model.curation.Curation
+import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
 import nl.knaw.dans.easy.properties.app.model.ingestStep.DepositIngestStepFilter
 import nl.knaw.dans.easy.properties.app.model.state.DepositStateFilter
-import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, Timestamp }
+import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, SeriesFilter, Timestamp }
 import nl.knaw.dans.easy.properties.app.repository.DepositFilters
 import org.joda.time.DateTime
-import sangria.macros.derive.{ GraphQLDescription, GraphQLField, GraphQLName }
+import sangria.macros.derive.{ GraphQLDefault, GraphQLDescription, GraphQLField, GraphQLName }
 import sangria.relay.{ ConnectionArgs, Node }
 import sangria.schema.{ Context, DeferredValue }
 
@@ -70,7 +72,8 @@ class GraphQLCuration(curation: Curation) extends Node {
 
   @GraphQLField
   @GraphQLDescription("List all deposits with the same data manager.")
-  def deposits(@GraphQLDescription("Find only those deposits that have this specified bag name.") bagName: Option[String] = None,
+  def deposits(@GraphQLDescription("Determine whether to search in current curators (`LATEST`, default) only or all current and past curators (`ALL`) of this deposit.") @GraphQLDefault(SeriesFilter.LATEST) curatorFilter: SeriesFilter,
+               @GraphQLDescription("Find only those deposits that have this specified bag name.") bagName: Option[String] = None,
                @GraphQLDescription("Find only those deposits that have this specified origin.") origin: Option[Origin] = None,
                @GraphQLDescription("List only those deposits that have this specified state label.") state: Option[DepositStateFilter] = None,
                @GraphQLDescription("List only those deposits that have this specified ingest step label.") ingestStep: Option[DepositIngestStepFilter] = None,
@@ -96,6 +99,7 @@ class GraphQLCuration(curation: Curation) extends Node {
       ingestStepFilter = ingestStep,
       doiRegisteredFilter = doiRegistered,
       doiActionFilter = doiAction,
+      curatorFilter = Some(DepositCuratorFilter(datamanagerUserId, curatorFilter)),
       isNewVersionFilter = isNewVersion,
       curationRequiredFilter = curationRequired,
       curationPerformedFilter = curationPerformed,

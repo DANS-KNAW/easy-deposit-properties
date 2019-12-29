@@ -1,18 +1,21 @@
 input AddBagNameInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
   """The name of the deposited bag."""
   bagName: String!
-  clientMutationId: String
 }
 
 type AddBagNamePayload {
-  deposit: Deposit
   clientMutationId: String
+  deposit: Deposit
 }
 
 input AddDepositInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
@@ -27,15 +30,16 @@ input AddDepositInput {
 
   """The origin of the deposited bag."""
   origin: Origin!
-  clientMutationId: String
 }
 
 type AddDepositPayload {
-  deposit: Deposit
   clientMutationId: String
+  deposit: Deposit
 }
 
 input AddIdentifierInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
@@ -47,18 +51,20 @@ input AddIdentifierInput {
 
   """The timestamp at which the identifier got added to this deposit."""
   timestamp: DateTime!
-  clientMutationId: String
 }
 
 type AddIdentifierPayload {
-  identifier: Identifier
   clientMutationId: String
+  identifier: Identifier
 }
 
 """
 A SWORD2 internal property to record the type of messages sent by a client to create the deposit.
 """
 type ContentType implements Node {
+  """The content type associated with this deposit."""
+  value: String!
+
   """
   The timestamp at which this springfield configuration was associated with the deposit.
   """
@@ -74,7 +80,7 @@ type ContentType implements Node {
     """
     Determine whether to search in current content types (`LATEST`, default) or all current and past content types (`ALL`).
     """
-    contentTypeFilter: SeriesFilter! = LATEST
+    contentTypeFilter: SeriesFilter = LATEST
 
     """Ordering options for the returned deposits."""
     orderBy: DepositOrder
@@ -97,13 +103,10 @@ type ContentType implements Node {
     after: String
     first: Int
     last: Int
-  ): DepositConnection
+  ): DepositConnection!
 
   """The ID of an object"""
   id: ID!
-
-  """The content type associated with this deposit."""
-  value: String
 }
 
 """Ordering options for content types"""
@@ -139,6 +142,12 @@ enum ContentTypeValue {
 Curation event containing the data manager and status of curation for this deposit.
 """
 type Curation implements Node {
+  """The data manager's username in EASY."""
+  datamanagerUserId: String!
+
+  """The data manager's email address."""
+  datamanagerEmail: String!
+
   """True if the deposit is a new version."""
   isNewVersion: Boolean
 
@@ -147,12 +156,6 @@ type Curation implements Node {
 
   """True if curation by the data manager has been performed."""
   curationPerformed: Boolean!
-
-  """The data manager's username in EASY."""
-  datamanagerUserId: String!
-
-  """The data manager's email address."""
-  datamanagerEmail: String!
 
   """
   The timestamp at which this curation event was assigned to this deposit.
@@ -170,7 +173,7 @@ type Curation implements Node {
     Determine whether to search in current curators (`LATEST`, default) only or
     all current and past curators (`ALL`) of this deposit.
     """
-    curatorFilter: SeriesFilter! = LATEST
+    curatorFilter: SeriesFilter = LATEST
 
     """Find only those deposits that have this specified bag name."""
     bagName: String
@@ -233,7 +236,7 @@ type Curation implements Node {
     after: String
     first: Int
     last: Int
-  ): DepositConnection
+  ): DepositConnection!
 
   """The ID of an object"""
   id: ID!
@@ -281,7 +284,7 @@ type Curator implements Node {
     Determine whether to search in current curators (`LATEST`, default) only or
     all current and past curators (`ALL`) of this deposit.
     """
-    curatorFilter: SeriesFilter! = LATEST
+    curatorFilter: SeriesFilter = LATEST
 
     """Find only those deposits that have this specified bag name."""
     bagName: String
@@ -344,7 +347,7 @@ type Curator implements Node {
     after: String
     first: Int
     last: Int
-  ): DepositConnection
+  ): DepositConnection!
 
   """The ID of an object"""
   id: ID!
@@ -395,14 +398,15 @@ A DateTime scalar type represents textual data, formatted as an ISO8601 date-tim
 scalar DateTime
 
 input DeleteDepositsInput {
+  clientMutationId: String
+
   """A list of deposit identifiers."""
   depositIds: [UUID!]!
-  clientMutationId: String
 }
 
 type DeleteDepositsPayload {
-  depositIds: [UUID!]!
   clientMutationId: String
+  depositIds: [UUID!]!
 }
 
 """Contains all technical metadata about this deposit."""
@@ -410,11 +414,20 @@ type Deposit implements Node {
   """The identifier of the deposit."""
   depositId: UUID!
 
+  """The name of the deposited bag."""
+  bagName: String
+
   """The moment this deposit was created."""
   creationTimestamp: DateTime!
 
-  """The ID of an object"""
-  id: ID!
+  """The origin of the deposit."""
+  origin: Origin!
+
+  """
+  Get the timestamp at which this deposit was last modified. If the dataset was
+  only created, the creation timestamp is returned.
+  """
+  lastModified: DateTime
 
   """The current state of the deposit."""
   state: State
@@ -442,13 +455,7 @@ type Deposit implements Node {
     after: String
     first: Int
     last: Int
-  ): StateConnection
-
-  """
-  Get the timestamp at which this deposit was last modified. If the dataset was
-  only created, the creation timestamp is returned.
-  """
-  lastModified: DateTime
+  ): StateConnection!
 
   """The current ingest step of the deposit."""
   ingestStep: IngestStep
@@ -476,36 +483,39 @@ type Deposit implements Node {
     after: String
     first: Int
     last: Int
-  ): IngestStepConnection
+  ): IngestStepConnection!
 
-  """Return the identifier of the given type related to this deposit"""
+  """Information about the depositor that submitted this deposit."""
+  depositor: Depositor!
+
+  """Return the identifier of the given type related to this deposit."""
   identifier(
     """Find the identifier with this specific type."""
     type: IdentifierType!
   ): Identifier
 
-  """List the identifiers related to this deposit"""
+  """List the identifiers related to this deposit."""
   identifiers: [Identifier!]!
 
   """Returns whether the DOI is registered in DataCite."""
   doiRegistered: Boolean
 
   """
-  Lists all state changes related to the registration of the DOI in DataCite
+  Lists all state changes related to the registration of the DOI in DataCite.
   """
   doiRegisteredEvents: [DoiRegisteredEvent!]!
 
   """
-  Returns whether the DOI should be 'created' or 'updated' on registration in DataCite
+  Returns whether the DOI should be 'created' or 'updated' on registration in DataCite.
   """
   doiAction: DoiAction
 
   """
-  Lists all state changes related to whether the DOI should be 'created' or 'updated' on registration in DataCite
+  Lists all state changes related to whether the DOI should be 'created' or 'updated' on registration in DataCite.
   """
   doiActionEvents: [DoiActionEvent!]!
 
-  """The data manager currently assigned to this deposit"""
+  """The data manager currently assigned to this deposit."""
   curator: Curator
 
   """List all data manager that were ever assigned to this deposit."""
@@ -531,7 +541,7 @@ type Deposit implements Node {
     after: String
     first: Int
     last: Int
-  ): CuratorConnection
+  ): CuratorConnection!
 
   """Whether this deposit is a new version."""
   isNewVersion: Boolean
@@ -599,14 +609,8 @@ type Deposit implements Node {
     atTimestamp: DateTime
   ): [ContentType!]!
 
-  """The name of the deposited bag."""
-  bagName: String
-
-  """The origin of the deposit."""
-  origin: Origin
-
-  """Information about the depositor that submitted this deposit."""
-  depositor: Depositor!
+  """The ID of an object"""
+  id: ID!
 }
 
 """A connection to a list of items."""
@@ -769,6 +773,9 @@ type Depositor {
     """
     doiAction: DepositDoiActionFilter
 
+    """List only those deposits that have this specified data manager."""
+    curator: DepositCuratorFilter
+
     """
     List only those deposits that have this specified value for 'is-new-version'.
     """
@@ -783,9 +790,6 @@ type Depositor {
     List only those deposits that have this specified value for 'curation performed'.
     """
     curationPerformed: DepositCurationPerformedFilter
-
-    """List only those deposits that have this specified data manager."""
-    curator: DepositCuratorFilter
 
     """List only those deposits that have this specified content type."""
     contentType: DepositContentTypeFilter
@@ -811,7 +815,19 @@ type Depositor {
     after: String
     first: Int
     last: Int
-  ): DepositConnection
+  ): DepositConnection!
+}
+
+"""A connection to a list of items."""
+type DepositorConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [DepositorEdge]
+
+  """Identifies the total count of items in the connection."""
+  totalCount: Int!
 }
 
 """Ordering options for deposits"""
@@ -838,20 +854,8 @@ enum DepositOrderField {
   DEPOSIT_ID
 }
 
-"""A connection to a list of items."""
-type DepositorIdConnection {
-  """Information to aid in pagination."""
-  pageInfo: PageInfo!
-
-  """A list of edges."""
-  edges: [DepositorIdEdge]
-
-  """Identifies the total count of items in the connection."""
-  totalCount: Int!
-}
-
 """An edge in a connection."""
-type DepositorIdEdge {
+type DepositorEdge {
   """The item at the end of the edge."""
   node: Depositor!
 
@@ -884,7 +888,7 @@ enum DoiAction {
   CREATE
 }
 
-"""A DOI action event related to a deposit"""
+"""A DOI action event related to a deposit."""
 type DoiActionEvent {
   """
   Whether the DOI must be 'created' or 'updated' when registering in DataCite.
@@ -895,7 +899,7 @@ type DoiActionEvent {
   timestamp: DateTime!
 }
 
-"""A DOI registration event related to a deposit"""
+"""A DOI registration event related to a deposit."""
 type DoiRegisteredEvent {
   """Whether the DOI is registered in DataCite."""
   value: Boolean!
@@ -948,7 +952,7 @@ type IngestStep implements Node {
   timestamp: DateTime!
 
   """
-  Returns the deposit that is associated with this particular ingest step
+  Returns the deposit that is associated with this particular ingest step.
   """
   deposit: Deposit
 
@@ -957,7 +961,7 @@ type IngestStep implements Node {
     """
     Determine whether to search in current ingest steps (`LATEST`, default) or all current and past ingest steps (`ALL`).
     """
-    ingestStepFilter: SeriesFilter! = LATEST
+    ingestStepFilter: SeriesFilter = LATEST
 
     """Ordering options for the returned deposits."""
     orderBy: DepositOrder
@@ -980,7 +984,7 @@ type IngestStep implements Node {
     after: String
     first: Int
     last: Int
-  ): DepositConnection
+  ): DepositConnection!
 
   """The ID of an object"""
   id: ID!
@@ -1067,44 +1071,44 @@ type Mutation {
   """
   Register a new deposit with 'id', 'creationTimestamp', 'depositId' and 'origin'.
   """
-  addDeposit(input: AddDepositInput!): AddDepositPayload
+  addDeposit(input: AddDepositInput!): AddDepositPayload!
 
   """Register the bag's name for the deposit identified by 'id'."""
-  addBagName(input: AddBagNameInput!): AddBagNamePayload
+  addBagName(input: AddBagNameInput!): AddBagNamePayload!
 
   """Update the state of the deposit identified by 'id'."""
-  updateState(input: UpdateStateInput!): UpdateStatePayload
+  updateState(input: UpdateStateInput!): UpdateStatePayload!
 
   """Update the ingest step of the deposit identified by 'id'."""
-  updateIngestStep(input: UpdateIngestStepInput!): UpdateIngestStepPayload
+  updateIngestStep(input: UpdateIngestStepInput!): UpdateIngestStepPayload!
 
   """Add an identifier to the deposit identified by 'id'."""
-  addIdentifier(input: AddIdentifierInput!): AddIdentifierPayload
+  addIdentifier(input: AddIdentifierInput!): AddIdentifierPayload!
 
   """Set whether the DOI has been registered in DataCite."""
-  setDoiRegistered(input: SetDoiRegisteredInput!): SetDoiRegisteredPayload
+  setDoiRegistered(input: SetDoiRegisteredInput!): SetDoiRegisteredPayload!
 
   """
   Set whether the DOI should be 'created' or 'updated' on registration in DataCite.
   """
-  setDoiAction(input: SetDoiActionInput!): SetDoiActionPayload
+  setDoiAction(input: SetDoiActionInput!): SetDoiActionPayload!
 
   """Assign a curation event to the deposit identified by 'id'."""
-  setCuration(input: SetCurationInput!): SetCurationPayload
+  setCuration(input: SetCurationInput!): SetCurationPayload!
 
   """Set the springfield configuration for this deposit."""
-  setSpringfield(input: SetSpringfieldInput!): SetSpringfieldPayload
+  setSpringfield(input: SetSpringfieldInput!): SetSpringfieldPayload!
 
   """Set the content type for this deposit."""
-  setContentType(input: SetContentTypeInput!): SetContentTypePayload
+  setContentType(input: SetContentTypeInput!): SetContentTypePayload!
 
   """
   Register a new deposit with initial properties from a 'deposit.properties' string.
   """
-  registerDeposit(input: RegisterDepositInput!): RegisterDepositPayload
+  registerDeposit(input: RegisterDepositInput!): RegisterDepositPayload!
 
   """Delete deposits."""
-  deleteDeposits(input: DeleteDepositsInput!): DeleteDepositsPayload
+  deleteDeposits(input: DeleteDepositsInput!): DeleteDepositsPayload!
 }
 
 """An object with an ID"""
@@ -1225,13 +1229,13 @@ type Query {
     after: String
     first: Int
     last: Int
-  ): DepositConnection
+  ): DepositConnection!
 
   """Get the technical metadata related to this depositor."""
   depositor(
-    """If provided, only show deposits from this depositor."""
-    id: String
-  ): Depositor
+    """Show deposits from this depositor."""
+    id: String!
+  ): Depositor!
 
   """List all depositors."""
   depositors(
@@ -1240,7 +1244,7 @@ type Query {
     """
     origin: Origin
 
-    """Find only those depositors that have deposits with this state"""
+    """Find only those depositors that have deposits with this state."""
     state: DepositStateFilter
 
     """Find only those depositors that have deposits with this ingest step."""
@@ -1278,7 +1282,7 @@ type Query {
     after: String
     first: Int
     last: Int
-  ): DepositorIdConnection
+  ): DepositorConnection!
 
   """Find an identifier with the given type and value."""
   identifier(
@@ -1303,17 +1307,18 @@ type Query {
 }
 
 input RegisterDepositInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
   """The 'deposit.properties' describing the deposit to be registered."""
   depositProperties: String!
-  clientMutationId: String
 }
 
 type RegisterDepositPayload {
-  deposit: Deposit
   clientMutationId: String
+  deposit: Deposit
 }
 
 """
@@ -1328,6 +1333,8 @@ enum SeriesFilter {
 }
 
 input SetContentTypeInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
@@ -1338,15 +1345,16 @@ input SetContentTypeInput {
   The timestamp at which this springfield configuration was associated with the deposit.
   """
   timestamp: DateTime!
-  clientMutationId: String
 }
 
 type SetContentTypePayload {
-  contentType: ContentType
   clientMutationId: String
+  contentType: ContentType
 }
 
 input SetCurationInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
@@ -1369,15 +1377,16 @@ input SetCurationInput {
   The timestamp at which the curation event was assigned to this deposit.
   """
   timestamp: DateTime!
-  clientMutationId: String
 }
 
 type SetCurationPayload {
-  curation: Curation
   clientMutationId: String
+  curation: Curation
 }
 
 input SetDoiActionInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
@@ -1388,15 +1397,16 @@ input SetDoiActionInput {
 
   """The timestamp at which this value was added."""
   timestamp: DateTime!
-  clientMutationId: String
 }
 
 type SetDoiActionPayload {
-  doiAction: DoiActionEvent
   clientMutationId: String
+  doiAction: DoiActionEvent!
 }
 
 input SetDoiRegisteredInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
@@ -1405,15 +1415,16 @@ input SetDoiRegisteredInput {
 
   """The timestamp at which the DOI was registered in DataCite."""
   timestamp: DateTime!
-  clientMutationId: String
 }
 
 type SetDoiRegisteredPayload {
-  doiRegistered: DoiRegisteredEvent
   clientMutationId: String
+  doiRegistered: DoiRegisteredEvent!
 }
 
 input SetSpringfieldInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
@@ -1433,12 +1444,11 @@ input SetSpringfieldInput {
   The timestamp at which this springfield configuration was associated with the deposit.
   """
   timestamp: DateTime!
-  clientMutationId: String
 }
 
 type SetSpringfieldPayload {
-  springfield: Springfield
   clientMutationId: String
+  springfield: Springfield
 }
 
 """Springfield configuration associated with this deposit."""
@@ -1512,7 +1522,7 @@ type State implements Node {
     """
     Determine whether to search in current states (`LATEST`, default) or all current and past states (`ALL`).
     """
-    stateFilter: SeriesFilter! = LATEST
+    stateFilter: SeriesFilter = LATEST
 
     """Ordering options for the returned deposits."""
     orderBy: DepositOrder
@@ -1535,7 +1545,7 @@ type State implements Node {
     after: String
     first: Int
     last: Int
-  ): DepositConnection
+  ): DepositConnection!
 
   """The ID of an object"""
   id: ID!
@@ -1620,6 +1630,8 @@ enum StateOrderField {
 }
 
 input UpdateIngestStepInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
@@ -1628,15 +1640,16 @@ input UpdateIngestStepInput {
 
   """The timestamp at which the deposit got into this ingest step."""
   timestamp: DateTime!
-  clientMutationId: String
 }
 
 type UpdateIngestStepPayload {
-  ingestStep: IngestStep
   clientMutationId: String
+  ingestStep: IngestStep
 }
 
 input UpdateStateInput {
+  clientMutationId: String
+
   """The deposit's identifier."""
   depositId: UUID!
 
@@ -1648,12 +1661,11 @@ input UpdateStateInput {
 
   """The timestamp at which the deposit got into this state."""
   timestamp: DateTime!
-  clientMutationId: String
 }
 
 type UpdateStatePayload {
-  state: State
   clientMutationId: String
+  state: State
 }
 
 """

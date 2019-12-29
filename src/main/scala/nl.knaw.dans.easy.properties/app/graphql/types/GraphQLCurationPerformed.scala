@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.graphql.types
 import nl.knaw.dans.easy.properties.app.model.{ CurationPerformedEvent, Timestamp }
 import sangria.macros.derive.{ GraphQLDescription, GraphQLField, GraphQLName }
 
-@GraphQLName("CurationPerformed")
+@GraphQLName("CurationPerformedEvent")
 @GraphQLDescription("Whether the deposit has been curated by the data manager.")
 class GraphQLCurationPerformed(curationPerformed: CurationPerformedEvent) {
 
