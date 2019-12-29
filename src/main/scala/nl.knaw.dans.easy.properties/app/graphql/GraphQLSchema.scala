@@ -15,119 +15,29 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql
 
-import java.util.UUID
-
-import nl.knaw.dans.easy.properties.app.graphql.annotated.{ GraphQLIdentifier, dataContextFromContext, _ }
-import nl.knaw.dans.easy.properties.app.graphql.annotated.types.{ GraphQLDepositType, GraphQLIdentifierType }
-import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
-import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ ContentTypeResolver, CurationResolver, DepositResolver, DoiEventResolver, IdentifierResolver, IngestStepResolver, SpringfieldResolver, StateResolver }
+import nl.knaw.dans.easy.properties.app.graphql.resolvers._
 import nl.knaw.dans.easy.properties.app.graphql.types.Scalars
+import nl.knaw.dans.easy.properties.app.graphql.types.typedefs._
 import sangria.execution.deferred.DeferredResolver
 import sangria.macros.derive._
-import sangria.relay.{ GlobalId, Node, NodeDefinition }
 import sangria.schema._
 
-object GraphQLSchema extends
-  Scalars
+object GraphQLSchema extends Scalars
+  with GraphQLCommonTypes
+  with GraphQLContentTypeType
+  with GraphQLCurationPerformedType
+  with GraphQLCurationRequiredType
+  with GraphQLCuratorType
   with GraphQLDepositType
+  with GraphQLDoiActionType
+  with GraphQLDoiRegisteredType
   with GraphQLIdentifierType
-  //  with NodeType
-  //  with MetaTypes
-  //  with TimebasedSearch
-  //  with ContentTypeGraphQLType
-  //  with SpringfieldType
-  //  with CurationEventType
-  //  with DoiEventTypes
-  //  with IdentifierGraphQLType
-  //  with IngestStepType
-  //  with StateType
-  //  with CurationType
-  //  with CuratorType
-  //  with DepositorType
-  //  with DepositType
-  //  with QueryType
-  //  with MutationType 
-{
-
-  val NodeDefinition(nodeInterface, nodeField, nodesField) = {
-    Node.definition(
-      resolve = (id: GlobalId, ctx: Context[DataContext, Unit]) => {
-        implicit val context: Context[DataContext, Unit] = ctx
-        id.typeName match {
-          case GraphQLContentTypeType.name =>
-            ContentTypeResolver.contentTypeById(id.id)
-              .map(_.map(new GraphQLContentType(_)))
-          case GraphQLCuratorType.name =>
-            CurationResolver.curationById(id.id)
-              .map(_.map(curation => new GraphQLCurator(curation.getCurator)))
-          case GraphQLDepositType.name =>
-            DepositResolver.depositById(UUID.fromString(id.id))
-              .map(_.map(new GraphQLDeposit(_)))
-          case GraphQLIdentifierType.name =>
-            IdentifierResolver.identifierById(id.id)
-              .map(_.map(new GraphQLIdentifier(_)))
-          case GraphQLIngestStepType.name =>
-            IngestStepResolver.ingestStepById(id.id)
-              .map(_.map(new GraphQLIngestStep(_)))
-          case GraphQLSpringfieldType.name =>
-            SpringfieldResolver.springfieldById(id.id)
-              .map(_.map(new GraphQLSpringfield(_)))
-          case GraphQLStateType.name =>
-            StateResolver.stateById(id.id)
-              .map(_.map(new GraphQLState(_)))
-          case _ => None
-        }
-      },
-      possibleTypes = Node.possibleNodeTypes[DataContext, Node](
-        GraphQLContentTypeType,
-        GraphQLCuratorType,
-        GraphQLDepositType,
-        GraphQLIdentifierType,
-        GraphQLIngestStepType,
-        GraphQLSpringfieldType,
-        GraphQLStateType,
-      ),
-    )
-  }
-
-  implicit lazy val GraphQLContentTypeType: ObjectType[DataContext, GraphQLContentType] = deriveObjectType[DataContext, GraphQLContentType](
-    Interfaces(nodeInterface),
-    AddFields(Node.globalIdField),
-  )
-
-  implicit lazy val GraphQLCuratorType: ObjectType[DataContext, GraphQLCurator] = deriveObjectType[DataContext, GraphQLCurator](
-    Interfaces(nodeInterface),
-    AddFields(Node.globalIdField),
-  )
-
-  implicit lazy val GraphQLDepositType: ObjectType[DataContext, GraphQLDeposit] = deriveObjectType[DataContext, GraphQLDeposit](
-    Interfaces(nodeInterface),
-    AddFields(Node.globalIdField),
-  )
-
-  implicit lazy val GraphQLIdentifierType: ObjectType[DataContext, GraphQLIdentifier] = deriveObjectType[DataContext, GraphQLIdentifier](
-    Interfaces(nodeInterface),
-    AddFields(Node.globalIdField),
-  )
-
-  implicit lazy val GraphQLIngestStepType: ObjectType[DataContext, GraphQLIngestStep] = deriveObjectType[DataContext, GraphQLIngestStep](
-    Interfaces(nodeInterface),
-    AddFields(Node.globalIdField),
-  )
-
-  implicit lazy val GraphQLSpringfieldType: ObjectType[DataContext, GraphQLSpringfield] = deriveObjectType[DataContext, GraphQLSpringfield](
-    Interfaces(nodeInterface),
-    AddFields(Node.globalIdField),
-  )
-
-  implicit lazy val GraphQLStateType: ObjectType[DataContext, GraphQLState] = deriveObjectType[DataContext, GraphQLState](
-    Interfaces(nodeInterface),
-    AddFields(Node.globalIdField),
-  )
-
-  implicit def GeneralConnectionType[Ctx, T](implicit objType: ObjectType[Ctx, T]): ObjectType[Ctx, ExtendedConnection[T]] = {
-    ExtendedConnection.definition[Ctx, ExtendedConnection, T](objType.name, objType).connectionType
-  }
+  with GraphQLIngestStepType
+  with GraphQLIsNewVersionType
+  with GraphQLMutationType
+  with GraphQLQueryType
+  with GraphQLSpringfieldType
+  with GraphQLStateType {
 
   implicit val QueryType: ObjectType[DataContext, Unit] = deriveContextObjectType(
     _.query,

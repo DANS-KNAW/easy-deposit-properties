@@ -16,30 +16,15 @@
 package nl.knaw.dans.easy.properties.app.graphql.types
 
 import nl.knaw.dans.easy.properties.app.model.{ Timestamp, Timestamped, timestampOrdering }
-import nl.knaw.dans.lib.logging.DebugEnhancedLogging
-import sangria.marshalling.FromInput.coercedScalaInput
-import sangria.schema.{ Argument, OptionInputType, WithArguments }
-
 import scala.Ordering.Implicits._
-import scala.language.postfixOps
 
-trait TimebasedSearch extends DebugEnhancedLogging {
-  this: Scalars =>
+object TimebasedSearch {
 
-  case class TimebasedSearchArguments(earlierThan: Option[Timestamp],
-                                      laterThan: Option[Timestamp],
-                                      atTimestamp: Option[Timestamp],
-                                     ) {
-
-    private def between(earlierThan: Timestamp, laterThan: Timestamp)(timestamped: Timestamped): Boolean = {
-      if (earlierThan equiv laterThan)
-        throw new IllegalArgumentException("arguments 'earlierThan' and 'laterThan' cannot have the same value; use 'atTimestamp' instead")
-      else if (earlierThan > laterThan)
-        timestamped.timestamp < earlierThan && timestamped.timestamp > laterThan
-      else
-        timestamped.timestamp < earlierThan || timestamped.timestamp > laterThan
-    }
-
+  def apply[T <: Timestamped](earlierThan: Option[Timestamp],
+                              laterThan: Option[Timestamp],
+                              atTimestamp: Option[Timestamp],
+                              orderBy: Option[Ordering[T]],
+                             )(input: Seq[T]): Seq[T] = {
     val filterTimebased: Timestamped => Boolean = (earlierThan, laterThan, atTimestamp) match {
       case (None, None, None) => _ => true // returns a predicate that always returns true
       case (Some(earlierThan), None, None) => _.timestamp < earlierThan
@@ -50,57 +35,17 @@ trait TimebasedSearch extends DebugEnhancedLogging {
            (Some(_), None, Some(_)) |
            (Some(_), Some(_), Some(_)) => throw new IllegalArgumentException("argument 'atTimestamp' cannot be used in conjunction with arguments 'earlierThan' or 'laterThan'")
     }
+    val filtered = input.filter(filterTimebased)
+    orderBy.fold(filtered)(filtered.sorted(_))
   }
-  object TimebasedSearchArguments {
-    def apply(args: WithArguments): TimebasedSearchArguments = {
-      TimebasedSearchArguments(
-        args arg earlierThanArgument,
-        args arg laterThanArgument,
-        args arg atTimestampArgument,
-      )
+
+  private def between(earlierThan: Timestamp, laterThan: Timestamp)(timestamped: Timestamped): Boolean = {
+    if (earlierThan equiv laterThan)
+      throw new IllegalArgumentException("arguments 'earlierThan' and 'laterThan' cannot have the same value; use 'atTimestamp' instead")
+    else if (earlierThan > laterThan) {
+      timestamped.timestamp < earlierThan && timestamped.timestamp > laterThan
     }
-  }
-
-  val earlierThanArgument: Argument[Option[Timestamp]] = Argument(
-    name = "earlierThan",
-    argumentType = OptionInputType(DateTimeType),
-    description = Some("List only those elements that have a timestamp earlier than this given timestamp."),
-    defaultValue = None,
-    fromInput = coercedScalaInput,
-    astDirectives = Vector.empty,
-    astNodes = Vector.empty,
-  )
-  val laterThanArgument: Argument[Option[Timestamp]] = Argument(
-    name = "laterThan",
-    argumentType = OptionInputType(DateTimeType),
-    description = Some("List only those elements that have a timestamp later than this given timestamp."),
-    defaultValue = None,
-    fromInput = coercedScalaInput,
-    astDirectives = Vector.empty,
-    astNodes = Vector.empty,
-  )
-  val atTimestampArgument: Argument[Option[Timestamp]] = Argument(
-    name = "atTimestamp",
-    argumentType = OptionInputType(DateTimeType),
-    description = Some("List only those elements that have a timestamp equal to the given timestamp."),
-    defaultValue = None,
-    fromInput = coercedScalaInput,
-    astDirectives = Vector.empty,
-    astNodes = Vector.empty,
-  )
-  val timebasedSearchArguments = List(
-    earlierThanArgument,
-    laterThanArgument,
-    atTimestampArgument,
-  )
-
-  def timebasedFilterAndSort[T <: Timestamped, Ord <: Ordering[T]](orderArgument: Argument[Option[Ord]])
-                                                                  (input: Seq[T])
-                                                                  (implicit context: WithArguments): Seq[T] = {
-    val timebasedSearchArguments = TimebasedSearchArguments(context)
-    val filtered = input.filter(timebasedSearchArguments.filterTimebased)
-
-    context.arg(orderArgument)
-      .fold(filtered)(filtered.sorted(_))
+    else
+      timestamped.timestamp < earlierThan || timestamped.timestamp > laterThan
   }
 }

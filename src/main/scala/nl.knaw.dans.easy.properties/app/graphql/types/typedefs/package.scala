@@ -13,21 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.easy.properties.app.graphql
+package nl.knaw.dans.easy.properties.app.graphql.types
 
 import sangria.marshalling.{ CoercedScalaResultMarshaller, FromInput, ResultMarshaller }
-import sangria.schema.Context
 
-import scala.concurrent.ExecutionContext
-import scala.language.implicitConversions
+package object typedefs {
 
-package object types {
-
-  private[types] implicit def dataContextFromContext(implicit ctx: Context[DataContext, _]): DataContext = ctx.ctx
-
-  private[types] implicit def executionContext(implicit ctx: DataContext): ExecutionContext = ctx.executionContext
-
-  implicit def fromInput[T](create: Map[String, Any] => T): FromInput[T] = new FromInput[T] {
+  def fromInput[T](create: Map[String, Any] => T): FromInput[T] = new FromInput[T] {
     override val marshaller: ResultMarshaller = CoercedScalaResultMarshaller.default
 
     override def fromResult(node: marshaller.Node): T = create(node.asInstanceOf[Map[String, Any]])
