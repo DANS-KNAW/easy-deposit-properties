@@ -15,24 +15,13 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql
 
-import nl.knaw.dans.easy.properties.app.Deleter
-import nl.knaw.dans.easy.properties.app.graphql.model.{ Mutation, Query }
-import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
-import nl.knaw.dans.easy.properties.app.repository.Repository
+import sangria.marshalling.{ CoercedScalaResultMarshaller, FromInput, ResultMarshaller }
 
-import scala.concurrent.ExecutionContext
+package object typedefinitions {
 
-trait DataContext {
+  def fromInput[T](create: Map[String, Any] => T): FromInput[T] = new FromInput[T] {
+    override val marshaller: ResultMarshaller = CoercedScalaResultMarshaller.default
 
-  val query: Query
-  val mutation: Mutation
-  val executionContext: ExecutionContext
-
-  def isLoggedIn: Boolean
-
-  def repo: Repository
-
-  def registration: DepositPropertiesRegistration
-
-  def deleter: Deleter
+    override def fromResult(node: marshaller.Node): T = create(node.asInstanceOf[Map[String, Any]])
+  }
 }

@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.resolvers
 
-import nl.knaw.dans.easy.properties.app.graphql.DataContext
+import nl.knaw.dans.easy.properties.app.graphql._
 import nl.knaw.dans.easy.properties.app.model.springfield.Springfield
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
 import sangria.schema.DeferredValue

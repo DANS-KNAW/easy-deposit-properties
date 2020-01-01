@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.easy.properties.app.graphql
+package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
-import nl.knaw.dans.easy.properties.app.Deleter
-import nl.knaw.dans.easy.properties.app.graphql.model.{ Mutation, Query }
-import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
-import nl.knaw.dans.easy.properties.app.repository.Repository
+import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType
+import sangria.macros.derive.{ DocumentValue, EnumTypeDescription, deriveEnumType }
+import sangria.schema.EnumType
 
-import scala.concurrent.ExecutionContext
+trait GraphQLIdentifierType {
 
-trait DataContext {
-
-  val query: Query
-  val mutation: Mutation
-  val executionContext: ExecutionContext
-
-  def isLoggedIn: Boolean
-
-  def repo: Repository
-
-  def registration: DepositPropertiesRegistration
-
-  def deleter: Deleter
+  implicit val IdentifierTypeType: EnumType[IdentifierType.Value] = deriveEnumType(
+    EnumTypeDescription("The type of the identifier."),
+    DocumentValue("DOI", "The doi identifier."),
+    DocumentValue("URN", "The 'urn:nbn' identifier."),
+    DocumentValue("FEDORA", "The Fedora identifier."),
+    DocumentValue("BAG_STORE", "The bagstore identifier."),
+  )
 }

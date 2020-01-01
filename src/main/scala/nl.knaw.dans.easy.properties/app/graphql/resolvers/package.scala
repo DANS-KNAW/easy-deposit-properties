@@ -20,11 +20,7 @@ import nl.knaw.dans.easy.properties.app.repository.QueryErrorOr
 import sangria.execution.deferred.{ Fetcher, HasId }
 import sangria.relay.Node
 
-import scala.concurrent.ExecutionContext
-
 package object resolvers {
-
-  implicit def executionContext(implicit ctx: DataContext): ExecutionContext = ctx.executionContext
 
   private[resolvers] implicit def keyBasedHasId[K, V]: HasId[(K, V), K] = HasId { case (id, _) => id }
   private[resolvers] implicit val depositHasId: HasId[Deposit, DepositId] = HasId[Deposit, DepositId](_.id)

@@ -16,8 +16,8 @@
 package nl.knaw.dans.easy.properties.app.graphql
 
 import nl.knaw.dans.easy.properties.app.graphql.resolvers._
-import nl.knaw.dans.easy.properties.app.graphql.types.Scalars
-import nl.knaw.dans.easy.properties.app.graphql.types.typedefs._
+import nl.knaw.dans.easy.properties.app.graphql.model.Scalars
+import nl.knaw.dans.easy.properties.app.graphql.typedefinitions._
 import sangria.execution.deferred.DeferredResolver
 import sangria.macros.derive._
 import sangria.schema._

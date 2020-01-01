@@ -20,7 +20,7 @@ import java.sql.Connection
 import nl.knaw.dans.easy.properties.app.Deleter
 import nl.knaw.dans.easy.properties.app.graphql.DataContext
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
-import nl.knaw.dans.easy.properties.app.graphql.types.{ Mutation, Query }
+import nl.knaw.dans.easy.properties.app.graphql.model.{ Mutation, Query }
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesRegistration
 import nl.knaw.dans.easy.properties.app.repository.Repository
 
