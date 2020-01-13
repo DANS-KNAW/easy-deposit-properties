@@ -22,7 +22,7 @@ import nl.knaw.dans.easy.properties.app.model.DoiAction.DoiAction
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.sort._
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, Timestamp, timestampOrdering }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, TimeFilter, Timestamp, timestampOrdering }
 import org.joda.time.DateTime
 import sangria.macros.derive.{ GraphQLDescription, GraphQLField, GraphQLName }
 import sangria.relay.{ ConnectionArgs, Node }
@@ -75,7 +75,7 @@ class GraphQLDeposit(deposit: Deposit) extends Node {
              last: Option[Int] = None,
             )(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, ExtendedConnection[GraphQLState]] = {
     StateResolver.allById(deposit.id)
-      .map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      .map(TimebasedSearch(TimeFilter(earlierThan, laterThan, atTimestamp), orderBy))
       .map(states => ExtendedConnection.connectionFromSeq(
         states.map(new GraphQLState(_)),
         ConnectionArgs(before, after, first, last),
@@ -101,7 +101,7 @@ class GraphQLDeposit(deposit: Deposit) extends Node {
                   last: Option[Int] = None,
                  )(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, ExtendedConnection[GraphQLIngestStep]] = {
     IngestStepResolver.allById(deposit.id)
-      .map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      .map(TimebasedSearch(TimeFilter(earlierThan, laterThan, atTimestamp), orderBy))
       .map(ingestSteps => ExtendedConnection.connectionFromSeq(
         ingestSteps.map(new GraphQLIngestStep(_)),
         ConnectionArgs(before, after, first, last),
@@ -174,7 +174,7 @@ class GraphQLDeposit(deposit: Deposit) extends Node {
                last: Option[Int] = None,
               )(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, ExtendedConnection[GraphQLCurator]] = {
     CurationResolver.allCuratorsById(deposit.id)
-      .map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      .map(TimebasedSearch(TimeFilter(earlierThan, laterThan, atTimestamp), orderBy))
       .map(curators => ExtendedConnection.connectionFromSeq(
         curators.map(new GraphQLCurator(_)),
         ConnectionArgs(before, after, first, last),
@@ -235,7 +235,7 @@ class GraphQLDeposit(deposit: Deposit) extends Node {
                    @GraphQLDescription("List only those elements that have a timestamp equal to the given timestamp.") atTimestamp: Option[DateTime] = None,
                   )(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Seq[GraphQLSpringfield]] = {
     SpringfieldResolver.allById(deposit.id)
-      .map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      .map(TimebasedSearch(TimeFilter(earlierThan, laterThan, atTimestamp), orderBy))
       .map(_.map(new GraphQLSpringfield(_)))
   }
 
@@ -254,7 +254,7 @@ class GraphQLDeposit(deposit: Deposit) extends Node {
                    @GraphQLDescription("List only those elements that have a timestamp equal to the given timestamp.") atTimestamp: Option[DateTime] = None,
                   )(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Seq[GraphQLContentType]] = {
     ContentTypeResolver.allById(deposit.id)
-      .map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      .map(TimebasedSearch(TimeFilter(earlierThan, laterThan, atTimestamp), orderBy))
       .map(_.map(new GraphQLContentType(_)))
   }
 }
