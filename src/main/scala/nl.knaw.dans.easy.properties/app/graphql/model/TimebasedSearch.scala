@@ -23,13 +23,6 @@ object TimebasedSearch {
   def apply[T <: Timestamped](earlierThan: Option[Timestamp],
                               laterThan: Option[Timestamp],
                               atTimestamp: Option[Timestamp],
-                             )(input: Seq[T]): Seq[T] = {
-    apply(earlierThan, laterThan, atTimestamp, Option.empty)(input)
-  }
-
-  def apply[T <: Timestamped](earlierThan: Option[Timestamp],
-                              laterThan: Option[Timestamp],
-                              atTimestamp: Option[Timestamp],
                               orderBy: Option[Ordering[T]],
                              )(input: Seq[T]): Seq[T] = {
     val filterTimebased: Timestamped => Boolean = (earlierThan, laterThan, atTimestamp) match {

@@ -595,7 +595,7 @@ class GraphQLResolveSpec extends TestSupportFixture
     val filters1 = DepositFilters(stateFilter = Some(DepositStateFilter(state1.label)))
     val filters2 = DepositFilters(stateFilter = Some(DepositStateFilter(state2.label)))
     val filters3 = DepositFilters(stateFilter = Some(DepositStateFilter(state3.label)))
-    depositDao.search _ expects Seq(filters1, filters3, filters2) once() returning Seq(
+    depositDao.search _ expects Seq(filters2, filters3, filters1) once() returning Seq(
       filters1 -> Seq(deposit1, deposit2, deposit3),
       filters2 -> Seq(deposit1, deposit2, deposit3),
       filters3 -> Seq(deposit1, deposit2, deposit3),
@@ -1469,7 +1469,7 @@ class GraphQLResolveSpec extends TestSupportFixture
         depositId2 -> step2,
         depositId3 -> step3,
       ).asRight
-      depositDao.search _ expects Seq(filters2, filters4, filters3) once() returning Seq(
+      depositDao.search _ expects Seq(filters3, filters2, filters4) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
         filters4 -> Seq(deposit1, deposit3),
@@ -1496,7 +1496,7 @@ class GraphQLResolveSpec extends TestSupportFixture
         depositId2 -> Seq(step3, step1),
         depositId3 -> Seq.empty,
       ).asRight
-      depositDao.search _ expects Seq(filters2, filters4, filters3) once() returning Seq(
+      depositDao.search _ expects Seq(filters3, filters2, filters4) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
         filters4 -> Seq(deposit1, deposit3),
@@ -1522,7 +1522,7 @@ class GraphQLResolveSpec extends TestSupportFixture
         depositId2 -> state2,
         depositId3 -> state3,
       ).asRight
-      depositDao.search _ expects Seq(filters2, filters4, filters3) once() returning Seq(
+      depositDao.search _ expects Seq(filters3, filters4, filters2) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
         filters4 -> Seq(deposit1, deposit3),
@@ -1548,7 +1548,7 @@ class GraphQLResolveSpec extends TestSupportFixture
         depositId2 -> Seq(state3, state1),
         depositId3 -> Seq.empty,
       ).asRight
-      depositDao.search _ expects Seq(filters2, filters4, filters3) once() returning Seq(
+      depositDao.search _ expects Seq(filters3, filters4, filters2) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
         filters4 -> Seq(deposit1, deposit3),

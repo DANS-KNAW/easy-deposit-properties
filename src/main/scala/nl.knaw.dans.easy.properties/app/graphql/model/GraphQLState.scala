@@ -22,7 +22,7 @@ import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.state.StateLabel.StateLabel
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, State }
-import nl.knaw.dans.easy.properties.app.model.{ SeriesFilter, Timestamp }
+import nl.knaw.dans.easy.properties.app.model.{ SeriesFilter, TimeFilter, Timestamp }
 import nl.knaw.dans.easy.properties.app.repository.DepositFilters
 import org.joda.time.DateTime
 import sangria.macros.derive.{ GraphQLDefault, GraphQLDescription, GraphQLField, GraphQLName }
@@ -68,8 +68,9 @@ class GraphQLState(state: State) extends Node {
               )(implicit ctx: Context[DataContext, GraphQLState]): DeferredValue[DataContext, ExtendedConnection[GraphQLDeposit]] = {
     DepositResolver.findDeposit(DepositFilters(
       stateFilter = Some(DepositStateFilter(label, stateFilter)),
+      timeFilter = TimeFilter(earlierThan, laterThan, atTimestamp),
       sort = orderBy,
-    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp))
+    ))
       .map(deposits => ExtendedConnection.connectionFromSeq(
         deposits.map(new GraphQLDeposit(_)),
         ConnectionArgs(before, after, first, last),

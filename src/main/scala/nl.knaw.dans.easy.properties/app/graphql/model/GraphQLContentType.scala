@@ -21,7 +21,7 @@ import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ ContentTypeResolver,
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, DepositContentTypeFilter }
 import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
-import nl.knaw.dans.easy.properties.app.model.{ SeriesFilter, Timestamp }
+import nl.knaw.dans.easy.properties.app.model.{ SeriesFilter, TimeFilter, Timestamp }
 import nl.knaw.dans.easy.properties.app.repository.DepositFilters
 import org.joda.time.DateTime
 import sangria.macros.derive.{ GraphQLDefault, GraphQLDescription, GraphQLField, GraphQLName }
@@ -63,8 +63,9 @@ class GraphQLContentType(contentType: ContentType) extends Node {
               )(implicit ctx: Context[DataContext, GraphQLContentType]): DeferredValue[DataContext, ExtendedConnection[GraphQLDeposit]] = {
     DepositResolver.findDeposit(DepositFilters(
       contentTypeFilter = Some(DepositContentTypeFilter(contentType.value, contentTypeFilter)),
-      sort = orderBy
-    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp))
+      timeFilter = TimeFilter(earlierThan, laterThan, atTimestamp),
+      sort = orderBy,
+    ))
       .map(deposits => ExtendedConnection.connectionFromSeq(
         deposits.map(new GraphQLDeposit(_)),
         ConnectionArgs(before, after, first, last),

@@ -46,6 +46,8 @@ package object sql {
 
   def setInt(s: String): PrepStatementResolver = setInt(s.toInt)
 
+  def setTimestamp(dt: DateTime): PrepStatementResolver = (ps, i) => ps.setTimestamp(i, dt)
+
   implicit class UpdateExecutor(val statement: ManagedResource[PreparedStatement]) extends AnyVal {
 
     /** @return rowCount */

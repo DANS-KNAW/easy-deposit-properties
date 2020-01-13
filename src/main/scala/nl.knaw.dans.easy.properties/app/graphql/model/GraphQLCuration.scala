@@ -104,8 +104,9 @@ class GraphQLCuration(curation: Curation) extends Node {
       curationRequiredFilter = curationRequired,
       curationPerformedFilter = curationPerformed,
       contentTypeFilter = contentType,
+      timeFilter = TimeFilter(earlierThan, laterThan, atTimestamp),
       sort = orderBy
-    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp))
+    ))
       .map(deposits => ExtendedConnection.connectionFromSeq(
         deposits.map(new GraphQLDeposit(_)),
         ConnectionArgs(before, after, first, last),

@@ -21,7 +21,7 @@ import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
 import nl.knaw.dans.easy.properties.app.model.ingestStep.DepositIngestStepFilter
 import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.state.DepositStateFilter
-import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, DepositorId }
+import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, DepositorId, TimeFilter }
 
 case class DepositFilters(depositorId: Option[DepositorId] = Option.empty,
                           bagName: Option[String] = Option.empty,
@@ -35,6 +35,7 @@ case class DepositFilters(depositorId: Option[DepositorId] = Option.empty,
                           curationPerformedFilter: Option[DepositCurationPerformedFilter] = Option.empty,
                           contentTypeFilter: Option[DepositContentTypeFilter] = Option.empty,
                           originFilter: Option[Origin] = Option.empty,
+                          timeFilter: Option[TimeFilter] = Option.empty,
                           sort: Option[DepositOrder] = Option.empty,
                          ) {
   override def toString: String = {
@@ -51,6 +52,7 @@ case class DepositFilters(depositorId: Option[DepositorId] = Option.empty,
       curationPerformedFilter,
       contentTypeFilter,
       originFilter,
+      timeFilter,
       sort,
     )
       .collect { case Some(x) => x }
