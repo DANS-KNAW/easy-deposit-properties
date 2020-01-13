@@ -583,8 +583,8 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     val expectedSize = List(
       "user001",
       "my-bag",
-      dt1,
       dt2,
+      dt1,
       StateLabel.SUBMITTED.toString,
       "ingest-step",
       IngestStepLabel.FEDORA.toString,

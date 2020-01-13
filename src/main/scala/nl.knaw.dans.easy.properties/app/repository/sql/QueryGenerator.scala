@@ -84,7 +84,7 @@ object QueryGenerator {
         "creationTimestamp > ?::timestamp with time zone" -> List(setTimestamp(later)),
       )
       case NotBetween(earlier, later) => List(
-        "(creationTimestamp > ?::timestamp with time zone OR creationTimestamp < ?::timestamp with time zone)" -> List(setTimestamp(later), setTimestamp(earlier)),
+        "(creationTimestamp > ?::timestamp with time zone OR creationTimestamp < ?::timestamp with time zone)" -> List(setTimestamp(earlier), setTimestamp(later)),
       )
     }
     val (queryWherePart, whereValues) = (whereClauses ::: timeClause)
