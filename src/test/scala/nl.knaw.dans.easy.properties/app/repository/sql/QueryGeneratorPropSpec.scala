@@ -22,6 +22,7 @@ import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStepLabel }
+import nl.knaw.dans.easy.properties.app.model.sort.{ DepositOrder, DepositOrderField, OrderDirection }
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, StateLabel }
 import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, DoiAction, Origin, SeriesFilter }
 import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
@@ -60,6 +61,12 @@ class QueryGeneratorPropSpec extends PropSpec with GeneratorDrivenPropertyChecks
   implicit val arbitraryCurationRequiredFilter: Arbitrary[DepositCurationRequiredFilter] = genDepositFilter(DepositCurationRequiredFilter)
   implicit val arbitraryCurationPerformedFilter: Arbitrary[DepositCurationPerformedFilter] = genDepositFilter(DepositCurationPerformedFilter)
   implicit val arbitraryContentTypeFilter: Arbitrary[DepositContentTypeFilter] = genDepositFilter(ContentTypeValue)(DepositContentTypeFilter)
+  implicit val arbitraryDepositOrder: Arbitrary[DepositOrder] = Arbitrary {
+    for {
+      field <- genFromEnum(DepositOrderField).arbitrary
+      direction <- genFromEnum(OrderDirection).arbitrary
+    } yield DepositOrder(field, direction)
+  }
 
   implicit val arbitraryDepositFilters: Arbitrary[DepositFilters] = Arbitrary {
     arbitrary[(
@@ -75,6 +82,7 @@ class QueryGeneratorPropSpec extends PropSpec with GeneratorDrivenPropertyChecks
         Option[DepositCurationPerformedFilter],
         Option[DepositContentTypeFilter],
         Option[Origin.Origin],
+        Option[DepositOrder],
       )]
       .map(DepositFilters.tupled)
   }

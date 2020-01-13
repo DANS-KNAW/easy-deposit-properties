@@ -16,12 +16,12 @@
 package nl.knaw.dans.easy.properties.app.graphql.model
 
 import nl.knaw.dans.easy.properties.app.graphql._
-import nl.knaw.dans.easy.properties.app.graphql.ordering.DepositOrder
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ DepositResolver, IngestStepResolver }
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.ingestStep.IngestStepLabel.IngestStepLabel
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStep }
+import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.{ SeriesFilter, Timestamp }
 import nl.knaw.dans.easy.properties.app.repository.DepositFilters
 import org.joda.time.DateTime
@@ -36,7 +36,7 @@ class GraphQLIngestStep(ingestStep: IngestStep) extends Node {
   @GraphQLField
   @GraphQLDescription("The label of the ingest step.")
   val step: IngestStepLabel = ingestStep.step
-  
+
   @GraphQLField
   @GraphQLDescription("The timestamp at which the deposit got into this ingest step.")
   val timestamp: Timestamp = ingestStep.timestamp
@@ -64,7 +64,8 @@ class GraphQLIngestStep(ingestStep: IngestStep) extends Node {
               )(implicit ctx: Context[DataContext, GraphQLIngestStep]): DeferredValue[DataContext, ExtendedConnection[GraphQLDeposit]] = {
     DepositResolver.findDeposit(DepositFilters(
       ingestStepFilter = Some(DepositIngestStepFilter(step, ingestStepFilter)),
-    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      sort = orderBy,
+    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp))
       .map(deposits => ExtendedConnection.connectionFromSeq(
         deposits.map(new GraphQLDeposit(_)),
         ConnectionArgs(before, after, first, last),

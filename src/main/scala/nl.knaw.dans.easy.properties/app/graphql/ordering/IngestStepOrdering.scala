@@ -16,6 +16,7 @@
 package nl.knaw.dans.easy.properties.app.graphql.ordering
 
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestStepLabel }
+import nl.knaw.dans.easy.properties.app.model.sort.OrderDirection
 import nl.knaw.dans.easy.properties.app.model.{ Timestamp, timestampOrdering }
 import sangria.macros.derive.GraphQLDescription
 

@@ -17,6 +17,7 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 
 import cats.data.NonEmptyList
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
+import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.{ DepositFilter, DepositId, SeriesFilter }
 import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
 
@@ -92,20 +93,24 @@ object QueryGenerator {
         case ((q, vs), (subQuery, values)) => s"$q $subQuery" -> (values ::: vs)
       }
 
-    (queryJoinPart, queryWherePart) match {
+    val (query, resolvers) = (queryJoinPart, queryWherePart) match {
       case ("", "") =>
-        val query = s"SELECT * FROM Deposit;"
+        val query = s"SELECT * FROM Deposit"
         query -> Nil
       case ("", _) =>
-        val query = s"SELECT * FROM Deposit WHERE $queryWherePart;"
+        val query = s"SELECT * FROM Deposit WHERE $queryWherePart"
         query -> whereValues.reverse
       case (_, "") =>
-        val query = s"SELECT * FROM Deposit $queryJoinPart;"
+        val query = s"SELECT * FROM Deposit $queryJoinPart"
         query -> joinValues.reverse
       case (_, _) =>
-        val query = s"SELECT * FROM (SELECT * FROM Deposit WHERE $queryWherePart) AS SelectedDeposits $queryJoinPart;"
+        val query = s"SELECT * FROM (SELECT * FROM Deposit WHERE $queryWherePart) AS SelectedDeposits $queryJoinPart"
         query -> (whereValues.reverse ::: joinValues.reverse)
     }
+
+    filters.sort.fold(s"$query;") {
+      case DepositOrder(field, direction) => s"$query ORDER BY $field $direction;"
+    } -> resolvers
   }
 
   def searchDepositors(filters: DepositorIdFilters): (String, Seq[PrepStatementResolver]) = {
@@ -139,7 +144,7 @@ object QueryGenerator {
         case (("", vs), (subQuery, values)) => subQuery -> (values ::: vs)
         case ((q, vs), (subQuery, values)) => s"$q $subQuery" -> (values ::: vs)
       }
-    
+
     (queryJoinPart, queryWherePart) match {
       case ("", "") =>
         val query = "SELECT DISTINCT depositorId FROM Deposit;"

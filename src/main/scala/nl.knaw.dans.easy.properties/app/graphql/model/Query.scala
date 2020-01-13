@@ -16,7 +16,7 @@
 package nl.knaw.dans.easy.properties.app.graphql.model
 
 import nl.knaw.dans.easy.properties.app.graphql._
-import nl.knaw.dans.easy.properties.app.graphql.ordering.DepositOrder
+import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ DepositResolver, IdentifierResolver }
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
@@ -77,8 +77,9 @@ class Query {
       curationRequiredFilter = curationRequired,
       curationPerformedFilter = curationPerformed,
       contentTypeFilter = contentType,
+      sort = orderBy,
     ))
-      .map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      .map(TimebasedSearch(earlierThan, laterThan, atTimestamp))
       .map(deposits => ExtendedConnection.connectionFromSeq(
         deposits.map(new GraphQLDeposit(_)),
         ConnectionArgs(before, after, first, last),

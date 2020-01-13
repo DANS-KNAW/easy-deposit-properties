@@ -16,7 +16,6 @@
 package nl.knaw.dans.easy.properties.app.graphql.model
 
 import nl.knaw.dans.easy.properties.app.graphql._
-import nl.knaw.dans.easy.properties.app.graphql.ordering.DepositOrder
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ CurationResolver, DepositResolver }
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
@@ -25,6 +24,7 @@ import nl.knaw.dans.easy.properties.app.model._
 import nl.knaw.dans.easy.properties.app.model.contentType.DepositContentTypeFilter
 import nl.knaw.dans.easy.properties.app.model.curator.{ Curator, DepositCuratorFilter }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.DepositIngestStepFilter
+import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.state.DepositStateFilter
 import nl.knaw.dans.easy.properties.app.repository.DepositFilters
 import org.joda.time.DateTime
@@ -91,7 +91,8 @@ class GraphQLCurator(curator: Curator) extends Node {
       curationRequiredFilter = curationRequired,
       curationPerformedFilter = curationPerformed,
       contentTypeFilter = contentType,
-    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      sort = orderBy,
+    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp))
       .map(deposits => ExtendedConnection.connectionFromSeq(
         deposits.map(new GraphQLDeposit(_)),
         ConnectionArgs(before, after, first, last),

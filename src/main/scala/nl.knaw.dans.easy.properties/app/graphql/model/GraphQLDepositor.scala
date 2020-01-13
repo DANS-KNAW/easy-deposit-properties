@@ -16,13 +16,13 @@
 package nl.knaw.dans.easy.properties.app.graphql.model
 
 import nl.knaw.dans.easy.properties.app.graphql._
-import nl.knaw.dans.easy.properties.app.graphql.ordering.DepositOrder
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.DepositResolver
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.contentType.DepositContentTypeFilter
 import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
 import nl.knaw.dans.easy.properties.app.model.ingestStep.DepositIngestStepFilter
+import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.state.DepositStateFilter
 import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, DepositorId }
 import nl.knaw.dans.easy.properties.app.repository.DepositFilters
@@ -74,7 +74,8 @@ class GraphQLDepositor(id: DepositorId) {
       curationRequiredFilter = curationRequired,
       curationPerformedFilter = curationPerformed,
       contentTypeFilter = contentType,
-    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      sort = orderBy,
+    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp))
       .map(deposits => ExtendedConnection.connectionFromSeq(
         deposits.map(new GraphQLDeposit(_)),
         ConnectionArgs(before, after, first, last),

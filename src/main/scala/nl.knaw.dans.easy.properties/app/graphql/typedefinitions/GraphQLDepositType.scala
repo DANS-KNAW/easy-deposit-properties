@@ -15,8 +15,8 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
-import nl.knaw.dans.easy.properties.app.graphql.ordering.{ DepositOrder, DepositOrderField, OrderDirection }
 import nl.knaw.dans.easy.properties.app.model.Origin
+import nl.knaw.dans.easy.properties.app.model.sort.{ DepositOrder, DepositOrderField, OrderDirection }
 import sangria.macros.derive._
 import sangria.marshalling.FromInput
 import sangria.schema.{ EnumType, InputObjectType }
@@ -31,7 +31,13 @@ trait GraphQLDepositType {
     DocumentValue("SMD", "easy-split-multi-deposit"),
   )
 
-  implicit val DepositOrderFieldType: EnumType[DepositOrderField.Value] = deriveEnumType()
+  implicit val DepositOrderFieldType: EnumType[DepositOrderField.Value] = deriveEnumType(
+    EnumTypeDescription("Properties by which deposits can be ordered."),
+    DocumentValue("DEPOSIT_ID", "Order deposits by depositId."),
+    DocumentValue("BAG_NAME", "Order deposits by bag name."),
+    DocumentValue("CREATION_TIMESTAMP", "Order deposits by creation timestamp."),
+    DocumentValue("ORIGIN", "Order deposits by origin."),
+  )
 
   implicit val DepositOrderInputType: InputObjectType[DepositOrder] = deriveInputObjectType(
     InputObjectTypeDescription("Ordering options for deposits"),

@@ -16,10 +16,10 @@
 package nl.knaw.dans.easy.properties.app.graphql.model
 
 import nl.knaw.dans.easy.properties.app.graphql._
-import nl.knaw.dans.easy.properties.app.graphql.ordering.DepositOrder
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ DepositResolver, StateResolver }
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
+import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.state.StateLabel.StateLabel
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, State }
 import nl.knaw.dans.easy.properties.app.model.{ SeriesFilter, Timestamp }
@@ -67,8 +67,9 @@ class GraphQLState(state: State) extends Node {
                last: Option[Int] = None,
               )(implicit ctx: Context[DataContext, GraphQLState]): DeferredValue[DataContext, ExtendedConnection[GraphQLDeposit]] = {
     DepositResolver.findDeposit(DepositFilters(
-      stateFilter = Some(DepositStateFilter(label, stateFilter))
-    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp, orderBy))
+      stateFilter = Some(DepositStateFilter(label, stateFilter)),
+      sort = orderBy,
+    )).map(TimebasedSearch(earlierThan, laterThan, atTimestamp))
       .map(deposits => ExtendedConnection.connectionFromSeq(
         deposits.map(new GraphQLDeposit(_)),
         ConnectionArgs(before, after, first, last),

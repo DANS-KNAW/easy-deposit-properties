@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
-import nl.knaw.dans.easy.properties.app.graphql.ordering.OrderDirection
+import nl.knaw.dans.easy.properties.app.model.sort.OrderDirection
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
@@ -33,7 +33,11 @@ trait GraphQLCommonTypes {
   )
   implicit val SeriesFilterToInput: ToInput[SeriesFilter, _] = new ScalarToInput
 
-  implicit val OrderDirectionType: EnumType[OrderDirection.Value] = deriveEnumType()
+  implicit val OrderDirectionType: EnumType[OrderDirection.Value] = deriveEnumType(
+    EnumTypeDescription("Possible directions in which to order a list of items when provided an orderBy argument"),
+    DocumentValue("ASC", "Specifies an ascending order for a given orderBy argument."),
+    DocumentValue("DESC", "Specifies a descending order for a given orderBy argument."),
+  )
 
   implicit def GeneralConnectionType[Ctx, T](implicit objType: ObjectType[Ctx, T]): ObjectType[Ctx, ExtendedConnection[T]] = {
     ExtendedConnection.definition[Ctx, ExtendedConnection, T](objType.name, objType).connectionType

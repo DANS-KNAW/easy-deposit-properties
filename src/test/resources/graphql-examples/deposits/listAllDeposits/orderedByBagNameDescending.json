@@ -4,6 +4,118 @@
       "edges": [
         {
           "node": {
+            "depositId": "00000000-0000-0000-0000-000000000002",
+            "depositor": {
+              "depositorId": "user001"
+            },
+            "bagName": null,
+            "origin": "API",
+            "creationTimestamp": "2019-02-02T00:00:00.000Z",
+            "lastModified": "2019-02-02T03:03:00.000Z",
+            "state": {
+              "label": "ARCHIVED",
+              "description": "deposit is archived",
+              "timestamp": "2019-02-02T03:03:00.000Z"
+            },
+            "ingestStep": {
+              "step": "COMPLETED",
+              "timestamp": "2019-02-02T02:11:00.000Z"
+            },
+            "identifiers": [
+              {
+                "id": "SWRlbnRpZmllcjo0",
+                "type": "BAG_STORE",
+                "value": "00000000-0000-0000-0000-000000000002",
+                "timestamp": "2019-02-02T00:00:00.000Z"
+              },
+              {
+                "id": "SWRlbnRpZmllcjo1",
+                "type": "DOI",
+                "value": "10.5072/dans-f3g-hij4",
+                "timestamp": "2019-02-02T00:01:00.000Z"
+              },
+              {
+                "id": "SWRlbnRpZmllcjo3",
+                "type": "FEDORA",
+                "value": "easy-dataset:2",
+                "timestamp": "2019-02-02T00:03:00.000Z"
+              },
+              {
+                "id": "SWRlbnRpZmllcjo2",
+                "type": "URN",
+                "value": "urn:nbn:789012",
+                "timestamp": "2019-02-02T00:02:00.000Z"
+              }
+            ],
+            "doiRegistered": true,
+            "doiRegisteredEvents": [
+              {
+                "value": false,
+                "timestamp": "2019-02-02T00:00:00.000Z"
+              },
+              {
+                "value": true,
+                "timestamp": "2019-02-02T02:07:00.000Z"
+              }
+            ],
+            "doiAction": "CREATE",
+            "doiActionEvents": [
+              {
+                "value": "CREATE",
+                "timestamp": "2019-02-02T00:00:00.000Z"
+              }
+            ],
+            "curator": null,
+            "curators": {
+              "edges": [
+              ]
+            },
+            "isNewVersion": null,
+            "isNewVersionEvents": [
+            ],
+            "curationRequired": null,
+            "curationRequiredEvents": [
+            ],
+            "curationPerformed": null,
+            "curationPerformedEvents": [
+            ],
+            "springfield": {
+              "domain": "domain2",
+              "user": "user2",
+              "collection": "collection2",
+              "playmode": "MENU",
+              "timestamp": "2019-02-02T02:02:00.000Z"
+            },
+            "springfields": [
+              {
+                "domain": "domain1",
+                "user": "user1",
+                "collection": "collection1",
+                "playmode": "CONTINUOUS",
+                "timestamp": "2019-02-02T00:00:00.000Z"
+              },
+              {
+                "domain": "domain2",
+                "user": "user2",
+                "collection": "collection2",
+                "playmode": "MENU",
+                "timestamp": "2019-02-02T02:02:00.000Z"
+              }
+            ],
+            "contentType": {
+              "value": "application/zip",
+              "timestamp": "2019-02-02T00:05:00.000Z"
+            },
+            "contentTypes": [
+              {
+                "value": "application/zip",
+                "timestamp": "2019-02-02T00:05:00.000Z"
+              }
+            ]
+          }
+        },
+        {
+          "node": {
             "depositId": "00000000-0000-0000-0000-000000000005",
             "depositor": {
               "depositorId": "user002"
@@ -451,118 +563,6 @@
               {
                 "value": "application/octet-stream",
                 "timestamp": "2019-01-01T00:10:00.000Z"
-              }
-            ]
-          }
-        },
-        {
-          "node": {
-            "depositId": "00000000-0000-0000-0000-000000000002",
-            "depositor": {
-              "depositorId": "user001"
-            },
-            "bagName": null,
-            "origin": "API",
-            "creationTimestamp": "2019-02-02T00:00:00.000Z",
-            "lastModified": "2019-02-02T03:03:00.000Z",
-            "state": {
-              "label": "ARCHIVED",
-              "description": "deposit is archived",
-              "timestamp": "2019-02-02T03:03:00.000Z"
-            },
-            "ingestStep": {
-              "step": "COMPLETED",
-              "timestamp": "2019-02-02T02:11:00.000Z"
-            },
-            "identifiers": [
-              {
-                "id": "SWRlbnRpZmllcjo0",
-                "type": "BAG_STORE",
-                "value": "00000000-0000-0000-0000-000000000002",
-                "timestamp": "2019-02-02T00:00:00.000Z"
-              },
-              {
-                "id": "SWRlbnRpZmllcjo1",
-                "type": "DOI",
-                "value": "10.5072/dans-f3g-hij4",
-                "timestamp": "2019-02-02T00:01:00.000Z"
-              },
-              {
-                "id": "SWRlbnRpZmllcjo3",
-                "type": "FEDORA",
-                "value": "easy-dataset:2",
-                "timestamp": "2019-02-02T00:03:00.000Z"
-              },
-              {
-                "id": "SWRlbnRpZmllcjo2",
-                "type": "URN",
-                "value": "urn:nbn:789012",
-                "timestamp": "2019-02-02T00:02:00.000Z"
-              }
-            ],
-            "doiRegistered": true,
-            "doiRegisteredEvents": [
-              {
-                "value": false,
-                "timestamp": "2019-02-02T00:00:00.000Z"
-              },
-              {
-                "value": true,
-                "timestamp": "2019-02-02T02:07:00.000Z"
-              }
-            ],
-            "doiAction": "CREATE",
-            "doiActionEvents": [
-              {
-                "value": "CREATE",
-                "timestamp": "2019-02-02T00:00:00.000Z"
-              }
-            ],
-            "curator": null,
-            "curators": {
-              "edges": [
-              ]
-            },
-            "isNewVersion": null,
-            "isNewVersionEvents": [
-            ],
-            "curationRequired": null,
-            "curationRequiredEvents": [
-            ],
-            "curationPerformed": null,
-            "curationPerformedEvents": [
-            ],
-            "springfield": {
-              "domain": "domain2",
-              "user": "user2",
-              "collection": "collection2",
-              "playmode": "MENU",
-              "timestamp": "2019-02-02T02:02:00.000Z"
-            },
-            "springfields": [
-              {
-                "domain": "domain1",
-                "user": "user1",
-                "collection": "collection1",
-                "playmode": "CONTINUOUS",
-                "timestamp": "2019-02-02T00:00:00.000Z"
-              },
-              {
-                "domain": "domain2",
-                "user": "user2",
-                "collection": "collection2",
-                "playmode": "MENU",
-                "timestamp": "2019-02-02T02:02:00.000Z"
-              }
-            ],
-            "contentType": {
-              "value": "application/zip",
-              "timestamp": "2019-02-02T00:05:00.000Z"
-            },
-            "contentTypes": [
-              {
-                "value": "application/zip",
-                "timestamp": "2019-02-02T00:05:00.000Z"
               }
             ]
           }
