@@ -15,11 +15,11 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
-import nl.knaw.dans.easy.properties.app.graphql.ordering.{ IngestStepOrder, IngestStepOrderField, OrderDirection }
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.ingestStep.IngestStepLabel.IngestStepLabel
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStepLabel }
+import nl.knaw.dans.easy.properties.app.model.sort.{ IngestStepOrder, IngestStepOrderField, OrderDirection }
 import sangria.macros.derive._
 import sangria.marshalling.FromInput
 import sangria.schema.{ EnumType, InputObjectType }
@@ -48,7 +48,11 @@ trait GraphQLIngestStepType {
     filter = ad("filter").asInstanceOf[Option[SeriesFilter]].getOrElse(SeriesFilter.LATEST),
   ))
 
-  implicit val IngestStepOrderFieldType: EnumType[IngestStepOrderField.Value] = deriveEnumType()
+  implicit val IngestStepOrderFieldType: EnumType[IngestStepOrderField.Value] = deriveEnumType(
+    EnumTypeDescription("Properties by which ingest steps can be ordered"),
+    DocumentValue("STEP", "Order ingest steps by step"),
+    DocumentValue("TIMESTAMP", "Order ingest steps by timestamp"),
+  )
   implicit val IngestStepOrderInputType: InputObjectType[IngestStepOrder] = deriveInputObjectType(
     InputObjectTypeDescription("Ordering options for ingest steps"),
     DocumentInputField("field", "The field to order ingest steps by"),

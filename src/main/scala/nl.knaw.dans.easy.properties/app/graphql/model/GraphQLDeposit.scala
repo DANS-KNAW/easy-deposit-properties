@@ -16,12 +16,12 @@
 package nl.knaw.dans.easy.properties.app.graphql.model
 
 import nl.knaw.dans.easy.properties.app.graphql._
-import nl.knaw.dans.easy.properties.app.graphql.ordering._
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers._
 import nl.knaw.dans.easy.properties.app.model.DoiAction.DoiAction
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType
+import nl.knaw.dans.easy.properties.app.model.sort._
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, Timestamp, timestampOrdering }
 import org.joda.time.DateTime
 import sangria.macros.derive.{ GraphQLDescription, GraphQLField, GraphQLName }

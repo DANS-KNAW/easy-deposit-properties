@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.easy.properties.app.graphql.ordering
+package nl.knaw.dans.easy.properties.app.model.sort
 
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestStepLabel }
-import nl.knaw.dans.easy.properties.app.model.sort.OrderDirection
 import nl.knaw.dans.easy.properties.app.model.{ Timestamp, timestampOrdering }
-import sangria.macros.derive.GraphQLDescription
 
-@GraphQLDescription("Properties by which ingest steps can be ordered")
 object IngestStepOrderField extends Enumeration {
   type IngestStepOrderField = Value
 
   // @formatter:off
-  @GraphQLDescription("Order ingest steps by step")
   val STEP     : IngestStepOrderField = Value("STEP")
-  @GraphQLDescription("Order ingest steps by timestamp")
   val TIMESTAMP: IngestStepOrderField = Value("TIMESTAMP")
   // @formatter:on
 }

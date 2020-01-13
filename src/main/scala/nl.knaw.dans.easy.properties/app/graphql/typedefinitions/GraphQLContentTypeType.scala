@@ -15,11 +15,11 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
-import nl.knaw.dans.easy.properties.app.graphql.ordering.{ ContentTypeOrder, ContentTypeOrderField, OrderDirection }
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.contentType.ContentTypeValue.ContentTypeValue
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, DepositContentTypeFilter }
+import nl.knaw.dans.easy.properties.app.model.sort.{ ContentTypeOrder, ContentTypeOrderField, OrderDirection }
 import sangria.macros.derive._
 import sangria.marshalling.FromInput
 import sangria.schema.{ EnumType, InputObjectType }
@@ -43,7 +43,11 @@ trait GraphQLContentTypeType {
     filter = ad("filter").asInstanceOf[Option[SeriesFilter]].getOrElse(SeriesFilter.LATEST),
   ))
 
-  implicit val ContentTypeOrderFieldType: EnumType[ContentTypeOrderField.Value] = deriveEnumType()
+  implicit val ContentTypeOrderFieldType: EnumType[ContentTypeOrderField.Value] = deriveEnumType(
+    EnumTypeDescription("Properties by which content types can be ordered"),
+    DocumentValue("VALUE", "Order content types by value"),
+    DocumentValue("TIMESTAMP", "Order content types by timestamp"),
+  )
   implicit val ContentTypeOrderInputType: InputObjectType[ContentTypeOrder] = deriveInputObjectType(
     InputObjectTypeDescription("Ordering options for content types"),
     DocumentInputField("field", "The field to order content types by"),

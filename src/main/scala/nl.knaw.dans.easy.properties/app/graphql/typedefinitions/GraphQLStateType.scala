@@ -15,9 +15,9 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
-import nl.knaw.dans.easy.properties.app.graphql.ordering.{ OrderDirection, StateOrder, StateOrderField }
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
+import nl.knaw.dans.easy.properties.app.model.sort.{ OrderDirection, StateOrder, StateOrderField }
 import nl.knaw.dans.easy.properties.app.model.state.StateLabel.StateLabel
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, StateLabel }
 import sangria.macros.derive._
@@ -51,7 +51,11 @@ trait GraphQLStateType {
     filter = ad("filter").asInstanceOf[Option[SeriesFilter]].getOrElse(SeriesFilter.LATEST),
   ))
 
-  implicit val StateOrderFieldType: EnumType[StateOrderField.Value] = deriveEnumType()
+  implicit val StateOrderFieldType: EnumType[StateOrderField.Value] = deriveEnumType(
+    EnumTypeDescription("Properties by which states can be ordered"),
+    DocumentValue("LABEL", "Order states by label"),
+    DocumentValue("TIMESTAMP", "Order states by timestamp")
+  )
   implicit val StateOrderInputType: InputObjectType[StateOrder] = deriveInputObjectType(
     InputObjectTypeDescription("Ordering options for states"),
     DocumentInputField("field", "The field to order state by"),

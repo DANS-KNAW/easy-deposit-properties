@@ -15,10 +15,10 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
-import nl.knaw.dans.easy.properties.app.graphql.ordering.{ CuratorOrder, CuratorOrderField, OrderDirection }
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
+import nl.knaw.dans.easy.properties.app.model.sort.{ CuratorOrder, CuratorOrderField, OrderDirection }
 import sangria.macros.derive._
 import sangria.marshalling.FromInput
 import sangria.schema.{ EnumType, InputObjectType }
@@ -37,7 +37,11 @@ trait GraphQLCuratorType {
     filter = ad("filter").asInstanceOf[Option[SeriesFilter]].getOrElse(SeriesFilter.LATEST),
   ))
 
-  implicit val CuratorOrderFieldType: EnumType[CuratorOrderField.Value] = deriveEnumType()
+  implicit val CuratorOrderFieldType: EnumType[CuratorOrderField.Value] = deriveEnumType(
+    EnumTypeDescription("Properties by which curators can be ordered"),
+    DocumentValue("USERID", "Order curators by step"),
+    DocumentValue("TIMESTAMP", "Order curators by timestamp"),
+  )
   implicit val CuratorOrderInputType: InputObjectType[CuratorOrder] = deriveInputObjectType(
     InputObjectTypeDescription("Ordering options for curators"),
     DocumentInputField("field", "The field to order curators by"),

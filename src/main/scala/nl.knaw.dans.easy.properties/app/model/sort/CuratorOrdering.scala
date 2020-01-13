@@ -13,21 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package nl.knaw.dans.easy.properties.app.graphql.ordering
+package nl.knaw.dans.easy.properties.app.model.sort
 
 import nl.knaw.dans.easy.properties.app.model.curator.Curator
-import nl.knaw.dans.easy.properties.app.model.sort.OrderDirection
 import nl.knaw.dans.easy.properties.app.model.{ Timestamp, timestampOrdering }
-import sangria.macros.derive.GraphQLDescription
 
-@GraphQLDescription("Properties by which curators can be ordered")
 object CuratorOrderField extends Enumeration {
   type CuratorOrderField = Value
 
   // @formatter:off
-  @GraphQLDescription("Order curators by step")
   val USERID   : CuratorOrderField = Value("USERID")
-  @GraphQLDescription("Order curators by timestamp")
   val TIMESTAMP: CuratorOrderField = Value("TIMESTAMP")
   // @formatter:on
 }

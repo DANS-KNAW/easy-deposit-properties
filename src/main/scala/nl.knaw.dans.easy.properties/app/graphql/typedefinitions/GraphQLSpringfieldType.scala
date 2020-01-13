@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
-import nl.knaw.dans.easy.properties.app.graphql.ordering.{ OrderDirection, SpringfieldOrder, SpringfieldOrderField }
+import nl.knaw.dans.easy.properties.app.model.sort.{ OrderDirection, SpringfieldOrder, SpringfieldOrderField }
 import nl.knaw.dans.easy.properties.app.model.springfield.SpringfieldPlayMode
 import sangria.macros.derive._
 import sangria.marshalling.FromInput
@@ -30,7 +30,10 @@ trait GraphQLSpringfieldType {
     DocumentValue("MENU", "Play audio/video in Springfield as selected in a menu."),
   )
 
-  implicit val SpringfieldOrderFieldType: EnumType[SpringfieldOrderField.Value] = deriveEnumType()
+  implicit val SpringfieldOrderFieldType: EnumType[SpringfieldOrderField.Value] = deriveEnumType(
+    EnumTypeDescription("Properties by which springfields can be ordered"),
+    DocumentValue("TIMESTAMP", "Order springfields by timestamp"),
+  )
   implicit val SpringfieldOrderInputType: InputObjectType[SpringfieldOrder] = deriveInputObjectType(
     InputObjectTypeDescription("Ordering options for springfields"),
     DocumentInputField("field", "The field to order springfields by"),
