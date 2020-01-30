@@ -1,0 +1,12 @@
+{
+  "data": {
+    "setContentType": {
+      "clientMutationId": "my-mutation-id",
+      "contentType": {
+        "id": "Q29udGVudFR5cGU6MzI=",
+        "value": "application/octet-stream",
+        "timestamp": "2020-02-02T20:20:02.000Z"
+      }
+    }
+  }
+}

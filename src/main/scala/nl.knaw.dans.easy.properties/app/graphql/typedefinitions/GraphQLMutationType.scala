@@ -47,7 +47,7 @@ trait GraphQLMutationType {
     clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
     depositId = ad("depositId").asInstanceOf[DepositId],
     bagName = ad.get("bagName").flatMap(_.asInstanceOf[Option[String]]),
-    creationTimestamp = ad("creationTimestamp").asInstanceOf[DateTime],
+    creationTimestamp = ad.get("creationTimestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
     depositorId = ad("depositorId").asInstanceOf[DepositorId],
     origin = ad("origin").asInstanceOf[Origin],
   ))
@@ -67,7 +67,7 @@ trait GraphQLMutationType {
     depositId = ad("depositId").asInstanceOf[DepositId],
     label = ad("label").asInstanceOf[StateLabel],
     description = ad("description").asInstanceOf[String],
-    timestamp = ad("timestamp").asInstanceOf[DateTime],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
   implicit val UpdateStatePayloadType: ObjectType[DataContext, UpdateStatePayload] = deriveObjectType[DataContext, UpdateStatePayload]()
 
@@ -76,7 +76,7 @@ trait GraphQLMutationType {
     clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
     depositId = ad("depositId").asInstanceOf[DepositId],
     step = ad("step").asInstanceOf[IngestStepLabel],
-    timestamp = ad("timestamp").asInstanceOf[DateTime],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
   implicit val UpdateIngestStepPayloadType: ObjectType[DataContext, UpdateIngestStepPayload] = deriveObjectType[DataContext, UpdateIngestStepPayload]()
 
@@ -86,7 +86,7 @@ trait GraphQLMutationType {
     depositId = ad("depositId").asInstanceOf[DepositId],
     idType = ad("type").asInstanceOf[IdentifierType],
     idValue = ad("value").asInstanceOf[String],
-    timestamp = ad("timestamp").asInstanceOf[DateTime],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
   implicit val AddIdentifierPayloadType: ObjectType[DataContext, AddIdentifierPayload] = deriveObjectType[DataContext, AddIdentifierPayload]()
 
@@ -95,7 +95,7 @@ trait GraphQLMutationType {
     clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
     depositId = ad("depositId").asInstanceOf[DepositId],
     value = ad("value").asInstanceOf[Boolean],
-    timestamp = ad("timestamp").asInstanceOf[DateTime],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
   implicit val SetDoiRegisteredPayloadType: ObjectType[DataContext, SetDoiRegisteredPayload] = deriveObjectType[DataContext, SetDoiRegisteredPayload]()
 
@@ -104,7 +104,7 @@ trait GraphQLMutationType {
     clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
     depositId = ad("depositId").asInstanceOf[DepositId],
     value = ad("value").asInstanceOf[DoiAction],
-    timestamp = ad("timestamp").asInstanceOf[DateTime],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
   implicit val SetDoiActionPayloadType: ObjectType[DataContext, SetDoiActionPayload] = deriveObjectType[DataContext, SetDoiActionPayload]()
 
@@ -117,7 +117,7 @@ trait GraphQLMutationType {
     isNewVersion = ad.get("isNewVersion").flatMap(_.asInstanceOf[Option[Boolean]]),
     isCurationRequired = ad("isCurationRequired").asInstanceOf[Boolean],
     isCurationPerformed = ad("isCurationPerformed").asInstanceOf[Boolean],
-    timestamp = ad("timestamp").asInstanceOf[DateTime],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
   implicit val SetCurationPayloadType: ObjectType[DataContext, SetCurationPayload] = deriveObjectType[DataContext, SetCurationPayload]()
 
@@ -129,7 +129,7 @@ trait GraphQLMutationType {
     user = ad("user").asInstanceOf[String],
     collection = ad("collection").asInstanceOf[String],
     playmode = ad("playmode").asInstanceOf[SpringfieldPlayMode],
-    timestamp = ad("timestamp").asInstanceOf[DateTime],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
   implicit val SetSpringfieldPayloadType: ObjectType[DataContext, SetSpringfieldPayload] = deriveObjectType[DataContext, SetSpringfieldPayload]()
 
@@ -138,7 +138,7 @@ trait GraphQLMutationType {
     clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
     depositId = ad("depositId").asInstanceOf[DepositId],
     value = ad("value").asInstanceOf[ContentTypeValue],
-    timestamp = ad("timestamp").asInstanceOf[DateTime],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
   implicit val SetContentTypePayloadType: ObjectType[DataContext, SetContentTypePayload] = deriveObjectType[DataContext, SetContentTypePayload]()
 

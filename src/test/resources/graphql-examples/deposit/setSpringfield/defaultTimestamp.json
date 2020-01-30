@@ -1,0 +1,15 @@
+{
+  "data": {
+    "setSpringfield": {
+      "clientMutationId": "my-mutation-id",
+      "springfield": {
+        "id": "U3ByaW5nZmllbGQ6Mw==",
+        "domain": "domain2",
+        "collection": "collection2",
+        "user": "user2",
+        "playmode": "MENU",
+        "timestamp": "2020-02-02T20:20:02.000Z"
+      }
+    }
+  }
+}

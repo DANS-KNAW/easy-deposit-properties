@@ -1,0 +1,16 @@
+{
+  "data": {
+    "setCuration": {
+      "clientMutationId": "my-mutation-id",
+      "curation": {
+        "id": "Q3VyYXRpb246MTA=",
+        "datamanagerUserId": "archie003",
+        "datamanagerEmail": "does.not.exists3@dans.knaw.nl",
+        "isNewVersion": true,
+        "curationRequired": true,
+        "curationPerformed": false,
+        "timestamp": "2020-02-02T20:20:02.000Z"
+      }
+    }
+  }
+}

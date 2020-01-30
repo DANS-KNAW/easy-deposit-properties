@@ -22,8 +22,10 @@ input AddDepositInput {
   """The name of the deposited bag."""
   bagName: String
 
-  """The timestamp at which this deposit was created."""
-  creationTimestamp: DateTime!
+  """
+  The timestamp at which this deposit was created. If not provided, the current date/timestamp is used instead.
+  """
+  creationTimestamp: DateTime
 
   """The depositor that submits this deposit."""
   depositorId: String!
@@ -49,8 +51,11 @@ input AddIdentifierInput {
   """The value of the identifier."""
   value: String!
 
-  """The timestamp at which the identifier got added to this deposit."""
-  timestamp: DateTime!
+  """
+  The timestamp at which the identifier got added to this deposit. If not
+  provided, the current date/timestamp is used instead.
+  """
+  timestamp: DateTime
 }
 
 type AddIdentifierPayload {
@@ -839,18 +844,18 @@ input DepositOrder {
   direction: OrderDirection!
 }
 
-"""Properties by which deposits can be ordered"""
+"""Properties by which deposits can be ordered."""
 enum DepositOrderField {
-  """Order deposits by origin"""
+  """Order deposits by origin."""
   ORIGIN
 
-  """Order deposits by creation timestamp"""
+  """Order deposits by creation timestamp."""
   CREATION_TIMESTAMP
 
-  """Order deposits by bag name"""
+  """Order deposits by bag name."""
   BAG_NAME
 
-  """Order deposits by depositId"""
+  """Order deposits by depositId."""
   DEPOSIT_ID
 }
 
@@ -1121,10 +1126,10 @@ interface Node {
 Possible directions in which to order a list of items when provided an orderBy argument
 """
 enum OrderDirection {
-  """Specifies a descending order for a given orderBy argument"""
+  """Specifies a descending order for a given orderBy argument."""
   DESC
 
-  """Specifies an ascending order for a given orderBy argumen."""
+  """Specifies an ascending order for a given orderBy argument."""
   ASC
 }
 
@@ -1342,9 +1347,10 @@ input SetContentTypeInput {
   value: ContentTypeValue!
 
   """
-  The timestamp at which this springfield configuration was associated with the deposit.
+  The timestamp at which this springfield configuration was associated with the
+  deposit. If not provided, the current date/timestamp is used instead.
   """
-  timestamp: DateTime!
+  timestamp: DateTime
 }
 
 type SetContentTypePayload {
@@ -1374,9 +1380,10 @@ input SetCurationInput {
   isCurationPerformed: Boolean!
 
   """
-  The timestamp at which the curation event was assigned to this deposit.
+  The timestamp at which the curation event was assigned to this deposit. If not
+  provided, the current date/timestamp is used instead.
   """
-  timestamp: DateTime!
+  timestamp: DateTime
 }
 
 type SetCurationPayload {
@@ -1395,8 +1402,10 @@ input SetDoiActionInput {
   """
   value: DoiAction!
 
-  """The timestamp at which this value was added."""
-  timestamp: DateTime!
+  """
+  The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.
+  """
+  timestamp: DateTime
 }
 
 type SetDoiActionPayload {
@@ -1413,8 +1422,10 @@ input SetDoiRegisteredInput {
   """Whether the DOI is registered in DataCite."""
   value: Boolean!
 
-  """The timestamp at which the DOI was registered in DataCite."""
-  timestamp: DateTime!
+  """
+  The timestamp at which the DOI was registered in DataCite. If not provided, the current date/timestamp is used instead.
+  """
+  timestamp: DateTime
 }
 
 type SetDoiRegisteredPayload {
@@ -1441,9 +1452,10 @@ input SetSpringfieldInput {
   playmode: SpringfieldPlayMode!
 
   """
-  The timestamp at which this springfield configuration was associated with the deposit.
+  The timestamp at which this springfield configuration was associated with the
+  deposit. If not provided, the current date/timestamp is used instead.
   """
-  timestamp: DateTime!
+  timestamp: DateTime
 }
 
 type SetSpringfieldPayload {
@@ -1638,8 +1650,10 @@ input UpdateIngestStepInput {
   """The label of the ingest step."""
   step: IngestStepLabel!
 
-  """The timestamp at which the deposit got into this ingest step."""
-  timestamp: DateTime!
+  """
+  The timestamp at which the deposit got into this ingest step. If not provided, the current date/timestamp is used instead.
+  """
+  timestamp: DateTime
 }
 
 type UpdateIngestStepPayload {
@@ -1659,8 +1673,10 @@ input UpdateStateInput {
   """Additional information about the state."""
   description: String!
 
-  """The timestamp at which the deposit got into this state."""
-  timestamp: DateTime!
+  """
+  The timestamp at which the deposit got into this state. If not provided, the current date/timestamp is used instead.
+  """
+  timestamp: DateTime
 }
 
 type UpdateStatePayload {

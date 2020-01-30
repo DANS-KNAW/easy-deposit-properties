@@ -1,0 +1,17 @@
+mutation {
+    updateState(input: {
+        clientMutationId: "my-mutation-id",
+        depositId: "00000000-0000-0000-0000-000000000004",
+        label: UPLOADED,
+        description: "deposit is ready for finalising",
+#        timestamp uses default
+    }) {
+        clientMutationId
+        state {
+            id
+            label
+            description
+            timestamp
+        }
+    }
+}

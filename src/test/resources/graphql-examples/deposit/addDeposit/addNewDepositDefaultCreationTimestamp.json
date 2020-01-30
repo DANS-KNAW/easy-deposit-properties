@@ -1,0 +1,18 @@
+{
+  "data": {
+    "addDeposit": {
+      "clientMutationId": "my-mutation-id",
+      "deposit": {
+        "id": "RGVwb3NpdDowMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDY=",
+        "depositId": "00000000-0000-0000-0000-000000000006",
+        "bagName": "bag6",
+        "origin": "SWORD2",
+        "creationTimestamp": "2020-02-02T20:20:02.000Z",
+        "depositor": {
+          "depositorId": "archie001"
+        },
+        "state": null
+      }
+    }
+  }
+}

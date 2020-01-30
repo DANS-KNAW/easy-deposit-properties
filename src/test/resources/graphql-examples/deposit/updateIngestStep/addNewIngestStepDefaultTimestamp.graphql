@@ -1,0 +1,15 @@
+mutation {
+    updateIngestStep(input: {
+        clientMutationId: "my-mutation-id",
+        depositId: "00000000-0000-0000-0000-000000000004",
+        step: VALIDATE,
+#        timestamp uses default
+    }) {
+        clientMutationId
+        ingestStep {
+            id
+            step
+            timestamp
+        }
+    }
+}

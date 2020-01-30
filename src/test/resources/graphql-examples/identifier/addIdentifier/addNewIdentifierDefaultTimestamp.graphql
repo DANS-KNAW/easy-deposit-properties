@@ -1,0 +1,17 @@
+mutation {
+    addIdentifier(input: {
+        clientMutationId: "my-mutation-id",
+        depositId: "00000000-0000-0000-0000-000000000003",
+        type: DOI,
+        value: "abcdef",
+#        timestamp uses default
+    }) {
+        clientMutationId
+        identifier {
+            id
+            type
+            value
+            timestamp
+        }
+    }
+}

@@ -1,0 +1,14 @@
+mutation {
+    setDoiRegistered(input: {
+        clientMutationId: "my-mutation-id",
+        depositId: "00000000-0000-0000-0000-000000000004",
+        value: true,
+#        timestamp uses default
+    }) {
+        clientMutationId
+        doiRegistered {
+            value
+            timestamp
+        }
+    }
+}

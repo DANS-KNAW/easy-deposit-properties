@@ -32,14 +32,14 @@ import nl.knaw.dans.easy.properties.app.model.springfield.SpringfieldPlayMode.Sp
 import nl.knaw.dans.easy.properties.app.model.state.InputState
 import nl.knaw.dans.easy.properties.app.model.state.StateLabel.StateLabel
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiActionEvent, DoiRegisteredEvent }
-import org.joda.time.DateTime
+import org.joda.time.{ DateTime, DateTimeZone }
 import sangria.macros.derive.{ GraphQLDescription, GraphQLField, GraphQLFieldTags, GraphQLName }
 import sangria.schema.{ Action, Context, DeferredValue }
 
 case class AddDepositInput(clientMutationId: Option[String],
                            @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
                            @GraphQLDescription("The name of the deposited bag.") bagName: Option[String],
-                           @GraphQLDescription("The timestamp at which this deposit was created.") creationTimestamp: DateTime,
+                           @GraphQLDescription("The timestamp at which this deposit was created. If not provided, the current date/timestamp is used instead.") creationTimestamp: Option[DateTime],
                            @GraphQLDescription("The depositor that submits this deposit.") depositorId: String,
                            @GraphQLDescription("The origin of the deposited bag.") origin: Origin,
                           )
@@ -51,28 +51,28 @@ case class UpdateStateInput(clientMutationId: Option[String],
                             @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
                             @GraphQLDescription("The state label of the deposit.") label: StateLabel,
                             @GraphQLDescription("Additional information about the state.") description: String,
-                            @GraphQLDescription("The timestamp at which the deposit got into this state.") timestamp: DateTime,
+                            @GraphQLDescription("The timestamp at which the deposit got into this state. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                            )
 case class UpdateIngestStepInput(clientMutationId: Option[String],
                                  @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
                                  @GraphQLDescription("The label of the ingest step.") step: IngestStepLabel,
-                                 @GraphQLDescription("The timestamp at which the deposit got into this ingest step.") timestamp: DateTime,
+                                 @GraphQLDescription("The timestamp at which the deposit got into this ingest step. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                                 )
 case class AddIdentifierInput(clientMutationId: Option[String],
                               @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
                               @GraphQLName("type") @GraphQLDescription("The type of identifier.") idType: IdentifierType,
                               @GraphQLName("value") @GraphQLDescription("The value of the identifier.") idValue: String,
-                              @GraphQLDescription("The timestamp at which the identifier got added to this deposit.") timestamp: DateTime,
+                              @GraphQLDescription("The timestamp at which the identifier got added to this deposit. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                              )
 case class SetDoiRegisteredInput(clientMutationId: Option[String],
                                  @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
                                  @GraphQLDescription("Whether the DOI is registered in DataCite.") value: Boolean,
-                                 @GraphQLDescription("The timestamp at which the DOI was registered in DataCite.") timestamp: DateTime,
+                                 @GraphQLDescription("The timestamp at which the DOI was registered in DataCite. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                                 )
 case class SetDoiActionInput(clientMutationId: Option[String],
                              @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
                              @GraphQLDescription("Whether the DOI must be 'created' or 'updated' when registering in DataCite.") value: DoiAction,
-                             @GraphQLDescription("The timestamp at which this value was added.") timestamp: DateTime,
+                             @GraphQLDescription("The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                             )
 case class SetCurationInput(clientMutationId: Option[String],
                             @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
@@ -81,7 +81,7 @@ case class SetCurationInput(clientMutationId: Option[String],
                             @GraphQLDescription("True if the deposit is a new version.") isNewVersion: Option[Boolean],
                             @GraphQLDescription("True if curation by a data manager is required.") isCurationRequired: Boolean,
                             @GraphQLDescription("True if curation by the data manager has been performed.") isCurationPerformed: Boolean,
-                            @GraphQLDescription("The timestamp at which the curation event was assigned to this deposit.") timestamp: DateTime,
+                            @GraphQLDescription("The timestamp at which the curation event was assigned to this deposit. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                            )
 case class SetSpringfieldInput(clientMutationId: Option[String],
                                @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
@@ -89,12 +89,12 @@ case class SetSpringfieldInput(clientMutationId: Option[String],
                                @GraphQLDescription("The user of Springfield.") user: String,
                                @GraphQLDescription("The collection of Springfield.") collection: String,
                                @GraphQLDescription("The playmode used in Springfield.") playmode: SpringfieldPlayMode,
-                               @GraphQLDescription("The timestamp at which this springfield configuration was associated with the deposit.") timestamp: DateTime,
+                               @GraphQLDescription("The timestamp at which this springfield configuration was associated with the deposit. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                               )
 case class SetContentTypeInput(clientMutationId: Option[String],
                                @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
                                @GraphQLDescription("The content type associated with this deposit.") value: ContentTypeValue,
-                               @GraphQLDescription("The timestamp at which this springfield configuration was associated with the deposit.") timestamp: DateTime,
+                               @GraphQLDescription("The timestamp at which this springfield configuration was associated with the deposit. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                               )
 case class RegisterDepositInput(clientMutationId: Option[String],
                                 @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
@@ -217,6 +217,8 @@ case class DeleteDepositsPayload(@GraphQLField clientMutationId: Option[String],
 @GraphQLDescription("The root query for implementing GraphQL mutations.")
 class Mutation {
 
+  private def now(): DateTime = DateTime.now(DateTimeZone.UTC)
+
   @GraphQLField
   @GraphQLDescription("Register a new deposit with 'id', 'creationTimestamp', 'depositId' and 'origin'.")
   @GraphQLFieldTags(RequiresAuthentication)
@@ -225,7 +227,7 @@ class Mutation {
       .store(Deposit(
         id = input.depositId,
         bagName = input.bagName,
-        creationTimestamp = input.creationTimestamp,
+        creationTimestamp = input.creationTimestamp getOrElse now(),
         depositorId = input.depositorId,
         origin = input.origin,
       ))
@@ -259,7 +261,7 @@ class Mutation {
         state = InputState(
           label = input.label,
           description = input.description,
-          timestamp = input.timestamp,
+          timestamp = input.timestamp getOrElse now(),
         ),
       )
       .map(state => new UpdateStatePayload(
@@ -278,7 +280,7 @@ class Mutation {
         id = input.depositId,
         step = InputIngestStep(
           step = input.step,
-          timestamp = input.timestamp,
+          timestamp = input.timestamp getOrElse now(),
         ),
       )
       .map(ingestStep => new UpdateIngestStepPayload(
@@ -298,7 +300,7 @@ class Mutation {
         identifier = InputIdentifier(
           idType = input.idType,
           idValue = input.idValue,
-          timestamp = input.timestamp,
+          timestamp = input.timestamp getOrElse now(),
         ),
       )
       .map(identifier => new AddIdentifierPayload(
@@ -317,7 +319,7 @@ class Mutation {
         id = input.depositId,
         registered = DoiRegisteredEvent(
           value = input.value,
-          timestamp = input.timestamp,
+          timestamp = input.timestamp getOrElse now(),
         ),
       )
       .map(doiRegisteredEvent => new SetDoiRegisteredPayload(
@@ -336,7 +338,7 @@ class Mutation {
         id = input.depositId,
         action = DoiActionEvent(
           value = input.value,
-          timestamp = input.timestamp,
+          timestamp = input.timestamp getOrElse now(),
         ),
       )
       .map(doiActionEvent => new SetDoiActionPayload(
@@ -359,7 +361,7 @@ class Mutation {
           isPerformed = input.isCurationPerformed,
           datamanagerUserId = input.datamanagerUserId,
           datamanagerEmail = input.datamanagerEmail,
-          timestamp = input.timestamp,
+          timestamp = input.timestamp getOrElse now(),
         ),
       )
       .map(curation => new SetCurationPayload(
@@ -381,7 +383,7 @@ class Mutation {
           user = input.user,
           collection = input.collection,
           playmode = input.playmode,
-          timestamp = input.timestamp,
+          timestamp = input.timestamp getOrElse now(),
         ),
       )
       .map(springfield => new SetSpringfieldPayload(
@@ -400,7 +402,7 @@ class Mutation {
         id = input.depositId,
         contentType = InputContentType(
           value = input.value,
-          timestamp = input.timestamp,
+          timestamp = input.timestamp getOrElse now(),
         ),
       )
       .map(contentType => new SetContentTypePayload(

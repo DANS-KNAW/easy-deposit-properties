@@ -17,7 +17,7 @@ package nl.knaw.dans.easy.properties.server
 
 import better.files.File
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
-import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
+import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, FixedCurrentDateTimeSupport, TestSupportFixture }
 import org.json4s.JsonAST.JNull
 import org.json4s.JsonDSL._
 import org.json4s.ext.UUIDSerializer
@@ -33,6 +33,7 @@ import scala.concurrent.duration._
 import scala.language.postfixOps
 
 class GraphQLExamplesSpec extends TestSupportFixture
+  with FixedCurrentDateTimeSupport
   with FileSystemSupport
   with DatabaseFixture
   with DatabaseDataFixture
