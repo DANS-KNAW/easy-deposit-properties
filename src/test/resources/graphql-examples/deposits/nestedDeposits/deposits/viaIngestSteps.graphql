@@ -1,13 +1,13 @@
 query {
-    deposits {
+    deposits(first: 10) {
         edges {
             node {
                 depositId
-                ingestSteps {
+                ingestSteps(first: 10) {
                     edges {
                         node {
                             id
-                            deposits {
+                            deposits(first: 10) {
                                 edges {
                                     node {
                                         depositId

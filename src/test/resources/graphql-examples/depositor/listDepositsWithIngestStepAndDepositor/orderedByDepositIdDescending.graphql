@@ -1,6 +1,6 @@
 query ListDepositsWithIngestStepAndDepositor {
     depositor(id: "user001") {
-        deposits(ingestStep: {label: COMPLETED}, orderBy: {field: DEPOSIT_ID, direction: DESC}) {
+        deposits(first: 10, ingestStep: {label: COMPLETED}, orderBy: {field: DEPOSIT_ID, direction: DESC}) {
             edges {
                 node {
                     depositId

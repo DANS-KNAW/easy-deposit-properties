@@ -1,6 +1,6 @@
 query ListAllStatesOfDeposit {
     deposit(id: "00000000-0000-0000-0000-000000000001") {
-        ingestSteps(orderBy: {field: STEP, direction: DESC}) {
+        ingestSteps(first: 10, orderBy: {field: STEP, direction: DESC}) {
             edges {
                 node {
                     id

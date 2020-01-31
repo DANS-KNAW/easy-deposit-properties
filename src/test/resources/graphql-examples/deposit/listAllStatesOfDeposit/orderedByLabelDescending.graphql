@@ -1,6 +1,6 @@
 query ListAllStatesOfDeposit {
     deposit(id: "00000000-0000-0000-0000-000000000001") {
-        states(orderBy: {field: LABEL, direction: DESC}) {
+        states(first: 10, orderBy: {field: LABEL, direction: DESC}) {
             edges {
                 node {
                     id

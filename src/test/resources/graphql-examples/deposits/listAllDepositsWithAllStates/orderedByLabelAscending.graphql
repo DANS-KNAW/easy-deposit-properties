@@ -1,9 +1,9 @@
 query {
-    deposits(orderBy: {field: DEPOSIT_ID, direction: ASC}) {
+    deposits(first: 10, orderBy: {field: DEPOSIT_ID, direction: ASC}) {
         edges {
             node {
                 depositId
-                states(orderBy: {field: LABEL, direction: ASC}) {
+                states(first: 10, orderBy: {field: LABEL, direction: ASC}) {
                     edges {
                         node {
                             label

@@ -2,7 +2,7 @@ query {
     deposit(id: "00000000-0000-0000-0000-000000000001") {
         curator {
             userId
-            deposits(curatorFilter: ALL) {
+            deposits(first: 10, curatorFilter: ALL) {
                 edges {
                     node {
                         depositId

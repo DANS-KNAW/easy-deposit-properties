@@ -16,7 +16,7 @@ mutation RegisterDepositAlreadyExists {
                 depositorId
             }
             origin
-            states {
+            states(first: 10) {
                 edges {
                     node {
                         label
@@ -25,7 +25,7 @@ mutation RegisterDepositAlreadyExists {
                     }
                 }
             }
-            ingestSteps {
+            ingestSteps(first: 10) {
                 edges {
                     node {
                         step
@@ -48,7 +48,7 @@ mutation RegisterDepositAlreadyExists {
                 value
                 timestamp
             }
-            curators {
+            curators(first: 10) {
                 edges {
                     node {
                         userId

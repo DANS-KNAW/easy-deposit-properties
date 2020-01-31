@@ -8,7 +8,7 @@ query {
             deposit {
                 depositId
             }
-            deposits(stateFilter: ALL) {
+            deposits(first: 10, stateFilter: ALL) {
                 edges {
                     node {
                         id

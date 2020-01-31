@@ -1,5 +1,5 @@
 query {
-    deposits(curationPerformed: {value: true, filter: LATEST}, orderBy: {field: CREATION_TIMESTAMP, direction: DESC}) {
+    deposits(first: 10, curationPerformed: {value: true, filter: LATEST}, orderBy: {field: CREATION_TIMESTAMP, direction: DESC}) {
         edges {
             node {
                 depositId

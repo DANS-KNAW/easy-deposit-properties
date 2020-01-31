@@ -1,6 +1,6 @@
 query {
     depositor(id: "user001") {
-        deposits(contentType: {value: ZIP}) {
+        deposits(first: 10, contentType: {value: ZIP}) {
             edges {
                 node {
                     depositId

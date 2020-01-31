@@ -1,5 +1,5 @@
 query ListAllDeposits {
-    deposits {
+    deposits(first: 10) {
         edges {
             node {
                 depositId
@@ -40,7 +40,7 @@ query ListAllDeposits {
                     email
                     timestamp
                 }
-                curators {
+                curators(first: 10) {
                     edges {
                         node {
                             userId

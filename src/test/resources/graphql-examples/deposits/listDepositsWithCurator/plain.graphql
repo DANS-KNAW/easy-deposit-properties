@@ -1,5 +1,5 @@
 query {
-    deposits(curator: {userId: "archie001", filter: LATEST}) {
+    deposits(first: 10, curator: {userId: "archie001", filter: LATEST}) {
         edges {
             node {
                 depositId

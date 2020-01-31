@@ -1,11 +1,11 @@
 query {
-    deposits {
+    deposits(first: 10) {
         edges {
             node {
                 depositId
                 state {
                     id
-                    deposits {
+                    deposits(first: 10) {
                         edges {
                             node {
                                 depositId

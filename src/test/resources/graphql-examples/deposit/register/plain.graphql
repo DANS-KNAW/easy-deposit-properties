@@ -35,7 +35,7 @@ mutation RegisterDeposit {
                 depositorId
             }
             origin
-            states {
+            states(first: 10) {
                 edges {
                     node {
                         label
@@ -44,7 +44,7 @@ mutation RegisterDeposit {
                     }
                 }
             }
-            ingestSteps {
+            ingestSteps(first: 10) {
                 edges {
                     node {
                         step
@@ -67,7 +67,7 @@ mutation RegisterDeposit {
                 value
                 timestamp
             }
-            curators {
+            curators(first: 10) {
                 edges {
                     node {
                         userId

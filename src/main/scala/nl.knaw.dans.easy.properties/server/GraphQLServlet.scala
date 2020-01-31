@@ -22,6 +22,7 @@ import nl.knaw.dans.easy.properties.app.database.DatabaseAccess
 import nl.knaw.dans.easy.properties.app.graphql.GraphQLSchema
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.app.graphql.middleware.{ Middlewares, ProfilingConfiguration }
+import nl.knaw.dans.easy.properties.app.graphql.relay.RelayValidation
 import nl.knaw.dans.easy.properties.app.repository.Repository
 import nl.knaw.dans.easy.properties.app.repository.sql.SQLDataContext
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
@@ -37,6 +38,7 @@ import sangria.ast.Document
 import sangria.execution._
 import sangria.marshalling.json4s.native._
 import sangria.parser.{ DeliveryScheme, ParserConfig, QueryParser, SyntaxError }
+import sangria.validation.QueryValidator
 
 import scala.concurrent.duration.FiniteDuration
 import scala.concurrent.{ ExecutionContext, Future }
@@ -109,21 +111,22 @@ class GraphQLServlet(database: DatabaseAccess,
         deferredResolver = GraphQLSchema.deferredResolver,
         exceptionHandler = defaultExceptionHandler,
         middleware = middlewares.values,
+        queryValidator = QueryValidator.ruleBased(QueryValidator.allRules ::: RelayValidation.allRules),
       )
         .map(Serialization.writePretty(_))
         .map(Ok(_))
         .recover {
-          case error: QueryAnalysisError => BadRequest(Serialization.write(error.resolveError))
-          case error: ErrorWithResolver => InternalServerError(Serialization.write(error.resolveError))
+          case error: QueryAnalysisError => BadRequest(Serialization.writePretty(error.resolveError))
+          case error: ErrorWithResolver => InternalServerError(Serialization.writePretty(error.resolveError))
         }
     })
       .recover {
-        case error => InternalServerError(Serialization.write(error.getMessage))
+        case error => InternalServerError(Serialization.writePretty(error.getMessage))
       }
   }
 
   private def syntaxError(error: SyntaxError): String = {
-    Serialization.write {
+    Serialization.writePretty {
       ("syntaxError" -> error.getMessage) ~
         ("locations" -> List(
           ("line" -> error.originalError.position.line) ~

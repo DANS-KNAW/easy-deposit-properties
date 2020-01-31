@@ -1,6 +1,6 @@
 query {
     depositor(id: "user001") {
-        deposits(doiAction: {value: CREATE, filter: LATEST}, orderBy: {field: CREATION_TIMESTAMP, direction: DESC}) {
+        deposits(first: 10, doiAction: {value: CREATE, filter: LATEST}, orderBy: {field: CREATION_TIMESTAMP, direction: DESC}) {
             edges {
                 node {
                     depositId

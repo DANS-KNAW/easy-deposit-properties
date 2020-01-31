@@ -1,0 +1,14 @@
+{
+  "data": null,
+  "errors": [
+    {
+      "message": "Passing both `first` and `last` to paginate the `states` connection is not supported. (line 3, column 9):\n        states(first: 10, last: 10) { # too much pagination\n        ^",
+      "locations": [
+        {
+          "line": 3,
+          "column": 9
+        }
+      ]
+    }
+  ]
+}

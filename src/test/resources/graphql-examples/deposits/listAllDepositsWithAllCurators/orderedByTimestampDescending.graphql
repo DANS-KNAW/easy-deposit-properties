@@ -1,9 +1,9 @@
 query {
-    deposits(orderBy: {field: DEPOSIT_ID, direction: ASC}) {
+    deposits(first: 10, orderBy: {field: DEPOSIT_ID, direction: ASC}) {
         edges {
             node {
                 depositId
-                curators(orderBy: {field: TIMESTAMP, direction: DESC}) {
+                curators(first: 10, orderBy: {field: TIMESTAMP, direction: DESC}) {
                     edges {
                         node {
                             userId

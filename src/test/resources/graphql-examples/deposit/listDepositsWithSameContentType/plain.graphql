@@ -2,7 +2,7 @@ query {
     deposit(id: "00000000-0000-0000-0000-000000000002") {
         contentType {
             value
-            deposits {
+            deposits(first: 10) {
                 edges {
                     node {
                         depositId

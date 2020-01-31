@@ -2,7 +2,7 @@ query ListDepositsWithSameDepositor {
     deposit(id: "00000000-0000-0000-0000-000000000001") {
         depositor {
             depositorId
-            deposits(orderBy: {field: CREATION_TIMESTAMP, direction: ASC}) {
+            deposits(first: 10, orderBy: {field: CREATION_TIMESTAMP, direction: ASC}) {
                 edges {
                     node {
                         depositId

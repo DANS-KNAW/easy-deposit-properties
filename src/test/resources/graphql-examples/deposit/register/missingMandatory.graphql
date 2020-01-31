@@ -14,7 +14,7 @@ mutation RegisterMinimal {
                 depositorId
             }
             origin
-            states {
+            states(first: 10) {
                 edges {
                     node {
                         label
@@ -23,7 +23,7 @@ mutation RegisterMinimal {
                     }
                 }
             }
-            ingestSteps {
+            ingestSteps(first: 10) {
                 edges {
                     node {
                         step
@@ -46,7 +46,7 @@ mutation RegisterMinimal {
                 value
                 timestamp
             }
-            curators {
+            curators(first: 10) {
                 edges {
                     node {
                         userId

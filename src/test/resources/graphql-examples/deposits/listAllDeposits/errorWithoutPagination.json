@@ -1,0 +1,14 @@
+{
+  "data": null,
+  "errors": [
+    {
+      "message": "You must provide a `first` or `last` value to properly paginate the `deposits` connection. (line 2, column 5):\n    deposits { # no pagination\n    ^",
+      "locations": [
+        {
+          "line": 2,
+          "column": 5
+        }
+      ]
+    }
+  ]
+}

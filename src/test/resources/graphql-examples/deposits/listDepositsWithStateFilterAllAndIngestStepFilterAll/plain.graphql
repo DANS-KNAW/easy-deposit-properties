@@ -1,5 +1,5 @@
 query ListDepositsWithState {
-    deposits(state: {label: REJECTED, filter: ALL}, ingestStep: {label: VALIDATE, filter: ALL}) {
+    deposits(first: 10, state: {label: REJECTED, filter: ALL}, ingestStep: {label: VALIDATE, filter: ALL}) {
         edges {
             node {
                 depositId

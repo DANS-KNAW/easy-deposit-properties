@@ -1,6 +1,6 @@
 query ListDepositsFromDepositor {
     depositor(id: "user002") {
-        deposits(orderBy: {field: DEPOSIT_ID, direction: ASC}) {
+        deposits(first: 10, orderBy: {field: DEPOSIT_ID, direction: ASC}) {
             edges {
                 node {
                     depositId

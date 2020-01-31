@@ -1,5 +1,5 @@
 query {
-    deposits(bagName: "bag3") {
+    deposits(first: 10, bagName: "bag3") {
         edges {
             node {
                 depositId

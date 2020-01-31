@@ -1,5 +1,5 @@
 query ListAllDepositsOrderedByBagNameAscending {
-    deposits(orderBy: {field: BAG_NAME, direction: ASC}) {
+    deposits(first: 10, orderBy: {field: BAG_NAME, direction: ASC}) {
         edges {
             node {
                 depositId
@@ -40,7 +40,7 @@ query ListAllDepositsOrderedByBagNameAscending {
                     email
                     timestamp
                 }
-                curators {
+                curators(first: 10) {
                     edges {
                         node {
                             userId

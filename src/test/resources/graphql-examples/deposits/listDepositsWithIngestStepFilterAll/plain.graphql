@@ -1,5 +1,5 @@
 query ListDepositsWithState {
-    deposits(ingestStep: {label: VALIDATE, filter: ALL}) {
+    deposits(first: 10, ingestStep: {label: VALIDATE, filter: ALL}) {
         edges {
             node {
                 depositId

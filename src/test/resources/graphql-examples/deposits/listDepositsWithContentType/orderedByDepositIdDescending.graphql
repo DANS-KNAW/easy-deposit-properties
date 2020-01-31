@@ -1,5 +1,5 @@
 query {
-    deposits(contentType: {value: ZIP, filter: LATEST}, orderBy: {field: DEPOSIT_ID, direction: DESC}) {
+    deposits(first: 10, contentType: {value: ZIP, filter: LATEST}, orderBy: {field: DEPOSIT_ID, direction: DESC}) {
         edges {
             node {
                 depositId

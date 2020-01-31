@@ -1,0 +1,92 @@
+query ListAllDeposits {
+    deposits(first: 10, last: 10) { # too much pagination
+        edges {
+            node {
+                depositId
+                depositor {
+                    depositorId
+                }
+                bagName
+                origin
+                creationTimestamp
+                lastModified
+                state {
+                    label
+                    description
+                    timestamp
+                }
+                ingestStep {
+                    step
+                    timestamp
+                }
+                identifiers {
+                    id
+                    type
+                    value
+                    timestamp
+                }
+                doiRegistered
+                doiRegisteredEvents {
+                    value
+                    timestamp
+                }
+                doiAction
+                doiActionEvents {
+                    value
+                    timestamp
+                }
+                curator {
+                    userId
+                    email
+                    timestamp
+                }
+                curators(first: 10) {
+                    edges {
+                        node {
+                            userId
+                            email
+                            timestamp
+                        }
+                    }
+                }
+                isNewVersion
+                isNewVersionEvents {
+                    value
+                    timestamp
+                }
+                curationRequired
+                curationRequiredEvents {
+                    value
+                    timestamp
+                }
+                curationPerformed
+                curationPerformedEvents {
+                    value
+                    timestamp
+                }
+                springfield {
+                    domain
+                    user
+                    collection
+                    playmode
+                    timestamp
+                }
+                springfields {
+                    domain
+                    user
+                    collection
+                    playmode
+                    timestamp
+                }
+                contentType {
+                    value
+                    timestamp
+                }
+                contentTypes {
+                    value
+                    timestamp
+                }
+            }
+        }
+    }
+}

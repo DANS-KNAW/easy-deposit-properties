@@ -1,6 +1,6 @@
 query ListDepositsWithStateAndDepositor {
     depositor(id: "user001") {
-        deposits(state: {label: ARCHIVED}, orderBy: {field: CREATION_TIMESTAMP, direction: DESC}) {
+        deposits(first: 10, state: {label: ARCHIVED}, orderBy: {field: CREATION_TIMESTAMP, direction: DESC}) {
             edges {
                 node {
                     creationTimestamp

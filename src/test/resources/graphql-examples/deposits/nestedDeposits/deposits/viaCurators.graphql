@@ -1,13 +1,13 @@
 query {
-    deposits {
+    deposits(first: 10) {
         edges {
             node {
                 depositId
-                curators {
+                curators(first: 10) {
                     edges {
                         node {
                             id
-                            deposits {
+                            deposits(first: 10) {
                                 edges {
                                     node {
                                         depositId

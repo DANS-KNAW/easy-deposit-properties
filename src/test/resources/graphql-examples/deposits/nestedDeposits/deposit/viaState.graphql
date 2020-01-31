@@ -1,5 +1,5 @@
 query {
-    deposits {
+    deposits(first: 10) {
         edges {
             node {
                 depositId

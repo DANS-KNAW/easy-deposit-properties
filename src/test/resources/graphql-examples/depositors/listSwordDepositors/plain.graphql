@@ -1,5 +1,5 @@
 query {
-    depositors(origin: SWORD2) {
+    depositors(first: 10, origin: SWORD2) {
         edges {
             node {
                 depositorId

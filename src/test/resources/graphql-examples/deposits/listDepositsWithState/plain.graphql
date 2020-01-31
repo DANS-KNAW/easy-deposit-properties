@@ -1,5 +1,5 @@
 query ListDepositsWithState {
-    deposits(state: {label: ARCHIVED, filter: LATEST}) {
+    deposits(first: 10, state: {label: ARCHIVED, filter: LATEST}) {
         edges {
             node {
                 depositId

@@ -1,0 +1,14 @@
+{
+  "data": null,
+  "errors": [
+    {
+      "message": "You must provide a `first` or `last` value to properly paginate the `states` connection. (line 3, column 9):\n        states { # no pagination\n        ^",
+      "locations": [
+        {
+          "line": 3,
+          "column": 9
+        }
+      ]
+    }
+  ]
+}

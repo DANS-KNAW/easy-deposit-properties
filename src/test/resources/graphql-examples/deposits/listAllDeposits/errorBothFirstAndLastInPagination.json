@@ -1,0 +1,14 @@
+{
+  "data": null,
+  "errors": [
+    {
+      "message": "Passing both `first` and `last` to paginate the `deposits` connection is not supported. (line 2, column 5):\n    deposits(first: 10, last: 10) { # too much pagination\n    ^",
+      "locations": [
+        {
+          "line": 2,
+          "column": 5
+        }
+      ]
+    }
+  ]
+}

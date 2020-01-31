@@ -1,6 +1,6 @@
 query {
     depositor(id: "user001") {
-        deposits(curationRequired: {value: true, filter: LATEST}) {
+        deposits(first: 10, curationRequired: {value: true, filter: LATEST}) {
             edges {
                 node {
                     depositId

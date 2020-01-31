@@ -7,7 +7,7 @@ query {
             deposit {
                 depositId
             }
-            deposits(curatorFilter: ALL, orderBy: {field: DEPOSIT_ID, direction: ASC}) {
+            deposits(first: 10, curatorFilter: ALL, orderBy: {field: DEPOSIT_ID, direction: ASC}) {
                 edges {
                     node {
                         depositId

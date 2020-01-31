@@ -2,7 +2,7 @@ query ListDepositsWithSameState {
     deposit(id: "00000000-0000-0000-0000-000000000001") {
         ingestStep {
             step
-            deposits(ingestStepFilter: ALL) {
+            deposits(first: 10, ingestStepFilter: ALL) {
                 edges {
                     node {
                         depositId

@@ -1,5 +1,5 @@
 query {
-    deposits(isNewVersion: {value: false, filter: LATEST}) {
+    deposits(first: 10, isNewVersion: {value: false, filter: LATEST}) {
         edges {
             node {
                 depositId

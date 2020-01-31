@@ -6,7 +6,7 @@ query {
             deposit {
                 depositId
             }
-            deposits(ingestStepFilter: ALL, orderBy: {field: DEPOSIT_ID, direction: ASC}) {
+            deposits(first: 10, ingestStepFilter: ALL, orderBy: {field: DEPOSIT_ID, direction: ASC}) {
                 edges {
                     node {
                         depositId

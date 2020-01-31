@@ -1,37 +1,37 @@
 query {
-    deposits {
+    deposits(first: 10) {
         edges {
             node {
                 depositId
-                states {
+                states(first: 10) {
                     edges {
                         node {
                             label
-                            deposits {
+                            deposits(first: 10) {
                                 edges {
                                     node {
                                         depositId
-                                        states {
+                                        states(first: 10) {
                                             edges {
                                                 node {
                                                     label
-                                                    deposits {
+                                                    deposits(first: 10) {
                                                         edges {
                                                             node {
                                                                 depositId
-                                                                states {
+                                                                states(first: 10) {
                                                                     edges {
                                                                         node {
                                                                             label
-                                                                            deposits {
+                                                                            deposits(first: 10) {
                                                                                 edges {
                                                                                     node {
                                                                                         depositId
-                                                                                        states {
+                                                                                        states(first: 10) {
                                                                                             edges {
                                                                                                 node {
                                                                                                     label
-                                                                                                    deposits {
+                                                                                                    deposits(first: 10) {
                                                                                                         edges {
                                                                                                             node {
                                                                                                                 depositId

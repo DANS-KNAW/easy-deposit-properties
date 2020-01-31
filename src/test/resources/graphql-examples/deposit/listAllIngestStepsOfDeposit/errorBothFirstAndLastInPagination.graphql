@@ -1,0 +1,14 @@
+query ListAllStatesOfDeposit {
+    deposit(id: "00000000-0000-0000-0000-000000000001") {
+        ingestSteps(first: 10, last: 10) { # too much pagination
+            edges {
+                node {
+                    id
+                    step
+                    timestamp
+                }
+            }
+        }
+    }
+}
+

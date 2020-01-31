@@ -17,7 +17,7 @@ package nl.knaw.dans.easy.properties.server
 
 import better.files.File
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
-import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, FixedCurrentDateTimeSupport, TestSupportFixture }
+import nl.knaw.dans.easy.properties.fixture._
 import org.json4s.JsonAST.JNull
 import org.json4s.JsonDSL._
 import org.json4s.ext.UUIDSerializer
@@ -74,7 +74,10 @@ class GraphQLExamplesSpec extends TestSupportFixture
 
         post(uri = "/", body = inputBody.getBytes, headers = Seq(authHeader)) {
           body shouldBe expectedOutput
-          status shouldBe 200
+          if (graphQLExample.name startsWith "error")
+            status shouldBe 400
+          else
+            status shouldBe 200
         }
       }
     }
