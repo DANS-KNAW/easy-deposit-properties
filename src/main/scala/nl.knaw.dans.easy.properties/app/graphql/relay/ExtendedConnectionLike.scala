@@ -21,7 +21,7 @@ import scala.annotation.implicitNotFound
 import scala.language.higherKinds
 
 @implicitNotFound("Type ${T} can't be used as a ExtendedConnection. Please consider defining implicit instance of nl.dans.knaw.easy.properties.app.relay.ExtendedConnectionLike for type ${T} or extending nl.dans.knaw.easy.properties.app.relay.ExtendedConnection trait.")
-private[relay] trait ExtendedConnectionLike[T[_], Val, E <: Edge[Val]] extends ConnectionLike[T, Val, E] {
+private[relay] trait ExtendedConnectionLike[T[_], Val, E <: Edge[Val]] extends ConnectionLike[T, PageInfo, Val, E] {
   def totalCount(conn: T[Val]): Int
 }
 
@@ -34,6 +34,6 @@ private[relay] object ExtendedConnectionLike {
     override def totalCount(conn: ExtendedConnection[Any]): Int = conn.totalCount
   }
 
-  implicit def extendedConnectionIsExtendedConnectionLike[E <: Edge[Val], Val, T[_]]: ExtendedConnectionLike[T, Val, E] =
+  implicit def extendedConnectionIsExtendedConnectionLike[E <: Edge[Val], P <: PageInfo, Val, T[_]]: ExtendedConnectionLike[T, Val, E] =
     ExtendedConnectionIsExtendedConnectionLike.asInstanceOf[ExtendedConnectionLike[T, Val, E]]
 }

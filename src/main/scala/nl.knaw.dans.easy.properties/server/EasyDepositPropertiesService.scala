@@ -39,10 +39,10 @@ class EasyDepositPropertiesService(serverPort: Int,
                   for ((path, servlet) <- servlets)
                     context.mount(servlet, path)
 
-                  context.initParameters(AllowedOriginsKey) = "*"
-                  context.initParameters(AllowedMethodsKey) = "GET,POST,HEAD"
-                  context.initParameters(AllowedHeadersKey) = "Content-Type,Accept,Authorization"
-                  context.initParameters(AllowCredentialsKey) = "true"
+                  context.setInitParameter(AllowedOriginsKey, "*")
+                  context.setInitParameter(AllowedMethodsKey, "GET,POST,HEAD")
+                  context.setInitParameter(AllowedHeadersKey, "Content-Type,Accept,Authorization")
+                  context.setInitParameter(AllowCredentialsKey, "true")
                 }
               })
             }

@@ -79,7 +79,6 @@
         <dependency>
             <groupId>org.rogach</groupId>
             <artifactId>scallop_2.12</artifactId>
-            <version>3.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.jsuereth</groupId>
@@ -96,7 +95,6 @@
         <dependency>
             <groupId>nl.knaw.dans.lib</groupId>
             <artifactId>dans-scala-lib_2.12</artifactId>
-            <version>1.6.1</version>
         </dependency>
 
         <!-- Apache Commons -->
@@ -129,29 +127,40 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
         </dependency>
 
         <!-- graphql -->
         <dependency>
             <groupId>org.sangria-graphql</groupId>
             <artifactId>sangria_2.12</artifactId>
-            <version>1.4.2</version>
+            <version>2.0.0-M3</version>
         </dependency>
         <dependency>
             <groupId>org.sangria-graphql</groupId>
             <artifactId>sangria-relay_2.12</artifactId>
-            <version>1.4.2</version>
+            <version>2.0.0-M2</version>
         </dependency>
         <dependency>
             <groupId>org.sangria-graphql</groupId>
             <artifactId>sangria-json4s-native_2.12</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
         </dependency>
         <dependency>
             <groupId>org.sangria-graphql</groupId>
             <artifactId>sangria-slowlog_2.12</artifactId>
-            <version>0.1.8</version>
+            <version>2.0.0-M1</version>
+        </dependency>
+
+        <!-- xml -->
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>3.0.0-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>2.4.0-b180830.0438</version>
         </dependency>
 
         <!-- json -->
@@ -178,7 +187,6 @@
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.4.1</version>
         </dependency>
 
         <!-- joda -->
