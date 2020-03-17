@@ -469,6 +469,43 @@ class ImportPropsSpec extends TestSupportFixture
     )
   }
 
+  it should "find the datamanager in the 'datamanager' property for legacy deposits" in {
+    val time = new DateTime(2019, 1, 1, 0, 0, timeZone)
+    val file = testDir / "legacy_datamanager" / "bf729483-5d9b-4509-a8f2-91db639fb52f" / "deposit.properties"
+    val (depositId, _, lastModified) = fileProps(file)
+
+    props(file) should contain allOf (
+      "datamanager.userId" -> "archie001",
+      "datamanager.email" -> "does.not.exists@dans.knaw.nl",
+    )
+
+    inSequence {
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
+      stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
+      ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
+      identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
+      identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.URN, "my-urn-value", lastModified)) returning Identifier("my-id", IdentifierType.URN, "my-urn-value", lastModified).asRight
+      identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.FEDORA, "my-fedora-value", lastModified)) returning Identifier("my-id", IdentifierType.FEDORA, "my-fedora-value", lastModified).asRight
+      identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
+      doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
+      doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
+      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
+      contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
+    }
+
+    importProps.loadDepositProperties(file) shouldBe right
+
+    props(file) should contain allOf(
+      "curation.datamanager.userId" -> "archie001",
+      "curation.datamanager.email" -> "does.not.exists@dans.knaw.nl",
+    )
+    props(file) should contain noneOf(
+      "datamanager.userId" -> "archie001",
+      "datamanager.email" -> "does.not.exists@dans.knaw.nl",
+    )
+  }
+
   it should "fail when the properties file doesn't exist" in {
     val file = (testDir / "no_properties_file" / UUID.randomUUID().toString).createDirectoryIfNotExists(createParents = true) / "deposit.properties"
     file shouldNot exist

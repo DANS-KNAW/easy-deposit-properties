@@ -18,6 +18,7 @@ package nl.knaw.dans.easy.properties.app.legacyImport
 import better.files.File
 import cats.instances.either._
 import cats.instances.option._
+import cats.syntax.apply._
 import cats.syntax.either._
 import cats.syntax.option._
 import cats.syntax.traverse._
@@ -107,16 +108,20 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
     value
   }
 
-  private def removeProp[T](props: PropertiesConfiguration, key: String): Unit = {
-    if (testMode) logger.info(s"[TESTMODE] remove property $key")
-    else props.clearProperty(key)
-    
-    newPropertiesProvided = true
-  }
-
   private def storeProp[T](props: PropertiesConfiguration, key: String, transform: T => String)(value: T): T = {
     storeProp(props, key)(transform(value))
 
+    value
+  }
+
+  private def renameProp[T](props: PropertiesConfiguration, oldKey: String, newKey: String)(value: T): T = {
+    if (testMode) logger.info(s"[TESTMODE] rename property $oldKey to $newKey; value $value stays the same")
+    else {
+      props.setProperty(newKey, value)
+      props.clearProperty(oldKey)
+    }
+
+    newPropertiesProvided = true
     value
   }
 
@@ -265,8 +270,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
 
   private def loadCuration(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): Option[InputCuration] = {
     for {
-      userId <- Option(props.getString("curation.datamanager.userId"))
-      email <- Option(props.getString("curation.datamanager.email"))
+      (userId, email) <- loadCurator(props)
 
       // curation.is-new-version is never used until now and is hence set to `None`
       isNewVersion = none
@@ -277,6 +281,21 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
       curationPerformedString <- Option(props.getString("curation.performed"))
       curationPerformed <- Option(BooleanUtils.toBoolean(curationPerformedString))
     } yield InputCuration(isNewVersion, curationRequired, curationPerformed, userId, email, timestamp)
+  }
+
+  private def loadCurator(props: PropertiesConfiguration): Option[(String, String)] = {
+    val userId = Option(props.getString("curation.datamanager.userId"))
+      .orElse {
+        Option(props.getString("datamanager.userId"))
+          .map(renameProp(props, "datamanager.userId", "curation.datamanager.userId"))
+      }
+    val email = Option(props.getString("curation.datamanager.email"))
+      .orElse {
+        Option(props.getString("datamanager.email"))
+          .map(renameProp(props, "datamanager.email", "curation.datamanager.email"))
+      }
+    
+    (userId, email).tupled
   }
 
   private def loadSpringfield(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): Option[InputSpringfield] = {
@@ -299,11 +318,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
         case Some(contentType) => contentType.some.asRight
         case None =>
           getEnumProp("contentType")(ContentTypeValue)(props)
-            .map(_.map(oldStyleContentType => {
-              val res = storeProp(props, "easy-sword2.client-message.content-type")(oldStyleContentType)
-              removeProp(props, "contentType")
-              res
-            }))
+            .map(_.map(renameProp(props, "contentType", "easy-sword2.client-message.content-type")))
       }
       .getOrElse {
         storeProp(props, "easy-sword2.client-message.content-type") {
