@@ -435,6 +435,40 @@ class ImportPropsSpec extends TestSupportFixture
     )
   }
 
+  it should "find the content type in the 'contentType' property for legacy deposits" in {
+    val time = new DateTime(2019, 1, 1, 0, 0, timeZone)
+    val file = testDir / "legacy_content_type" / "d317ff0d-842f-49f4-8a18-cb396ce85a27" / "deposit.properties"
+    val (depositId, _, lastModified) = fileProps(file)
+
+    props(file) should contain(
+      "contentType" -> "application/zip"
+    )
+
+    inSequence {
+      depositDao.store _ expects where(isDeposit(Deposit(depositId, "bag".some, time, "user001", Origin.API))) returning Deposit(depositId, "bag".some, time, "user001", Origin.API).asRight
+      stateDao.store _ expects(depositId, InputState(StateLabel.SUBMITTED, "my description", lastModified)) returning State("my-id", StateLabel.SUBMITTED, "my description", lastModified).asRight
+      ingestStepDao.store _ expects(depositId, InputIngestStep(IngestStepLabel.BAGSTORE, lastModified)) returning IngestStep("my-id", IngestStepLabel.BAGSTORE, lastModified).asRight
+      identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.DOI, "my-doi-value", lastModified)) returning Identifier("my-id", IdentifierType.DOI, "my-doi-value", lastModified).asRight
+      identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.URN, "my-urn-value", lastModified)) returning Identifier("my-id", IdentifierType.URN, "my-urn-value", lastModified).asRight
+      identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.FEDORA, "my-fedora-value", lastModified)) returning Identifier("my-id", IdentifierType.FEDORA, "my-fedora-value", lastModified).asRight
+      identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
+      doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
+      doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
+      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
+      contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
+    }
+
+    importProps.loadDepositProperties(file) shouldBe right
+
+    props(file) should contain(
+      "easy-sword2.client-message.content-type" -> "application/zip",
+    )
+    props(file) should not contain(
+      "contentType" -> "application/zip"
+    )
+  }
+
   it should "fail when the properties file doesn't exist" in {
     val file = (testDir / "no_properties_file" / UUID.randomUUID().toString).createDirectoryIfNotExists(createParents = true) / "deposit.properties"
     file shouldNot exist

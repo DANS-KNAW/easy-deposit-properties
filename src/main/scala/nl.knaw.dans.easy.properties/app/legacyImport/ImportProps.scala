@@ -15,8 +15,6 @@
  */
 package nl.knaw.dans.easy.properties.app.legacyImport
 
-import java.util.UUID
-
 import better.files.File
 import cats.instances.either._
 import cats.instances.option._
@@ -107,6 +105,13 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
 
     newPropertiesProvided = true
     value
+  }
+
+  private def removeProp[T](props: PropertiesConfiguration, key: String): Unit = {
+    if (testMode) logger.info(s"[TESTMODE] remove property $key")
+    else props.clearProperty(key)
+    
+    newPropertiesProvided = true
   }
 
   private def storeProp[T](props: PropertiesConfiguration, key: String, transform: T => String)(value: T): T = {
@@ -290,6 +295,16 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
 
   private def loadContentType(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): Option[InputContentType] = {
     getEnumProp("easy-sword2.client-message.content-type")(ContentTypeValue)(props)
+      .flatMap {
+        case Some(contentType) => contentType.some.asRight
+        case None =>
+          getEnumProp("contentType")(ContentTypeValue)(props)
+            .map(_.map(oldStyleContentType => {
+              val res = storeProp(props, "easy-sword2.client-message.content-type")(oldStyleContentType)
+              removeProp(props, "contentType")
+              res
+            }))
+      }
       .getOrElse {
         storeProp(props, "easy-sword2.client-message.content-type") {
           interactor.ask(ContentTypeValue)(s"Invalid content type found for deposit $depositId. What value should this be?")
