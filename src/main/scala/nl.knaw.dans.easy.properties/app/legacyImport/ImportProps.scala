@@ -52,7 +52,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
       _ <- propsFileWritable(file)
       properties = readDepositProperties(file)
       depositId <- getDepositId(file)
-      creationTime = new DateTime(file.attributes.creationTime().toMillis)
+      creationTime = () => new DateTime(file.attributes.creationTime().toMillis)
       lastModifiedTime = new DateTime(file.attributes.lastModifiedTime().toMillis)
       _ <- storeDeposit(loadDeposit(file.parent, depositId, creationTime, properties))
       state <- storeState(depositId, loadState(depositId, lastModifiedTime, properties))
@@ -129,7 +129,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
     value
   }
 
-  private def loadDeposit(deposit: File, depositId: DepositId, creationTime: Timestamp, props: PropertiesConfiguration): Deposit = {
+  private def loadDeposit(deposit: File, depositId: DepositId, defaultCreationTime: () => Timestamp, props: PropertiesConfiguration): Deposit = {
     val bagName = Option(props.getString("bag-store.bag-name")).orElse {
       retrieveBagNameFromFilesystem(deposit)
         .map(storeProp(depositId, props, "bag-store.bag-name"))
@@ -141,7 +141,9 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
             interactor.ask(s => DateTime.parse(s))(s"Invalid value for creation timestamp for deposit $depositId. What value should this be?")
           }
         })
-      .getOrElse(creationTime)
+      .getOrElse {
+        storeProp(depositId, props, "creation.timestamp")(defaultCreationTime())
+      }
     val depositorId = Option(props.getString("depositor.userId"))
       .getOrElse {
         storeProp(depositId, props, "depositor.userId") {
