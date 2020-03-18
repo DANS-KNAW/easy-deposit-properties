@@ -16,7 +16,6 @@
 package nl.knaw.dans.easy.properties.app.model.contentType
 
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
-import nl.knaw.dans.easy.properties.app.model.contentType.ContentTypeValue.ContentTypeValue
 import nl.knaw.dans.easy.properties.app.model.{ DepositFilter, SeriesFilter }
 
-case class DepositContentTypeFilter(value: ContentTypeValue, filter: SeriesFilter = SeriesFilter.LATEST) extends DepositFilter
+case class DepositContentTypeFilter(value: String, filter: SeriesFilter = SeriesFilter.LATEST) extends DepositFilter

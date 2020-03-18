@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 import java.util.UUID
 
 import cats.scalatest.{ EitherMatchers, EitherValues }
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue, InputContentType }
+import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, InputContentType }
 import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlreadyExistError, InvalidValueError, NoSuchDepositError }
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
 import org.joda.time.DateTime
@@ -102,8 +102,8 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
   "store" should "insert a new content type into the database" in {
     val contentTypes = new SQLContentTypeDao
     val timestamp = new DateTime(2019, 7, 19, 22, 45, timeZone)
-    val inputContentType = InputContentType(ContentTypeValue.OCTET, timestamp)
-    val expectedContentType = ContentType("32", ContentTypeValue.OCTET, timestamp)
+    val inputContentType = InputContentType("application/octet-stream", timestamp)
+    val expectedContentType = ContentType("32", "application/octet-stream", timestamp)
 
     contentTypes.store(depositId4, inputContentType).value shouldBe expectedContentType
     contentTypes.getById(Seq("32")).value should contain only expectedContentType
@@ -115,7 +115,7 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
     val contentTypes = new SQLContentTypeDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
     val timestamp = new DateTime(2019, 7, 18, 22, 38, timeZone)
-    val inputContentType = InputContentType(ContentTypeValue.OCTET, timestamp)
+    val inputContentType = InputContentType("application/octet-stream", timestamp)
 
     contentTypes.store(depositId6, inputContentType).leftValue shouldBe NoSuchDepositError(depositId6)
   }
@@ -124,8 +124,8 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
     val contentTypes = new SQLContentTypeDao
     val depositId = depositId1
     val timestamp = new DateTime(2019, 1, 1, 6, 6, timeZone)
-    val inputContentType1 = InputContentType(ContentTypeValue.OCTET, timestamp)
-    val inputContentType2 = InputContentType(ContentTypeValue.ZIP, timestamp)
+    val inputContentType1 = InputContentType("application/octet-stream", timestamp)
+    val inputContentType2 = InputContentType("application/zip", timestamp)
 
     contentTypes.store(depositId, inputContentType1) shouldBe right
     contentTypes.store(depositId, inputContentType2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, objName = "content type")

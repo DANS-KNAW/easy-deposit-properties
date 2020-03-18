@@ -134,19 +134,16 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
         |springfield.domain = domain
         |springfield.user = user
         |springfield.collection = collection
-        |springfield.playmode = invalid-playmode
-        |
-        |easy-sword2.client-message.content-type = invalid-content-type""".stripMargin
+        |springfield.playmode = invalid-playmode""".stripMargin
     ).value
 
     inside(validateDepositProperties(depositId)(props).leftMap(_.toList)) {
-      case Invalid(originError :: stateLabelError :: ingestStepError :: doiActionError :: playmodeError :: contentTypeError :: Nil) =>
+      case Invalid(originError :: stateLabelError :: ingestStepError :: doiActionError :: playmodeError :: Nil) =>
         originError should matchPattern { case PropertyParseError("deposit.origin", _: NoSuchElementException) => }
         stateLabelError should matchPattern { case PropertyParseError("state.label", _: NoSuchElementException) => }
         ingestStepError should matchPattern { case PropertyParseError("deposit.ingest.current-step", _: NoSuchElementException) => }
         doiActionError should matchPattern { case PropertyParseError("identifier.dans-doi.action", _: NoSuchElementException) => }
         playmodeError should matchPattern { case PropertyParseError("springfield.playmode", _: NoSuchElementException) => }
-        contentTypeError should matchPattern { case PropertyParseError("easy-sword2.client-message.content-type", _: NoSuchElementException) => }
     }
   }
 

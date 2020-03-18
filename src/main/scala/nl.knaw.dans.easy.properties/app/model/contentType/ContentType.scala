@@ -15,8 +15,7 @@
  */
 package nl.knaw.dans.easy.properties.app.model.contentType
 
-import nl.knaw.dans.easy.properties.app.model.contentType.ContentTypeValue.ContentTypeValue
 import nl.knaw.dans.easy.properties.app.model.{ Timestamp, Timestamped }
 import sangria.relay.Node
 
-case class ContentType(id: String, value: ContentTypeValue, timestamp: Timestamp) extends Node with Timestamped
+case class ContentType(id: String, value: String, timestamp: Timestamp) extends Node with Timestamped

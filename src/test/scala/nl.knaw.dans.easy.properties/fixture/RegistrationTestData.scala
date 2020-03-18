@@ -18,14 +18,14 @@ package nl.knaw.dans.easy.properties.fixture
 import java.util.UUID
 
 import cats.syntax.option._
-import nl.knaw.dans.easy.properties.app.register.DepositProperties
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, InputContentType }
+import nl.knaw.dans.easy.properties.app.model.contentType.InputContentType
 import nl.knaw.dans.easy.properties.app.model.curation.InputCuration
 import nl.knaw.dans.easy.properties.app.model.identifier.{ IdentifierType, InputIdentifier }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStepLabel, InputIngestStep }
 import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, StateLabel }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin }
+import nl.knaw.dans.easy.properties.app.register.DepositProperties
 import org.joda.time.DateTime
 
 trait RegistrationTestData {
@@ -84,7 +84,7 @@ trait RegistrationTestData {
     doiRegistered = DoiRegisteredEvent(value = true, timestamp).some,
     curation = InputCuration(isNewVersion = true.some, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", timestamp).some,
     springfield = InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, timestamp).some,
-    contentType = InputContentType(ContentTypeValue.ZIP, timestamp).some,
+    contentType = InputContentType("application/zip", timestamp).some,
   )
   val minimalDepositProperties = DepositProperties(
     deposit = Deposit(UUID.fromString("9d507261-3b79-22e7-86d0-6fb9417d930d"), none, timestamp, "user001", Origin.SWORD2),

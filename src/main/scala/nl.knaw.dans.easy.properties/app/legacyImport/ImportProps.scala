@@ -24,7 +24,7 @@ import cats.syntax.option._
 import cats.syntax.traverse._
 import nl.knaw.dans.easy.properties.ApplicationErrorOr
 import nl.knaw.dans.easy.properties.Command.FeedBackMessage
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue, InputContentType }
+import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, InputContentType }
 import nl.knaw.dans.easy.properties.app.model.curation.{ Curation, InputCuration }
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType, InputIdentifier }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestStepLabel, InputIngestStep }
@@ -130,11 +130,11 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
   }
 
   private def loadDeposit(deposit: File, depositId: DepositId, defaultCreationTime: () => Timestamp, props: PropertiesConfiguration): Deposit = {
-    val bagName = Option(props.getString("bag-store.bag-name")).orElse {
+    val bagName = getProp("bag-store.bag-name")(props).orElse {
       retrieveBagNameFromFilesystem(deposit)
         .map(storeProp(depositId, props, "bag-store.bag-name"))
     }
-    val creationTimestamp = Option(props.getString("creation.timestamp"))
+    val creationTimestamp = getProp("creation.timestamp")(props)
       .map(s => Either.catchOnly[IllegalArgumentException] { DateTime.parse(s) }
         .getOrElse {
           storeProp(depositId, props, "creation.timestamp") {
@@ -144,7 +144,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
       .getOrElse {
         storeProp(depositId, props, "creation.timestamp")(defaultCreationTime())
       }
-    val depositorId = Option(props.getString("depositor.userId"))
+    val depositorId = getProp("depositor.userId")(props)
       .getOrElse {
         storeProp(depositId, props, "depositor.userId") {
           interactor.ask(s"Could not find the depositor for deposit $depositId. What value should this be?")
@@ -165,7 +165,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
 
   private def loadState(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): InputState = {
     val label = getOrAskEnumProp(StateLabel, "state.label", "state label", props, depositId)
-    val description = Option(props.getString("state.description"))
+    val description = getProp("state.description")(props)
       .getOrElse {
         storeProp(depositId, props, "state.description") {
           interactor.ask(s"Could not find the state description for deposit $depositId. What value should this be?")
@@ -205,7 +205,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
   }
 
   private def loadDoi(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): InputIdentifier = {
-    val doi = Option(props.getString("identifier.doi"))
+    val doi = getProp("identifier.doi")(props)
       .getOrElse {
         storeProp(depositId, props, "identifier.doi") {
           interactor.ask(s"Could not find DOI for deposit $depositId. What value should this be?")
@@ -216,7 +216,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
   }
 
   private def loadUrn(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): InputIdentifier = {
-    val urn = Option(props.getString("identifier.urn"))
+    val urn = getProp("identifier.urn")(props)
       .getOrElse {
         storeProp(depositId, props, "identifier.urn") {
           interactor.ask(s"Could not find URN for deposit $depositId. What value should this be?")
@@ -227,7 +227,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
   }
 
   private def loadFedoraIdentifier(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): InputIdentifier = {
-    val fedoraId = Option(props.getString("identifier.fedora"))
+    val fedoraId = getProp("identifier.fedora")(props)
       .getOrElse {
         storeProp(depositId, props, "identifier.fedora") {
           interactor.ask(s"Could not find Fedora identifier for deposit $depositId. What value should this be?")
@@ -238,7 +238,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
   }
 
   private def loadBagStoreIdentifier(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): InputIdentifier = {
-    val bagId = Option(props.getString("bag-store.bag-id")).getOrElse {
+    val bagId = getProp("bag-store.bag-id")(props).getOrElse {
       storeProp(depositId, props, "bag-store.bag-id")(depositId).toString
     }
 
@@ -246,7 +246,7 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
   }
 
   private def loadDoiRegistered(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration, doi: String): DoiRegisteredEvent = {
-    val registered = Option(props.getString("identifier.dans-doi.registered"))
+    val registered = getProp("identifier.dans-doi.registered")(props)
       .flatMap(s => Option(BooleanUtils.toBoolean(s)))
       .getOrElse {
         storeProp[Boolean](depositId, props, "identifier.dans-doi.registered", (b: Boolean) => BooleanUtils.toStringYesNo(b)) {
@@ -281,23 +281,23 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
       // curation.is-new-version is never used until now and is hence set to `None`
       isNewVersion = none
 
-      curationRequiredString <- Option(props.getString("curation.required"))
+      curationRequiredString <- getProp("curation.required")(props)
       curationRequired <- Option(BooleanUtils.toBoolean(curationRequiredString))
 
-      curationPerformedString <- Option(props.getString("curation.performed"))
+      curationPerformedString <- getProp("curation.performed")(props)
       curationPerformed <- Option(BooleanUtils.toBoolean(curationPerformedString))
     } yield InputCuration(isNewVersion, curationRequired, curationPerformed, userId, email, timestamp)
   }
 
   private def loadCurator(props: PropertiesConfiguration, depositId: DepositId): Option[(String, String)] = {
-    val userId = Option(props.getString("curation.datamanager.userId"))
+    val userId = getProp("curation.datamanager.userId")(props)
       .orElse {
-        Option(props.getString("datamanager.userId"))
+        getProp("datamanager.userId")(props)
           .map(renameProp(depositId, props, "datamanager.userId", "curation.datamanager.userId"))
       }
-    val email = Option(props.getString("curation.datamanager.email"))
+    val email = getProp("curation.datamanager.email")(props)
       .orElse {
-        Option(props.getString("datamanager.email"))
+        getProp("datamanager.email")(props)
           .map(renameProp(depositId, props, "datamanager.email", "curation.datamanager.email"))
       }
     
@@ -306,9 +306,9 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
 
   private def loadSpringfield(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): Option[InputSpringfield] = {
     for {
-      domain <- Option(props.getString("springfield.domain"))
-      user <- Option(props.getString("springfield.user"))
-      collection <- Option(props.getString("springfield.collection"))
+      domain <- getProp("springfield.domain")(props)
+      user <- getProp("springfield.user")(props)
+      collection <- getProp("springfield.collection")(props)
       playMode <- getEnumProp("springfield.playmode")(SpringfieldPlayMode)(props)
         .getOrElse {
           storeProp(depositId, props, "springfield.playmode") {
@@ -319,23 +319,20 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
   }
 
   private def loadContentType(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): Option[InputContentType] = {
-    getEnumProp("easy-sword2.client-message.content-type")(ContentTypeValue)(props)
-      .flatMap {
-        case Some(contentType) => contentType.some.asRight
-        case None =>
-          getEnumProp("contentType")(ContentTypeValue)(props)
-            .map(_.map(renameProp(depositId, props, "contentType", "easy-sword2.client-message.content-type")))
-      }
-      .getOrElse {
-        storeProp(depositId, props, "easy-sword2.client-message.content-type") {
-          interactor.ask(ContentTypeValue)(s"Invalid content type found for deposit $depositId. What value should this be?")
-        }.some
+    getProp("easy-sword2.client-message.content-type")(props)
+      .orElse {
+        getProp("contentType")(props)
+          .map(renameProp(depositId, props, "contentType", "easy-sword2.client-message.content-type"))
       }
       .map(InputContentType(_, timestamp))
   }
 
+  private def getProp(key: String)(props: PropertiesConfiguration): Option[String] = {
+    Option(props.getString(key))
+  }
+
   private def getEnumProp(key: String)(enum: Enumeration)(props: PropertiesConfiguration): LoadPropsErrorOr[Option[enum.Value]] = {
-    Option(props.getString(key)).traverse(s => parseEnumValue(enum)(s))
+    getProp(key)(props).traverse(s => parseEnumValue(enum)(s))
   }
 
   private def parseEnumValue(enum: Enumeration)(s: String): LoadPropsErrorOr[enum.Value] = {

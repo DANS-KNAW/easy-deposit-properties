@@ -20,7 +20,6 @@ import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Requir
 import nl.knaw.dans.easy.properties.app.graphql.resolvers._
 import nl.knaw.dans.easy.properties.app.model.DoiAction.DoiAction
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
-import nl.knaw.dans.easy.properties.app.model.contentType.ContentTypeValue.ContentTypeValue
 import nl.knaw.dans.easy.properties.app.model.contentType.InputContentType
 import nl.knaw.dans.easy.properties.app.model.curation.InputCuration
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
@@ -93,7 +92,7 @@ case class SetSpringfieldInput(clientMutationId: Option[String],
                               )
 case class SetContentTypeInput(clientMutationId: Option[String],
                                @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
-                               @GraphQLDescription("The content type associated with this deposit.") value: ContentTypeValue,
+                               @GraphQLDescription("The content type associated with this deposit.") value: String,
                                @GraphQLDescription("The timestamp at which this springfield configuration was associated with the deposit. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                               )
 case class RegisterDepositInput(clientMutationId: Option[String],
