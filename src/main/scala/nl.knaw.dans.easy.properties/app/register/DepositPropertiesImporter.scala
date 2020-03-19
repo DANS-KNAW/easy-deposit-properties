@@ -15,7 +15,7 @@
  */
 package nl.knaw.dans.easy.properties.app.register
 
-import better.files.StringOps
+import better.files.StringExtensions
 import cats.instances.either._
 import cats.instances.list._
 import cats.instances.option._

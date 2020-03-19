@@ -23,7 +23,7 @@
     <parent>
         <groupId>nl.knaw.dans.shared</groupId>
         <artifactId>dans-scala-app-project</artifactId>
-        <version>5.1.0</version>
+        <version>6.0.1</version>
     </parent>
 
     <groupId>nl.knaw.dans.easy</groupId>
@@ -38,6 +38,12 @@
     <properties>
         <main-class>nl.knaw.dans.easy.properties.Command</main-class>
         <easy.datacite.version>3.10.5</easy.datacite.version>
+
+        <!-- graphql -->
+        <sangria-slowlog.version>2.0.0-M1</sangria-slowlog.version>
+        <sangria-relay.version>2.0.0-M2</sangria-relay.version>
+        <sangria.version>2.0.0-M3</sangria.version>
+        <sangria-json4s-native.version>1.0.1</sangria-json4s-native.version>
     </properties>
 
     <scm>
@@ -79,7 +85,6 @@
         <dependency>
             <groupId>org.rogach</groupId>
             <artifactId>scallop_2.12</artifactId>
-            <version>3.2.0</version>
         </dependency>
         <dependency>
             <groupId>com.jsuereth</groupId>
@@ -96,7 +101,6 @@
         <dependency>
             <groupId>nl.knaw.dans.lib</groupId>
             <artifactId>dans-scala-lib_2.12</artifactId>
-            <version>1.6.1</version>
         </dependency>
 
         <!-- Apache Commons -->
@@ -129,29 +133,28 @@
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
-            <version>3.1.0</version>
         </dependency>
 
         <!-- graphql -->
         <dependency>
             <groupId>org.sangria-graphql</groupId>
             <artifactId>sangria_2.12</artifactId>
-            <version>1.4.2</version>
+            <version>${sangria.version}</version>
         </dependency>
         <dependency>
             <groupId>org.sangria-graphql</groupId>
             <artifactId>sangria-relay_2.12</artifactId>
-            <version>1.4.2</version>
+            <version>${sangria-relay.version}</version>
         </dependency>
         <dependency>
             <groupId>org.sangria-graphql</groupId>
             <artifactId>sangria-json4s-native_2.12</artifactId>
-            <version>1.0.0</version>
+            <version>${sangria-json4s-native.version}</version>
         </dependency>
         <dependency>
             <groupId>org.sangria-graphql</groupId>
             <artifactId>sangria-slowlog_2.12</artifactId>
-            <version>0.1.8</version>
+            <version>${sangria-slowlog.version}</version>
         </dependency>
 
         <!-- json -->
@@ -178,7 +181,6 @@
         <dependency>
             <groupId>org.hsqldb</groupId>
             <artifactId>hsqldb</artifactId>
-            <version>2.4.1</version>
         </dependency>
 
         <!-- joda -->
