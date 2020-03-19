@@ -44,10 +44,6 @@
         <sangria-relay.version>2.0.0-M2</sangria-relay.version>
         <sangria.version>2.0.0-M3</sangria.version>
         <sangria-json4s-native.version>1.0.1</sangria-json4s-native.version>
-
-        <!-- xml -->
-        <jakarta-xml-bind.version>3.0.0-RC1</jakarta-xml-bind.version>
-        <jaxb-runtime.version>2.4.0-b180830.0438</jaxb-runtime.version>
     </properties>
 
     <scm>
@@ -159,18 +155,6 @@
             <groupId>org.sangria-graphql</groupId>
             <artifactId>sangria-slowlog_2.12</artifactId>
             <version>${sangria-slowlog.version}</version>
-        </dependency>
-
-        <!-- xml -->
-        <dependency>
-            <groupId>jakarta.xml.bind</groupId>
-            <artifactId>jakarta.xml.bind-api</artifactId>
-            <version>${jakarta-xml-bind.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>${jaxb-runtime.version}</version>
         </dependency>
 
         <!-- json -->
