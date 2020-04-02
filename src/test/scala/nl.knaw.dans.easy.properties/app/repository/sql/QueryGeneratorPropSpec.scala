@@ -29,10 +29,11 @@ import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorId
 import org.joda.time.DateTime
 import org.scalacheck.Arbitrary._
 import org.scalacheck.{ Arbitrary, Gen }
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.propspec.AnyPropSpec
 import org.scalatestplus.scalacheck.ScalaCheckDrivenPropertyChecks
-import org.scalatest.{ Matchers, PropSpec }
 
-class QueryGeneratorPropSpec extends PropSpec with ScalaCheckDrivenPropertyChecks with Matchers {
+class QueryGeneratorPropSpec extends AnyPropSpec with ScalaCheckDrivenPropertyChecks with Matchers {
 
   def genFromEnum[E <: Enumeration](enum: E): Arbitrary[E#Value] = Arbitrary {
     Gen.oneOf(enum.values.toList)
