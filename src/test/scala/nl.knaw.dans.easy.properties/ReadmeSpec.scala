@@ -22,12 +22,13 @@ import nl.knaw.dans.easy.DataciteServiceConfiguration
 import nl.knaw.dans.easy.properties.app.database.DatabaseConfiguration
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.fixture.CustomMatchers
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
 
 import scala.concurrent.duration._
 import scala.language.postfixOps
 
-class ReadmeSpec extends FlatSpec with Matchers with CustomMatchers {
+class ReadmeSpec extends AnyFlatSpec with Matchers with CustomMatchers {
 
   private val configuration = Configuration(
     version = "my-version",

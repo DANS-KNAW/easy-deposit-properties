@@ -25,6 +25,7 @@ import nl.knaw.dans.easy.properties.app.graphql.middleware.{ Middlewares, Profil
 import nl.knaw.dans.easy.properties.app.graphql.relay.RelayValidation
 import nl.knaw.dans.easy.properties.app.repository.Repository
 import nl.knaw.dans.easy.properties.app.repository.sql.SQLDataContext
+import nl.knaw.dans.easy.properties.server.GraphQLServlet.GraphQLInput
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import nl.knaw.dans.lib.logging.servlet.{ LogResponseBodyOnError, MaskedLogFormatter, ServletLogger }
 import org.json4s.JsonAST.JObject
@@ -82,7 +83,7 @@ class GraphQLServlet(database: DatabaseAccess,
       Option.empty
   }
 
-  val defaultExceptionHandler = ExceptionHandler(
+  private val defaultExceptionHandler = ExceptionHandler(
     onException = {
       case (_, e) =>
         logger.error(s"Exception: ${ e.getMessage }", e)
@@ -134,4 +135,8 @@ class GraphQLServlet(database: DatabaseAccess,
         ))
     }
   }
+}
+
+object GraphQLServlet {
+  case class GraphQLInput(query: String, variables: Option[JValue], operationName: Option[String])
 }

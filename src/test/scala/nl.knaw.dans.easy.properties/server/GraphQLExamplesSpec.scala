@@ -332,4 +332,33 @@ class GraphQLExamplesSpec extends TestSupportFixture
       status shouldBe 200
     }
   }
+
+  it should "return an error if the depositId already exists" in {
+    val mutation =
+      """mutation {
+        |  addDeposit(input: { depositId: "00000000-0000-0000-0000-000000000001", depositorId: "user001", origin: SWORD2 }) {
+        |    deposit {
+        |      depositId
+        |    }
+        |  }
+        |}""".stripMargin
+    val mutationBody = compact(render("query" -> mutation))
+
+    val expectedMutationOutput = writePretty {
+      ("data" -> JNull) ~
+        ("errors" -> List(
+          ("message" -> "Deposit 00000000-0000-0000-0000-000000000001 already exist.") ~
+            ("path" -> List("addDeposit")) ~
+            ("locations" -> List(
+              ("line" -> 2) ~
+                ("column" -> 3)
+            ))
+        ))
+    }
+
+    post(uri = "/", body = mutationBody.getBytes, headers = Seq(authHeader)) {
+      body shouldBe expectedMutationOutput
+      status shouldBe 200
+    }
+  }
 }

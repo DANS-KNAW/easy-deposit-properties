@@ -15,9 +15,11 @@
  */
 package nl.knaw.dans.easy.properties.fixture
 
-import org.scalatest._
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.{ EitherValues, Inside, Inspectors, OptionValues }
 
-trait TestSupportFixture extends FlatSpec
+trait TestSupportFixture extends AnyFlatSpec
   with Matchers
   with Inside
   with OptionValues
