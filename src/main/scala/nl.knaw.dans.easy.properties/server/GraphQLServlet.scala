@@ -69,11 +69,12 @@ class GraphQLServlet(database: DatabaseAccess,
     val GraphQLInput(query, variables, operation) = Serialization.read[GraphQLInput](request.body)
 
     operation.foreach(operation => logger.info(s"operation: $operation"))
-    variables.foreach(variables => logger.info(s"variables: $variables"))
+    variables.foreach(variables => logger.info(s"variables: ${ Serialization.write(variables) }"))
     if (operation.isEmpty)
       logger.info(s"query: $query")
-    else if (logger.underlying.isDebugEnabled)
+    else if (logger.underlying.isDebugEnabled) {
       logger.debug(s"query: $query")
+    }
 
     val middlewares = new Middlewares(profiling)
     QueryParser.parse(query, ParserConfig.default.withoutComments)(DeliveryScheme.Either)
