@@ -17,12 +17,12 @@ package nl.knaw.dans.easy.properties.app.model
 
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
 
-sealed abstract class CurationEvent[T](value: T, timestamp: Timestamp) extends Timestamped
+@deprecated sealed abstract class CurationEvent[T](value: T, timestamp: Timestamp) extends Timestamped
 
-case class IsNewVersionEvent(isNewVersion: Option[Boolean], timestamp: Timestamp) extends CurationEvent(isNewVersion, timestamp)
-case class CurationRequiredEvent(curationRequired: Boolean, timestamp: Timestamp) extends CurationEvent(curationRequired, timestamp)
-case class CurationPerformedEvent(curationPerformed: Boolean, timestamp: Timestamp) extends CurationEvent(curationPerformed, timestamp)
+@deprecated case class IsNewVersionEvent(isNewVersion: Option[Boolean], timestamp: Timestamp) extends CurationEvent(isNewVersion, timestamp)
+@deprecated case class CurationRequiredEvent(curationRequired: Boolean, timestamp: Timestamp) extends CurationEvent(curationRequired, timestamp)
+@deprecated case class CurationPerformedEvent(curationPerformed: Boolean, timestamp: Timestamp) extends CurationEvent(curationPerformed, timestamp)
 
-case class DepositIsNewVersionFilter(isNewVersion: Boolean, filter: SeriesFilter = SeriesFilter.LATEST) extends DepositFilter
-case class DepositCurationRequiredFilter(curationRequired: Boolean, filter: SeriesFilter = SeriesFilter.LATEST) extends DepositFilter
-case class DepositCurationPerformedFilter(curationPerformed: Boolean, filter: SeriesFilter = SeriesFilter.LATEST) extends DepositFilter
+@deprecated case class DepositIsNewVersionFilter(isNewVersion: Boolean, filter: SeriesFilter = SeriesFilter.LATEST) extends DepositFilter
+@deprecated case class DepositCurationRequiredFilter(curationRequired: Boolean, filter: SeriesFilter = SeriesFilter.LATEST) extends DepositFilter
+@deprecated case class DepositCurationPerformedFilter(curationPerformed: Boolean, filter: SeriesFilter = SeriesFilter.LATEST) extends DepositFilter

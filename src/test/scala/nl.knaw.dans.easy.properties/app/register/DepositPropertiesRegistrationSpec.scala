@@ -34,7 +34,8 @@ class DepositPropertiesRegistrationSpec extends TestSupportFixture
     // @formatter:off
     val DepositProperties(
       deposit, Some(state), Some(ingestStep), Seq(fedora, doi, urn, bagstore), Some(doiAction),
-      Some(doiRegistered), Some(curation), Some(springfield), Some(contentType),
+      Some(doiRegistered), Some(curator), Some(isNewVersion), Some(isCurationRequired),
+      Some(isCurationPerformed), Some(springfield), Some(contentType),
     ) = validDepositProperties
     // @formatter:on
     val depositId = deposit.id
@@ -52,14 +53,17 @@ class DepositPropertiesRegistrationSpec extends TestSupportFixture
     )
     repository.doiAction.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only doiAction
     repository.doiRegistered.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only doiRegistered
-    repository.curation.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only curation.toOutput("0")
+    repository.curator.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only curator.toOutput("0")
+    repository.isNewVersion.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only isNewVersion.toOutput("0")
+    repository.isCurationRequired.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only isCurationRequired.toOutput("0")
+    repository.isCurationPerformed.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only isCurationPerformed.toOutput("0")
     repository.springfield.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only springfield.toOutput("0")
     repository.contentType.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only contentType.toOutput("3")
   }
 
   it should "import the minimal example" in {
     val props = minimalDepositPropertiesBody
-    val DepositProperties(deposit, None, None, Seq(), None, None, None, None, None) = minimalDepositProperties
+    val DepositProperties(deposit, None, None, Seq(), None, None, None, None, None, None, None, None) = minimalDepositProperties
     val depositId = deposit.id
 
     registration.register(depositId, props).value shouldBe depositId
@@ -70,7 +74,10 @@ class DepositPropertiesRegistrationSpec extends TestSupportFixture
     repository.identifiers.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
     repository.doiAction.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
     repository.doiRegistered.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
-    repository.curation.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
+    repository.curator.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
+    repository.isNewVersion.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
+    repository.isCurationRequired.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
+    repository.isCurationPerformed.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
     repository.springfield.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
     repository.contentType.getAll(Seq(depositId)).value.toMap.apply(depositId) shouldBe empty
   }

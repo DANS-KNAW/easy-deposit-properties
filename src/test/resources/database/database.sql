@@ -31,18 +31,15 @@ CREATE TABLE Identifier (
     UNIQUE (identifierSchema, identifierValue)
 );
 
-CREATE TABLE Curation (
-    curationId INTEGER IDENTITY NOT NULL PRIMARY KEY,
+CREATE TABLE Curator (
+    curatorEntryId INTEGER IDENTITY NOT NULL PRIMARY KEY,
     depositId CHAR(36) NOT NULL,
-    isNewVersion BOOLEAN,
-    isRequired BOOLEAN NOT NULL,
-    isPerformed BOOLEAN NOT NULL,
     datamanagerUserId VARCHAR(64) NOT NULL,
     datamanagerEmail VARCHAR(10000) NOT NULL,
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (depositId) REFERENCES Deposit (depositId),
     UNIQUE (depositId, timestamp)
-);
+)
 
 CREATE TABLE Springfield (
     springfieldId INTEGER IDENTITY NOT NULL PRIMARY KEY,

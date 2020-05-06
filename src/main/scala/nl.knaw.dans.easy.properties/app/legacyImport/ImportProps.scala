@@ -15,8 +15,6 @@
  */
 package nl.knaw.dans.easy.properties.app.legacyImport
 
-import java.util.UUID
-
 import better.files.File
 import cats.instances.either._
 import cats.instances.option._
@@ -26,9 +24,12 @@ import cats.syntax.traverse._
 import nl.knaw.dans.easy.properties.ApplicationErrorOr
 import nl.knaw.dans.easy.properties.Command.FeedBackMessage
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue, InputContentType }
-import nl.knaw.dans.easy.properties.app.model.curation.{ Curation, InputCuration }
+import nl.knaw.dans.easy.properties.app.model.curator.{ Curator, InputCurator }
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType, InputIdentifier }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestStepLabel, InputIngestStep }
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.{ InputIsCurationPerformed, IsCurationPerformed }
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.{ InputIsCurationRequired, IsCurationRequired }
+import nl.knaw.dans.easy.properties.app.model.isnewversion.{ InputIsNewVersion, IsNewVersion }
 import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, Springfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.StateLabel.StateLabel
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, State, StateLabel }
@@ -64,7 +65,10 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
       _ <- storeIdentifier(depositId, loadBagStoreIdentifier(depositId, lastModifiedTime, properties))
       _ <- storeDoiRegistered(depositId, loadDoiRegistered(depositId, lastModifiedTime, properties, doi.idValue))
       _ <- storeDoiAction(depositId, loadDoiAction(depositId, lastModifiedTime, properties))
-      _ <- loadCuration(depositId, lastModifiedTime, properties).traverse(storeCuration(depositId, _))
+      _ <- loadCurator(lastModifiedTime, properties).traverse(storeCurator(depositId, _))
+      _ <- loadIsNewVersion(lastModifiedTime, properties).traverse(storeIsNewVersion(depositId, _))
+      _ <- loadIsCurationRequired(lastModifiedTime, properties).traverse(storeIsCurationRequired(depositId, _))
+      _ <- loadIsCurationPerformed(lastModifiedTime, properties).traverse(storeIsCurationPerformed(depositId, _))
       _ <- loadSpringfield(depositId, lastModifiedTime, properties).traverse(storeSpringfield(depositId, _))
       _ <- loadContentType(depositId, lastModifiedTime, properties).traverse(storeContentType(depositId, _))
       _ = savePropertiesIfChanged(properties)
@@ -258,20 +262,32 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
     DoiActionEvent(doiAction, timestamp)
   }
 
-  private def loadCuration(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): Option[InputCuration] = {
+  private def loadCurator(timestamp: Timestamp, props: PropertiesConfiguration): Option[InputCurator] = {
     for {
       userId <- Option(props.getString("curation.datamanager.userId"))
       email <- Option(props.getString("curation.datamanager.email"))
+    } yield InputCurator(userId, email, timestamp)
+  }
 
-      // curation.is-new-version is never used until now and is hence set to `None`
-      isNewVersion = none
+  private def loadIsNewVersion(timestamp: Timestamp, props: PropertiesConfiguration): Option[InputIsNewVersion] = {
+    for {
+      isNewVersionString <- Option(props.getString("curation.is-new-version"))
+      isNewVersion = BooleanUtils.toBoolean(isNewVersionString)
+    } yield InputIsNewVersion(isNewVersion, timestamp)
+  }
 
+  private def loadIsCurationRequired(timestamp: Timestamp, props: PropertiesConfiguration): Option[InputIsCurationRequired] = {
+    for {
       curationRequiredString <- Option(props.getString("curation.required"))
-      curationRequired <- Option(BooleanUtils.toBoolean(curationRequiredString))
+      curationRequired = BooleanUtils.toBoolean(curationRequiredString)
+    } yield InputIsCurationRequired(curationRequired, timestamp)
+  }
 
+  private def loadIsCurationPerformed(timestamp: Timestamp, props: PropertiesConfiguration): Option[InputIsCurationPerformed] = {
+    for {
       curationPerformedString <- Option(props.getString("curation.performed"))
-      curationPerformed <- Option(BooleanUtils.toBoolean(curationPerformedString))
-    } yield InputCuration(isNewVersion, curationRequired, curationPerformed, userId, email, timestamp)
+      curationPerformed = BooleanUtils.toBoolean(curationPerformedString)
+    } yield InputIsCurationPerformed(curationPerformed, timestamp)
   }
 
   private def loadSpringfield(depositId: DepositId, timestamp: Timestamp, props: PropertiesConfiguration): Option[InputSpringfield] = {
@@ -362,12 +378,36 @@ class ImportProps(repository: Repository, interactor: Interactor, datacite: Data
     else repository.doiAction.store(depositId, doiActionEvent)
   }
 
-  private def storeCuration(depositId: DepositId, curation: InputCuration): MutationErrorOr[Curation] = {
+  private def storeCurator(depositId: DepositId, curator: InputCurator): MutationErrorOr[Curator] = {
     if (testMode) {
-      logger.info(s"[TESTMODE] store curation $curation")
-      curation.toOutput("id").asRight
+      logger.info(s"[TESTMODE] store curator $curator")
+      curator.toOutput("id").asRight
     }
-    else repository.curation.store(depositId, curation)
+    else repository.curator.store(depositId, curator)
+  }
+
+  private def storeIsNewVersion(depositId: DepositId, isNewVersion: InputIsNewVersion): MutationErrorOr[IsNewVersion] = {
+    if (testMode) {
+      logger.info(s"[TESTMODE] store is-new-version $isNewVersion")
+      isNewVersion.toOutput("id").asRight
+    }
+    else repository.isNewVersion.store(depositId, isNewVersion)
+  }
+
+  private def storeIsCurationRequired(depositId: DepositId, isCurationRequired: InputIsCurationRequired): MutationErrorOr[IsCurationRequired] = {
+    if (testMode) {
+      logger.info(s"[TESTMODE] store is-curation-required $isCurationRequired")
+      isCurationRequired.toOutput("id").asRight
+    }
+    else repository.isCurationRequired.store(depositId, isCurationRequired)
+  }
+
+  private def storeIsCurationPerformed(depositId: DepositId, isCurationPerformed: InputIsCurationPerformed): MutationErrorOr[IsCurationPerformed] = {
+    if (testMode) {
+      logger.info(s"[TESTMODE] store is-curation-performed $isCurationPerformed")
+      isCurationPerformed.toOutput("id").asRight
+    }
+    else repository.isCurationPerformed.store(depositId, isCurationPerformed)
   }
 
   private def storeSpringfield(depositId: DepositId, springfield: InputSpringfield): MutationErrorOr[Springfield] = {

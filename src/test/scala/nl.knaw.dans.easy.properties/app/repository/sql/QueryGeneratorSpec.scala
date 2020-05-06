@@ -851,7 +851,7 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
          |  (SELECT depositId, MAX(creationTimestamp) AS max FROM Deposit WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
          |  (SELECT depositId, MAX(timestamp) AS max FROM State WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
          |  (SELECT depositId, MAX(timestamp) AS max FROM Identifier WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
-         |  (SELECT depositId, MAX(timestamp) AS max FROM Curation WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
+         |  (SELECT depositId, MAX(timestamp) AS max FROM Curator WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
          |  (SELECT depositId, MAX(timestamp) AS max FROM Springfield WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
          |  (SELECT depositId, MAX(timestamp) AS max FROM SimpleProperties WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId)
          |) AS max_timestamps
@@ -1128,11 +1128,11 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     QueryGenerator.storeBagName shouldBe "UPDATE Deposit SET bagName = ? WHERE depositId = ? AND (bagName IS NULL OR bagName='');"
   }
 
-  "storeCuration" should "yield the query for inserting a Curation into the database if isNewVersion is defined" in {
+  "storeCuration" should "yield the query for inserting a Curation into the database if isNewVersion is defined" ignore {
     QueryGenerator.storeCuration(true) shouldBe "INSERT INTO Curation (depositId, isRequired, isPerformed, datamanagerUserId, datamanagerEmail, timestamp, isNewVersion) VALUES (?, ?, ?, ?, ?, ?, ?);"
   }
 
-  it should "yield the query for inserting a Curation into the database if isNewVersion is not defined" in {
+  it should "yield the query for inserting a Curation into the database if isNewVersion is not defined" ignore {
     QueryGenerator.storeCuration(false) shouldBe "INSERT INTO Curation (depositId, isRequired, isPerformed, datamanagerUserId, datamanagerEmail, timestamp) VALUES (?, ?, ?, ?, ?, ?);"
   }
 
@@ -1150,6 +1150,10 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
 
   "storeState" should "yield the query for inserting a State into the database" in {
     QueryGenerator.storeState shouldBe "INSERT INTO State (depositId, label, description, timestamp) VALUES (?, ?, ?, ?);"
+  }
+
+  "storeCurator" should "yield the query for inserting a Curator into the database" in {
+    QueryGenerator.storeCurator shouldBe "INSERT INTO Curator (depositId, datamanagerUserId, datamanagerEmail, timestamp) VALUES (?, ?, ?, ?);"
   }
 
   "deleteByDepositId" should "yield the query for deleting a State from the database" in {

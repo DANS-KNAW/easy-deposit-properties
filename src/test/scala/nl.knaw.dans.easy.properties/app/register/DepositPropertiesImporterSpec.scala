@@ -19,7 +19,7 @@ import cats.scalatest.{ EitherMatchers, EitherValues }
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesImporter._
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesValidator.{ depositorKey, _ }
-import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, MutationError, Repository, SpringfieldDao, StateDao }
+import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CuratorDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, IsCurationPerformedDao, IsCurationRequiredDao, IsNewVersionDao, MutationError, Repository, SpringfieldDao, StateDao }
 import nl.knaw.dans.easy.properties.fixture.{ RegistrationTestData, TestSupportFixture }
 import org.scalamock.scalatest.MockFactory
 
@@ -73,15 +73,19 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     val identifierDao = mock[IdentifierDao]
     val doiRegisteredDao = mock[DoiRegisteredDao]
     val doiActionDao = mock[DoiActionDao]
-    val curationDao = mock[CurationDao]
+    val curatorDao = mock[CuratorDao]
+    val isNewVersionDao = mock[IsNewVersionDao]
+    val isCurationRequiredDao = mock[IsCurationRequiredDao]
+    val isCurationPerformedDao = mock[IsCurationPerformedDao]
     val springfieldDao = mock[SpringfieldDao]
     val contentTypeDao = mock[ContentTypeDao]
-    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
+    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curatorDao, isNewVersionDao, isCurationRequiredDao, isCurationPerformedDao, springfieldDao, contentTypeDao)
 
     // @formatter:off
     val input @ DepositProperties(
       deposit, Some(state), Some(ingestStep), Seq(fedora, doi, urn, bagstore), Some(doiAction),
-      Some(doiRegistered), Some(curation), Some(springfield), Some(contentType),
+      Some(doiRegistered), Some(curator), Some(isNewVersion), Some(isCurationRequired),
+      Some(isCurationPerformed), Some(springfield), Some(contentType),
     ) = validDepositProperties
     // @formatter:on
     val depositId = deposit.id
@@ -94,7 +98,10 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     identifierDao.store _ expects(depositId, bagstore) once() returning bagstore.toOutput("abc").asRight
     doiRegisteredDao.store _ expects(depositId, doiRegistered) once() returning doiRegistered.asRight
     doiActionDao.store _ expects(depositId, doiAction) once() returning doiAction.asRight
-    curationDao.store _ expects(depositId, curation) once() returning curation.toOutput("abc").asRight
+    curatorDao.store _ expects(depositId, curator) once() returning curator.toOutput("abc").asRight
+    isNewVersionDao.store _ expects(depositId, isNewVersion) once() returning isNewVersion.toOutput("abc").asRight
+    isCurationRequiredDao.store _ expects(depositId, isCurationRequired) once() returning isCurationRequired.toOutput("abc").asRight
+    isCurationPerformedDao.store _ expects(depositId, isCurationPerformed) once() returning isCurationPerformed.toOutput("abc").asRight
     springfieldDao.store _ expects(depositId, springfield) once() returning springfield.toOutput("abc").asRight
     contentTypeDao.store _ expects(depositId, contentType) once() returning contentType.toOutput("abc").asRight
 
@@ -108,10 +115,13 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     val identifierDao = mock[IdentifierDao]
     val doiRegisteredDao = mock[DoiRegisteredDao]
     val doiActionDao = mock[DoiActionDao]
-    val curationDao = mock[CurationDao]
+    val curatorDao = mock[CuratorDao]
+    val isNewVersionDao = mock[IsNewVersionDao]
+    val isCurationRequiredDao = mock[IsCurationRequiredDao]
+    val isCurationPerformedDao = mock[IsCurationPerformedDao]
     val springfieldDao = mock[SpringfieldDao]
     val contentTypeDao = mock[ContentTypeDao]
-    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
+    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curatorDao, isNewVersionDao, isCurationRequiredDao, isCurationPerformedDao, springfieldDao, contentTypeDao)
 
     val input = minimalDepositProperties
     depositDao.store _ expects input.deposit once() returning input.deposit.asRight
@@ -120,7 +130,10 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     identifierDao.store _ expects(*, *) never()
     doiRegisteredDao.store _ expects(*, *) never()
     doiActionDao.store _ expects(*, *) never()
-    curationDao.store _ expects(*, *) never()
+    curatorDao.store _ expects(*, *) never()
+    isNewVersionDao.store _ expects(*, *) never()
+    isCurationRequiredDao.store _ expects(*, *) never()
+    isCurationPerformedDao.store _ expects(*, *) never()
     springfieldDao.store _ expects(*, *) never()
     contentTypeDao.store _ expects(*, *) never()
 
@@ -134,12 +147,15 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     val identifierDao = mock[IdentifierDao]
     val doiRegisteredDao = mock[DoiRegisteredDao]
     val doiActionDao = mock[DoiActionDao]
-    val curationDao = mock[CurationDao]
+    val curatorDao = mock[CuratorDao]
+    val isNewVersionDao = mock[IsNewVersionDao]
+    val isCurationRequiredDao = mock[IsCurationRequiredDao]
+    val isCurationPerformedDao = mock[IsCurationPerformedDao]
     val springfieldDao = mock[SpringfieldDao]
     val contentTypeDao = mock[ContentTypeDao]
-    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
+    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curatorDao, isNewVersionDao, isCurationRequiredDao, isCurationPerformedDao, springfieldDao, contentTypeDao)
 
-    val input @ DepositProperties(deposit, Some(state), _, _, _, _, _, _, _) = validDepositProperties
+    val input @ DepositProperties(deposit, Some(state), _, _, _, _, _, _, _, _, _, _) = validDepositProperties
     val depositId = deposit.id
     val error = MutationError("error")
 
@@ -149,7 +165,10 @@ class DepositPropertiesImporterSpec extends TestSupportFixture
     identifierDao.store _ expects(*, *) never()
     doiRegisteredDao.store _ expects(*, *) never()
     doiActionDao.store _ expects(*, *) never()
-    curationDao.store _ expects(*, *) never()
+    curatorDao.store _ expects(*, *) never()
+    isNewVersionDao.store _ expects(*, *) never()
+    isCurationRequiredDao.store _ expects(*, *) never()
+    isCurationPerformedDao.store _ expects(*, *) never()
     springfieldDao.store _ expects(*, *) never()
     contentTypeDao.store _ expects(*, *) never()
 

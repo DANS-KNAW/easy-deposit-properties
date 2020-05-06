@@ -15,13 +15,16 @@
  */
 package nl.knaw.dans.easy.properties.app.register
 
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DoiActionEvent, DoiRegisteredEvent }
 import nl.knaw.dans.easy.properties.app.model.contentType.InputContentType
-import nl.knaw.dans.easy.properties.app.model.curation.InputCuration
+import nl.knaw.dans.easy.properties.app.model.curator.InputCurator
 import nl.knaw.dans.easy.properties.app.model.identifier.InputIdentifier
 import nl.knaw.dans.easy.properties.app.model.ingestStep.InputIngestStep
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.InputIsCurationPerformed
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.InputIsCurationRequired
+import nl.knaw.dans.easy.properties.app.model.isnewversion.InputIsNewVersion
 import nl.knaw.dans.easy.properties.app.model.springfield.InputSpringfield
 import nl.knaw.dans.easy.properties.app.model.state.InputState
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DoiActionEvent, DoiRegisteredEvent }
 
 case class DepositProperties(deposit: Deposit,
                              state: Option[InputState],
@@ -29,7 +32,10 @@ case class DepositProperties(deposit: Deposit,
                              identifiers: Seq[InputIdentifier],
                              doiAction: Option[DoiActionEvent],
                              doiRegistered: Option[DoiRegisteredEvent],
-                             curation: Option[InputCuration],
+                             curator: Option[InputCurator],
+                             isNewVersion: Option[InputIsNewVersion],
+                             isCurationRequired: Option[InputIsCurationRequired],
+                             isCurationPerformed: Option[InputIsCurationPerformed],
                              springfield: Option[InputSpringfield],
                              contentType: Option[InputContentType],
                             )

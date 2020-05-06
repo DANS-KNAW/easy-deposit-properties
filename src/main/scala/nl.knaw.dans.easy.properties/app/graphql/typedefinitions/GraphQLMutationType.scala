@@ -108,18 +108,42 @@ trait GraphQLMutationType {
   ))
   implicit val SetDoiActionPayloadType: ObjectType[DataContext, SetDoiActionPayload] = deriveObjectType[DataContext, SetDoiActionPayload]()
 
-  implicit val SetCurationInputType: InputObjectType[SetCurationInput] = deriveInputObjectType[SetCurationInput]()
-  implicit val SetCurationInputFromInput: FromInput[SetCurationInput] = fromInput(ad => SetCurationInput(
+  implicit val SetCuratorInputType: InputObjectType[SetCuratorInput] = deriveInputObjectType[SetCuratorInput]()
+  implicit val SetCuratorInputFromInput: FromInput[SetCuratorInput] = fromInput(ad => SetCuratorInput(
     clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
     depositId = ad("depositId").asInstanceOf[DepositId],
     datamanagerUserId = ad("datamanagerUserId").asInstanceOf[String],
     datamanagerEmail = ad("datamanagerEmail").asInstanceOf[String],
-    isNewVersion = ad.get("isNewVersion").flatMap(_.asInstanceOf[Option[Boolean]]),
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
+  ))
+  implicit val SetCuratorPayloadType: ObjectType[DataContext, SetCuratorPayload] = deriveObjectType[DataContext, SetCuratorPayload]()
+
+  implicit val SetIsNewVersionInputType: InputObjectType[SetIsNewVersionInput] = deriveInputObjectType[SetIsNewVersionInput]()
+  implicit val SetIsNewVersionInputFromInput: FromInput[SetIsNewVersionInput] = fromInput(ad => SetIsNewVersionInput(
+    clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
+    depositId = ad("depositId").asInstanceOf[DepositId],
+    isNewVersion = ad("isNewVersion").asInstanceOf[Boolean],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
+  ))
+  implicit val SetIsNewVersionPayloadType: ObjectType[DataContext, SetIsNewVersionPayload] = deriveObjectType[DataContext, SetIsNewVersionPayload]()
+
+  implicit val SetIsCurationRequiredInputType: InputObjectType[SetIsCurationRequiredInput] = deriveInputObjectType[SetIsCurationRequiredInput]()
+  implicit val SetIsCurationRequiredInputFromInput: FromInput[SetIsCurationRequiredInput] = fromInput(ad => SetIsCurationRequiredInput(
+    clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
+    depositId = ad("depositId").asInstanceOf[DepositId],
     isCurationRequired = ad("isCurationRequired").asInstanceOf[Boolean],
+    timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
+  ))
+  implicit val SetIsCurationRequiredPayloadType: ObjectType[DataContext, SetIsCurationRequiredPayload] = deriveObjectType[DataContext, SetIsCurationRequiredPayload]()
+
+  implicit val SetIsCurationPerformedInputType: InputObjectType[SetIsCurationPerformedInput] = deriveInputObjectType[SetIsCurationPerformedInput]()
+  implicit val SetIsCurationPerformedInputFromInput: FromInput[SetIsCurationPerformedInput] = fromInput(ad => SetIsCurationPerformedInput(
+    clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
+    depositId = ad("depositId").asInstanceOf[DepositId],
     isCurationPerformed = ad("isCurationPerformed").asInstanceOf[Boolean],
     timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
-  implicit val SetCurationPayloadType: ObjectType[DataContext, SetCurationPayload] = deriveObjectType[DataContext, SetCurationPayload]()
+  implicit val SetIsCurationPerformedPayloadType: ObjectType[DataContext, SetIsCurationPerformedPayload] = deriveObjectType[DataContext, SetIsCurationPerformedPayload]()
 
   implicit val SetSpringfieldInputType: InputObjectType[SetSpringfieldInput] = deriveInputObjectType[SetSpringfieldInput]()
   implicit val SetSpringfieldInputFromInput: FromInput[SetSpringfieldInput] = fromInput(ad => SetSpringfieldInput(

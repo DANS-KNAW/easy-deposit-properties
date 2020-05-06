@@ -15,8 +15,9 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
+import nl.knaw.dans.easy.properties.app.model.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
-import nl.knaw.dans.easy.properties.app.model.{ DepositCurationRequiredFilter, SeriesFilter }
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.DepositIsCurationRequiredFilter
 import sangria.macros.derive.{ DocumentInputField, InputObjectTypeDescription, RenameInputField, deriveInputObjectType }
 import sangria.marshalling.FromInput
 import sangria.schema.InputObjectType
@@ -24,13 +25,13 @@ import sangria.schema.InputObjectType
 trait GraphQLCurationRequiredType {
   this: GraphQLCommonTypes =>
 
-  implicit val DepositCurationRequiredFilterType: InputObjectType[DepositCurationRequiredFilter] = deriveInputObjectType(
+  implicit val DepositCurationRequiredFilterType: InputObjectType[DepositIsCurationRequiredFilter] = deriveInputObjectType(
     InputObjectTypeDescription("The value and filter to be used in searching for deposits by 'curation-required'."),
     DocumentInputField("curationRequired", "If provided, only show deposits with this value for 'curation-required'."),
     DocumentInputField("filter", "Determine whether to search in current values (`LATEST`, default) or all current and past values (`ALL`)."),
     RenameInputField("curationRequired", "value"),
   )
-  implicit val DepositCurationRequiredFilterFromInput: FromInput[DepositCurationRequiredFilter] = fromInput(ad => DepositCurationRequiredFilter(
+  implicit val DepositCurationRequiredFilterFromInput: FromInput[DepositIsCurationRequiredFilter] = fromInput(ad => DepositIsCurationRequiredFilter(
     curationRequired = ad("value").asInstanceOf[Boolean],
     filter = ad("filter").asInstanceOf[Option[SeriesFilter]].getOrElse(SeriesFilter.LATEST),
   ))

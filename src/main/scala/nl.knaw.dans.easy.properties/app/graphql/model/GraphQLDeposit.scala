@@ -158,7 +158,7 @@ class GraphQLDeposit(deposit: Deposit) extends Node {
   @GraphQLField
   @GraphQLDescription("The data manager currently assigned to this deposit.")
   def curator(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Option[GraphQLCurator]] = {
-    CurationResolver.currentCuratorsById(deposit.id)
+    CuratorResolver.currentCuratorsById(deposit.id)
       .map(_.map(new GraphQLCurator(_)))
   }
 
@@ -173,7 +173,7 @@ class GraphQLDeposit(deposit: Deposit) extends Node {
                first: Option[Int] = None,
                last: Option[Int] = None,
               )(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, ExtendedConnection[GraphQLCurator]] = {
-    CurationResolver.allCuratorsById(deposit.id)
+    CuratorResolver.allCuratorsById(deposit.id)
       .map(TimebasedSearch(TimeFilter(earlierThan, laterThan, atTimestamp), orderBy))
       .map(curators => ExtendedConnection.connectionFromSeq(
         curators.map(new GraphQLCurator(_)),
@@ -183,40 +183,43 @@ class GraphQLDeposit(deposit: Deposit) extends Node {
 
   @GraphQLField
   @GraphQLDescription("Whether this deposit is a new version.")
-  def isNewVersion(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Option[Boolean]] = {
-    CurationResolver.isNewVersion(deposit.id)
+  def isNewVersion(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Option[GraphQLIsNewVersion]] = {
+    IsNewVersionResolver.currentIsNewVersionById(deposit.id)
+      .map(_.map(new GraphQLIsNewVersion(_)))
   }
 
   @GraphQLField
   @GraphQLDescription("List the present and past values for 'is-new-version'.")
   def isNewVersionEvents(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Seq[GraphQLIsNewVersion]] = {
-    CurationResolver.allIsNewVersionEvents(deposit.id)
+    IsNewVersionResolver.allIsNewVersionsById(deposit.id)
       .map(_.sortBy(_.timestamp).map(new GraphQLIsNewVersion(_)))
   }
 
   @GraphQLField
   @GraphQLDescription("Whether this deposit requires curation.")
-  def curationRequired(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Option[Boolean]] = {
-    CurationResolver.isCurationRequired(deposit.id)
+  def curationRequired(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Option[GraphQLCurationRequired]] = {
+    IsCurationRequiredResolver.currentIsCurationRequiredById(deposit.id)
+      .map(_.map(new GraphQLCurationRequired(_)))
   }
 
   @GraphQLField
   @GraphQLDescription("List the present and past values for 'curation-required'.")
   def curationRequiredEvents(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Seq[GraphQLCurationRequired]] = {
-    CurationResolver.allIsCurationRequiredEvents(deposit.id)
+    IsCurationRequiredResolver.allIsCurationRequiredsById(deposit.id)
       .map(_.sortBy(_.timestamp).map(new GraphQLCurationRequired(_)))
   }
 
   @GraphQLField
   @GraphQLDescription("Whether curation on this deposit has been performed.")
-  def curationPerformed(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Option[Boolean]] = {
-    CurationResolver.isCurationPerformed(deposit.id)
+  def curationPerformed(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Option[GraphQLCurationPerformed]] = {
+    IsCurationPerformedResolver.currentIsCurationPerformedById(deposit.id)
+      .map(_.map(new GraphQLCurationPerformed(_)))
   }
 
   @GraphQLField
   @GraphQLDescription("List the present and past values for 'curation-performed'.")
   def curationPerformedEvents(implicit ctx: Context[DataContext, GraphQLDeposit]): DeferredValue[DataContext, Seq[GraphQLCurationPerformed]] = {
-    CurationResolver.allIsCurationPerformedEvents(deposit.id)
+    IsCurationPerformedResolver.allIsCurationPerformedsById(deposit.id)
       .map(_.sortBy(_.timestamp).map(new GraphQLCurationPerformed(_)))
   }
 

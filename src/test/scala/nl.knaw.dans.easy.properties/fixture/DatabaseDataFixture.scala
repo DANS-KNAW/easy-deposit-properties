@@ -17,12 +17,16 @@ package nl.knaw.dans.easy.properties.fixture
 
 import java.util.UUID
 
-import cats.syntax.option._
 import better.files.File
+import cats.syntax.option._
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue }
 import nl.knaw.dans.easy.properties.app.model.curation.Curation
+import nl.knaw.dans.easy.properties.app.model.curator.Curator
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestStepLabel }
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.IsCurationPerformed
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.IsCurationRequired
+import nl.knaw.dans.easy.properties.app.model.isnewversion.IsNewVersion
 import nl.knaw.dans.easy.properties.app.model.springfield.{ Springfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.{ State, StateLabel }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin }
@@ -91,19 +95,29 @@ trait DatabaseDataFixture extends BeforeAndAfterEach {
 
   val identifier13 = Identifier("13", IdentifierType.BAG_STORE, depositId5.toString, new DateTime(2019, 5, 5, 0, 0, timeZone))
 
-  val curation0 = Curation("0", isNewVersion = none, isRequired = true, isPerformed = false, "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 1, 1, 0, 0, timeZone))
-  val curation1 = Curation("1", isNewVersion = none, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 1, 1, 3, 3, timeZone))
-  val curation2 = Curation("2", isNewVersion = none, isRequired = true, isPerformed = true, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 1, 1, 4, 4, timeZone))
+  @deprecated val curation0 = Curation("0", isNewVersion = none, isRequired = true, isPerformed = false, "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 1, 1, 0, 0, timeZone))
+  @deprecated val curation1 = Curation("1", isNewVersion = none, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 1, 1, 3, 3, timeZone))
+  @deprecated val curation2 = Curation("2", isNewVersion = none, isRequired = true, isPerformed = true, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 1, 1, 4, 4, timeZone))
 
-  val curation3 = Curation("3", isNewVersion = none, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 3, 3, 0, 0, timeZone))
-  val curation4 = Curation("4", isNewVersion = none, isRequired = true, isPerformed = false, "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 3, 3, 4, 4, timeZone))
-  val curation5 = Curation("5", isNewVersion = true.some, isRequired = true, isPerformed = true, "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 3, 3, 6, 6, timeZone))
+  @deprecated val curation3 = Curation("3", isNewVersion = none, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 3, 3, 0, 0, timeZone))
+  @deprecated val curation4 = Curation("4", isNewVersion = none, isRequired = true, isPerformed = false, "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 3, 3, 4, 4, timeZone))
+  @deprecated val curation5 = Curation("5", isNewVersion = true.some, isRequired = true, isPerformed = true, "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 3, 3, 6, 6, timeZone))
 
-  val curation6 = Curation("6", isNewVersion = false.some, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 4, 4, 0, 0, timeZone))
-  val curation7 = Curation("7", isNewVersion = false.some, isRequired = true, isPerformed = true, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 4, 4, 4, 4, timeZone))
+  @deprecated val curation6 = Curation("6", isNewVersion = false.some, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 4, 4, 0, 0, timeZone))
+  @deprecated val curation7 = Curation("7", isNewVersion = false.some, isRequired = true, isPerformed = true, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 4, 4, 4, 4, timeZone))
 
-  val curation8 = Curation("8", isNewVersion = false.some, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 5, 5, 0, 0, timeZone))
-  val curation9 = Curation("9", isNewVersion = false.some, isRequired = true, isPerformed = true, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 5, 5, 4, 4, timeZone))
+  @deprecated val curation8 = Curation("8", isNewVersion = false.some, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 5, 5, 0, 0, timeZone))
+  @deprecated val curation9 = Curation("9", isNewVersion = false.some, isRequired = true, isPerformed = true, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 5, 5, 4, 4, timeZone))
+
+  val curator0 = Curator("0", "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 1, 1, 0, 0, timeZone))
+  val curator1 = Curator("1", "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 1, 1, 3, 3, timeZone))
+
+  val curator2 = Curator("2", "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 3, 3, 0, 0, timeZone))
+  val curator3 = Curator("3", "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 3, 3, 4, 4, timeZone))
+
+  val curator4 = Curator("4", "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 4, 4, 0, 0, timeZone))
+
+  val curator5 = Curator("5", "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 5, 5, 0, 0, timeZone))
 
   val springfield0 = Springfield("0", "domain1", "user1", "collection1", SpringfieldPlayMode.CONTINUOUS, new DateTime(2019, 1, 1, 0, 0, timeZone))
   val springfield1 = Springfield("1", "domain1", "user1", "collection1", SpringfieldPlayMode.CONTINUOUS, new DateTime(2019, 2, 2, 0, 0, timeZone))
@@ -146,6 +160,24 @@ trait DatabaseDataFixture extends BeforeAndAfterEach {
   val contentType3 = ContentType("29", ContentTypeValue.ZIP, new DateTime(2019, 3, 3, 0, 5, timeZone))
   val contentType4 = ContentType("30", ContentTypeValue.ZIP, new DateTime(2019, 4, 4, 0, 5, timeZone))
   val contentType5 = ContentType("31", ContentTypeValue.ZIP, new DateTime(2019, 5, 5, 0, 5, timeZone))
+
+  val isNewVersion0 = IsNewVersion("32", value = true, new DateTime(2019, 3, 3, 6, 6, timeZone))
+  val isNewVersion1 = IsNewVersion("33", value = false, new DateTime(2019, 4, 4, 0, 0, timeZone))
+  val isNewVersion2 = IsNewVersion("34", value = false, new DateTime(2019, 5, 5, 0, 0, timeZone))
+
+  val isCurationRequired0 = IsCurationRequired("35", value = true, new DateTime(2019, 1, 1, 0, 0, timeZone))
+  val isCurationRequired1 = IsCurationRequired("36", value = true, new DateTime(2019, 3, 3, 0, 0, timeZone))
+  val isCurationRequired2 = IsCurationRequired("37", value = true, new DateTime(2019, 4, 4, 0, 0, timeZone))
+  val isCurationRequired3 = IsCurationRequired("38", value = true, new DateTime(2019, 5, 5, 0, 0, timeZone))
+
+  val isCurationPerformed0 = IsCurationPerformed("39", value = false, new DateTime(2019, 1, 1, 0, 0, timeZone))
+  val isCurationPerformed1 = IsCurationPerformed("40", value = true, new DateTime(2019, 1, 1, 4, 4, timeZone))
+  val isCurationPerformed2 = IsCurationPerformed("41", value = false, new DateTime(2019, 3, 3, 0, 0, timeZone))
+  val isCurationPerformed3 = IsCurationPerformed("42", value = true, new DateTime(2019, 3, 3, 6, 6, timeZone))
+  val isCurationPerformed4 = IsCurationPerformed("43", value = false, new DateTime(2019, 4, 4, 0, 0, timeZone))
+  val isCurationPerformed5 = IsCurationPerformed("44", value = true, new DateTime(2019, 4, 4, 4, 4, timeZone))
+  val isCurationPerformed6 = IsCurationPerformed("45", value = false, new DateTime(2019, 5, 5, 0, 0, timeZone))
+  val isCurationPerformed7 = IsCurationPerformed("46", value = true, new DateTime(2019, 5, 5, 4, 4, timeZone))
 
   def prepareTest(query: String): Unit = {
     managed(connection.createStatement())

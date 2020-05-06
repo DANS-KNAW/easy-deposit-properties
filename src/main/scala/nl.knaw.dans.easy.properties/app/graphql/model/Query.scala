@@ -16,7 +16,6 @@
 package nl.knaw.dans.easy.properties.app.graphql.model
 
 import nl.knaw.dans.easy.properties.app.graphql._
-import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
 import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ DepositResolver, IdentifierResolver }
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
@@ -25,6 +24,10 @@ import nl.knaw.dans.easy.properties.app.model.contentType.DepositContentTypeFilt
 import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.ingestStep.DepositIngestStepFilter
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.DepositIsCurationPerformedFilter
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.DepositIsCurationRequiredFilter
+import nl.knaw.dans.easy.properties.app.model.isnewversion.DepositIsNewVersionFilter
+import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.state.DepositStateFilter
 import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
 import org.joda.time.DateTime
@@ -53,8 +56,8 @@ class Query {
                @GraphQLDescription("List only those deposits that have this specified value for DOI action.") doiAction: Option[DepositDoiActionFilter] = None,
                @GraphQLDescription("List only those deposits that have this specified data manager.") curator: Option[DepositCuratorFilter] = None,
                @GraphQLDescription("List only those deposits that have this specified value for 'is-new-version'.") isNewVersion: Option[DepositIsNewVersionFilter] = None,
-               @GraphQLDescription("List only those deposits that have this specified value for 'curation required'.") curationRequired: Option[DepositCurationRequiredFilter] = None,
-               @GraphQLDescription("List only those deposits that have this specified value for 'curation performed'.") curationPerformed: Option[DepositCurationPerformedFilter] = None,
+               @GraphQLDescription("List only those deposits that have this specified value for 'curation required'.") curationRequired: Option[DepositIsCurationRequiredFilter] = None,
+               @GraphQLDescription("List only those deposits that have this specified value for 'curation performed'.") curationPerformed: Option[DepositIsCurationPerformedFilter] = None,
                @GraphQLDescription("List only those deposits that have this specified content type.") contentType: Option[DepositContentTypeFilter] = None,
                @GraphQLDescription("Ordering options for the returned deposits.") orderBy: Option[DepositOrder] = None,
                @GraphQLDescription("List only those elements that have a timestamp earlier than this given timestamp.") earlierThan: Option[DateTime] = None,
@@ -102,8 +105,8 @@ class Query {
                  @GraphQLDescription("Find only those depositors that have deposits with this action value.") doiAction: Option[DepositDoiActionFilter] = None,
                  @GraphQLDescription("Find only those depositors that have deposits with this curator.") curator: Option[DepositCuratorFilter] = None,
                  @GraphQLDescription("Find only those depositors that have deposits with this 'new version' value.") isNewVersion: Option[DepositIsNewVersionFilter] = None,
-                 @GraphQLDescription("Find only those depositors that have deposits with this 'curation required' value.") curationRequired: Option[DepositCurationRequiredFilter] = None,
-                 @GraphQLDescription("Find only those depositors that have deposits with this 'curation performed' value.") curationPerformed: Option[DepositCurationPerformedFilter] = None,
+                 @GraphQLDescription("Find only those depositors that have deposits with this 'curation required' value.") curationRequired: Option[DepositIsCurationRequiredFilter] = None,
+                 @GraphQLDescription("Find only those depositors that have deposits with this 'curation performed' value.") curationPerformed: Option[DepositIsCurationPerformedFilter] = None,
                  @GraphQLDescription("Find only those depositors that have deposits with this content type.") contentType: Option[DepositContentTypeFilter] = None,
                  before: Option[String] = None,
                  after: Option[String] = None,

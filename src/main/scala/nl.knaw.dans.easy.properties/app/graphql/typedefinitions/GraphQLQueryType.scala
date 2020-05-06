@@ -15,16 +15,14 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
-import java.util.UUID
-
 import nl.knaw.dans.easy.properties.app.graphql._
 import nl.knaw.dans.easy.properties.app.graphql.model._
 import nl.knaw.dans.easy.properties.app.graphql.resolvers._
+import nl.knaw.dans.lib.error._
+import nl.knaw.dans.lib.string._
 import sangria.macros.derive._
 import sangria.relay.{ GlobalId, Node, NodeDefinition }
 import sangria.schema.{ Context, ObjectType }
-import nl.knaw.dans.lib.string._
-import nl.knaw.dans.lib.error._
 
 trait GraphQLQueryType {
   this: Scalars
@@ -51,8 +49,8 @@ trait GraphQLQueryType {
             ContentTypeResolver.contentTypeById(id.id)
               .map(_.map(new GraphQLContentType(_)))
           case GraphQLCuratorType.name =>
-            CurationResolver.curationById(id.id)
-              .map(_.map(curation => new GraphQLCurator(curation.getCurator)))
+            CuratorResolver.curationById(id.id)
+              .map(_.map(new GraphQLCurator(_)))
           case GraphQLDepositType.name =>
             DepositResolver.depositById(id.id.toUUID.toTry.unsafeGetOrThrow)
               .map(_.map(new GraphQLDeposit(_)))
@@ -62,6 +60,15 @@ trait GraphQLQueryType {
           case GraphQLIngestStepType.name =>
             IngestStepResolver.ingestStepById(id.id)
               .map(_.map(new GraphQLIngestStep(_)))
+          case GraphQLIsNewVersionType.name =>
+            IsNewVersionResolver.isNewVersionById(id.id)
+              .map(_.map(new GraphQLIsNewVersion(_)))
+          case GraphQLCurationRequiredType.name =>
+            IsCurationRequiredResolver.isCurationRequiredById(id.id)
+              .map(_.map(new GraphQLCurationRequired(_)))
+          case GraphQLCurationPerformedType.name =>
+            IsCurationPerformedResolver.isCurationPerformedById(id.id)
+              .map(_.map(new GraphQLCurationPerformed(_)))
           case GraphQLSpringfieldType.name =>
             SpringfieldResolver.springfieldById(id.id)
               .map(_.map(new GraphQLSpringfield(_)))
@@ -73,11 +80,13 @@ trait GraphQLQueryType {
       },
       possibleTypes = Node.possibleNodeTypes[DataContext, Node](
         GraphQLContentTypeType,
-        GraphQLCurationType,
         GraphQLCuratorType,
         GraphQLDepositType,
         GraphQLIdentifierType,
         GraphQLIngestStepType,
+        GraphQLIsNewVersionType,
+        GraphQLCurationRequiredType,
+        GraphQLCurationPerformedType,
         GraphQLSpringfieldType,
         GraphQLStateType,
       ),
@@ -89,14 +98,15 @@ trait GraphQLQueryType {
     AddFields(Node.globalIdField),
   )
 
-  implicit lazy val GraphQLCurationType: ObjectType[DataContext, GraphQLCuration] = deriveObjectType[DataContext, GraphQLCuration](
+  implicit lazy val GraphQLCurationPerformedType: ObjectType[DataContext, GraphQLCurationPerformed] = deriveObjectType[DataContext, GraphQLCurationPerformed](
     Interfaces(nodeInterface),
     AddFields(Node.globalIdField),
   )
 
-  implicit lazy val GraphQLCurationPerformedType: ObjectType[DataContext, GraphQLCurationPerformed] = deriveObjectType[DataContext, GraphQLCurationPerformed]()
-
-  implicit lazy val GraphQLCurationRequiredType: ObjectType[DataContext, GraphQLCurationRequired] = deriveObjectType[DataContext, GraphQLCurationRequired]()
+  implicit lazy val GraphQLCurationRequiredType: ObjectType[DataContext, GraphQLCurationRequired] = deriveObjectType[DataContext, GraphQLCurationRequired](
+    Interfaces(nodeInterface),
+    AddFields(Node.globalIdField),
+  )
 
   implicit lazy val GraphQLCuratorType: ObjectType[DataContext, GraphQLCurator] = deriveObjectType[DataContext, GraphQLCurator](
     Interfaces(nodeInterface),
@@ -124,7 +134,10 @@ trait GraphQLQueryType {
     AddFields(Node.globalIdField),
   )
 
-  implicit val GraphQLIsNewVersionType: ObjectType[DataContext, GraphQLIsNewVersion] = deriveObjectType[DataContext, GraphQLIsNewVersion]()
+  implicit lazy val GraphQLIsNewVersionType: ObjectType[DataContext, GraphQLIsNewVersion] = deriveObjectType[DataContext, GraphQLIsNewVersion](
+    Interfaces(nodeInterface),
+    AddFields(Node.globalIdField),
+  )
 
   implicit lazy val GraphQLSpringfieldType: ObjectType[DataContext, GraphQLSpringfield] = deriveObjectType[DataContext, GraphQLSpringfield](
     Interfaces(nodeInterface),

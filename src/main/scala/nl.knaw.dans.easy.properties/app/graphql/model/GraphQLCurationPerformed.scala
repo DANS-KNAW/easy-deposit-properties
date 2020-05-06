@@ -15,18 +15,60 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.model
 
-import nl.knaw.dans.easy.properties.app.model.{ CurationPerformedEvent, Timestamp }
-import sangria.macros.derive.{ GraphQLDescription, GraphQLField, GraphQLName }
+import nl.knaw.dans.easy.properties.app.graphql._
+import nl.knaw.dans.easy.properties.app.graphql.relay.ExtendedConnection
+import nl.knaw.dans.easy.properties.app.graphql.resolvers.{ DepositResolver, IsCurationPerformedResolver }
+import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.{ DepositIsCurationPerformedFilter, IsCurationPerformed }
+import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
+import nl.knaw.dans.easy.properties.app.model.{ SeriesFilter, TimeFilter, Timestamp }
+import nl.knaw.dans.easy.properties.app.repository.DepositFilters
+import org.joda.time.DateTime
+import sangria.macros.derive.{ GraphQLDefault, GraphQLDescription, GraphQLField, GraphQLName }
+import sangria.relay.{ ConnectionArgs, Node }
+import sangria.schema.{ Context, DeferredValue }
 
-@GraphQLName("CurationPerformedEvent")
+@GraphQLName("IsCurationPerformed")
 @GraphQLDescription("Whether the deposit has been curated by the data manager.")
-class GraphQLCurationPerformed(curationPerformed: CurationPerformedEvent) {
+class GraphQLCurationPerformed(curationPerformed: IsCurationPerformed) extends Node {
 
   @GraphQLField
   @GraphQLDescription("True if curation by the data manager has been performed.")
-  val value: Boolean = curationPerformed.curationPerformed
+  val value: Boolean = curationPerformed.value
 
   @GraphQLField
   @GraphQLDescription("The timestamp at which the curation was completed.")
   val timestamp: Timestamp = curationPerformed.timestamp
+
+  override val id: String = curationPerformed.id
+
+  @GraphQLField
+  @GraphQLDescription("Returns the deposit that is associated with this particular IsCurationPerformedEvent")
+  def deposit(implicit ctx: Context[DataContext, GraphQLCurationPerformed]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+    IsCurationPerformedResolver.depositByIsCurationPerformedId(id)
+      .map(_.map(new GraphQLDeposit(_)))
+  }
+
+  @GraphQLField
+  @GraphQLDescription("List all deposits with the same current IsCurationPerformedEvent value.")
+  def deposits(@GraphQLDescription("Determine whether to search in current IsCurationPerformedEvents (`LATEST`, default) or all current and past IsCurationPerformedEvents (`ALL`).") @GraphQLDefault(SeriesFilter.LATEST) stateFilter: SeriesFilter,
+               @GraphQLDescription("Ordering options for the returned deposits.") orderBy: Option[DepositOrder] = None,
+               @GraphQLDescription("List only those elements that have a timestamp earlier than this given timestamp.") earlierThan: Option[DateTime] = None,
+               @GraphQLDescription("List only those elements that have a timestamp later than this given timestamp.") laterThan: Option[DateTime] = None,
+               @GraphQLDescription("List only those elements that have a timestamp equal to the given timestamp.") atTimestamp: Option[DateTime] = None,
+               before: Option[String] = None,
+               after: Option[String] = None,
+               first: Option[Int] = None,
+               last: Option[Int] = None,
+              )(implicit ctx: Context[DataContext, GraphQLCurationPerformed]): DeferredValue[DataContext, ExtendedConnection[GraphQLDeposit]] = {
+    DepositResolver.findDeposit(DepositFilters(
+      curationPerformedFilter = Some(DepositIsCurationPerformedFilter(value, stateFilter)),
+      timeFilter = TimeFilter(earlierThan, laterThan, atTimestamp),
+      sort = orderBy,
+    ))
+      .map(deposits => ExtendedConnection.connectionFromSeq(
+        deposits.map(new GraphQLDeposit(_)),
+        ConnectionArgs(before, after, first, last),
+      ))
+  }
 }

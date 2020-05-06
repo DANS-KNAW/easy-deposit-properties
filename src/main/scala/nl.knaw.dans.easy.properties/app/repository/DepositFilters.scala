@@ -19,9 +19,12 @@ import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.contentType.DepositContentTypeFilter
 import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
 import nl.knaw.dans.easy.properties.app.model.ingestStep.DepositIngestStepFilter
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.DepositIsCurationPerformedFilter
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.DepositIsCurationRequiredFilter
+import nl.knaw.dans.easy.properties.app.model.isnewversion.DepositIsNewVersionFilter
 import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.state.DepositStateFilter
-import nl.knaw.dans.easy.properties.app.model.{ DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, DepositorId, TimeFilter }
+import nl.knaw.dans.easy.properties.app.model.{ DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositorId, TimeFilter }
 
 case class DepositFilters(depositorId: Option[DepositorId] = Option.empty,
                           bagName: Option[String] = Option.empty,
@@ -31,8 +34,8 @@ case class DepositFilters(depositorId: Option[DepositorId] = Option.empty,
                           doiActionFilter: Option[DepositDoiActionFilter] = Option.empty,
                           curatorFilter: Option[DepositCuratorFilter] = Option.empty,
                           isNewVersionFilter: Option[DepositIsNewVersionFilter] = Option.empty,
-                          curationRequiredFilter: Option[DepositCurationRequiredFilter] = Option.empty,
-                          curationPerformedFilter: Option[DepositCurationPerformedFilter] = Option.empty,
+                          curationRequiredFilter: Option[DepositIsCurationRequiredFilter] = Option.empty,
+                          curationPerformedFilter: Option[DepositIsCurationPerformedFilter] = Option.empty,
                           contentTypeFilter: Option[DepositContentTypeFilter] = Option.empty,
                           originFilter: Option[Origin] = Option.empty,
                           timeFilter: Option[TimeFilter] = Option.empty,

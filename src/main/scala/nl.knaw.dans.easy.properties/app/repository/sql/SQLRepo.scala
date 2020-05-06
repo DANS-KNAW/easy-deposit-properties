@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 import java.sql.Connection
 
 import nl.knaw.dans.easy.properties.app.database.SQLErrorHandler
-import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, Repository, SpringfieldDao, StateDao }
+import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CuratorDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, IsCurationPerformedDao, IsCurationRequiredDao, IsNewVersionDao, Repository, SpringfieldDao, StateDao }
 
 class SQLRepo(implicit connection: Connection, errorHandler: SQLErrorHandler) {
 
@@ -28,7 +28,10 @@ class SQLRepo(implicit connection: Connection, errorHandler: SQLErrorHandler) {
   private val identifierDao: IdentifierDao = new SQLIdentifierDao
   private val doiRegisteredDao: DoiRegisteredDao = new SQLDoiRegisteredDao
   private val doiActionDao: DoiActionDao = new SQLDoiActionDao
-  private val curationDao: CurationDao = new SQLCurationDao
+  private val curatorDao: CuratorDao = new SQLCuratorDao
+  private val isNewVersionDao: IsNewVersionDao = new SQLIsNewVersionDao
+  private val isCurationRequiredDao: IsCurationRequiredDao = new SQLIsCurationRequiredDao
+  private val isCurationPerformedDao: IsCurationPerformedDao = new SQLIsCurationPerformedDao
   private val springfieldDao: SpringfieldDao = new SQLSpringfieldDao
   private val contentTypeDao: ContentTypeDao = new SQLContentTypeDao
 
@@ -39,7 +42,10 @@ class SQLRepo(implicit connection: Connection, errorHandler: SQLErrorHandler) {
     identifierDao,
     doiRegisteredDao,
     doiActionDao,
-    curationDao,
+    curatorDao,
+    isNewVersionDao,
+    isCurationRequiredDao,
+    isCurationPerformedDao,
     springfieldDao,
     contentTypeDao,
   )

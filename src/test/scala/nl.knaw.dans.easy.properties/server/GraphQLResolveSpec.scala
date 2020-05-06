@@ -19,19 +19,20 @@ import java.util.UUID
 
 import better.files.File
 import cats.syntax.either._
-import cats.syntax.option._
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue, DepositContentTypeFilter }
-import nl.knaw.dans.easy.properties.app.model.curation.Curation
-import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
+import nl.knaw.dans.easy.properties.app.model.curator.{ Curator, DepositCuratorFilter }
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStep, IngestStepLabel }
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.{ DepositIsCurationPerformedFilter, IsCurationPerformed }
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.{ DepositIsCurationRequiredFilter, IsCurationRequired }
+import nl.knaw.dans.easy.properties.app.model.isnewversion.{ DepositIsNewVersionFilter, IsNewVersion }
 import nl.knaw.dans.easy.properties.app.model.sort.{ DepositOrder, DepositOrderField, OrderDirection }
 import nl.knaw.dans.easy.properties.app.model.springfield.{ Springfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, State, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositId, DepositIsNewVersionFilter, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin, SeriesFilter }
-import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DepositFilters, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, Repository, SpringfieldDao, StateDao }
+import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin, SeriesFilter }
+import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CuratorDao, DepositDao, DepositFilters, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, IsCurationPerformedDao, IsCurationRequiredDao, IsNewVersionDao, Repository, SpringfieldDao, StateDao }
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseFixture, FileSystemSupport, TestSupportFixture }
 import org.joda.time.DateTime
 import org.json4s.JsonAST.{ JNothing, JString }
@@ -51,113 +52,137 @@ trait GraphQLResolveSpecTestObjects {
   val depositId1: DepositId = UUID.fromString("00000000-0000-0000-0000-000000000001")
   val depositId2: DepositId = UUID.fromString("00000000-0000-0000-0000-000000000002")
   val depositId3: DepositId = UUID.fromString("00000000-0000-0000-0000-000000000003")
-  val deposit1 = Deposit(
+  val deposit1: Deposit = Deposit(
     id = depositId1,
     bagName = Some("bag1"),
     creationTimestamp = DateTime.now(),
     depositorId = "user001",
     Origin.API,
   )
-  val deposit2 = Deposit(
+  val deposit2: Deposit = Deposit(
     id = depositId2,
     bagName = Some("bag2"),
     creationTimestamp = DateTime.now(),
     depositorId = "user002",
     Origin.API,
   )
-  val deposit3 = Deposit(
+  val deposit3: Deposit = Deposit(
     id = depositId3,
     bagName = Some("bag3"),
     creationTimestamp = DateTime.now(),
     depositorId = "user002",
     Origin.API,
   )
-  val state1 = State(
+  val state1: State = State(
     id = "1",
     label = StateLabel.ARCHIVED,
     description = "your deposit is archived",
     timestamp = DateTime.now(),
   )
-  val state2 = State(
+  val state2: State = State(
     id = "2",
     label = StateLabel.DRAFT,
     description = "your deposit is in draft",
     timestamp = DateTime.now(),
   )
-  val state3 = State(
+  val state3: State = State(
     id = "3",
     label = StateLabel.SUBMITTED,
     description = "your deposit is submitted",
     timestamp = DateTime.now(),
   )
-  val step1 = IngestStep(
+  val step1: IngestStep = IngestStep(
     id = "1",
     step = IngestStepLabel.VALIDATE,
     timestamp = DateTime.now(),
   )
-  val step2 = IngestStep(
+  val step2: IngestStep = IngestStep(
     id = "2",
     step = IngestStepLabel.FEDORA,
     timestamp = DateTime.now(),
   )
-  val step3 = IngestStep(
+  val step3: IngestStep = IngestStep(
     id = "3",
     step = IngestStepLabel.COMPLETED,
     timestamp = DateTime.now(),
   )
-  val identifier1 = Identifier(
+  val identifier1: Identifier = Identifier(
     id = "1",
     idType = IdentifierType.URN,
     idValue = "abcdef",
     timestamp = DateTime.now(),
   )
-  val identifier2 = Identifier(
+  val identifier2: Identifier = Identifier(
     id = "2",
     idType = IdentifierType.DOI,
     idValue = "123456",
     timestamp = DateTime.now(),
   )
-  val identifier3 = Identifier(
+  val identifier3: Identifier = Identifier(
     id = "3",
     idType = IdentifierType.FEDORA,
     idValue = "easy-dataset:1",
     timestamp = DateTime.now(),
   )
-  val doiRegisteredEvent1 = DoiRegisteredEvent(
+  val doiRegisteredEvent1: DoiRegisteredEvent = DoiRegisteredEvent(
     value = true,
     timestamp = DateTime.now(),
   )
-  val doiRegisteredEvent2 = DoiRegisteredEvent(
+  val doiRegisteredEvent2: DoiRegisteredEvent = DoiRegisteredEvent(
     value = false,
     timestamp = DateTime.now(),
   )
-  val doiActionEvent1 = DoiActionEvent(
+  val doiActionEvent1: DoiActionEvent = DoiActionEvent(
     value = DoiAction.CREATE,
     timestamp = DateTime.now(),
   )
-  val doiActionEvent2 = DoiActionEvent(
+  val doiActionEvent2: DoiActionEvent = DoiActionEvent(
     value = DoiAction.UPDATE,
     timestamp = DateTime.now(),
   )
-  val curation1 = Curation(
+  val curator1: Curator = Curator(
     id = "1",
-    isNewVersion = none,
-    isRequired = true,
-    isPerformed = true,
-    datamanagerUserId = "archie001",
-    datamanagerEmail = "does-not-exists1@dans.knaw.nl",
+    userId = "archie001",
+    email = "does-not-exists1@dans.knaw.nl",
     timestamp = DateTime.now(),
   )
-  val curation2 = Curation(
+  val curator2: Curator = Curator(
     id = "2",
-    isNewVersion = false.some,
-    isRequired = false,
-    isPerformed = false,
-    datamanagerUserId = "archie002",
-    datamanagerEmail = "does-not-exists2@dans.knaw.nl",
+    userId = "archie002",
+    email = "does-not-exists2@dans.knaw.nl",
     timestamp = DateTime.now(),
   )
-  val springfield1 = Springfield(
+  val isNewVersion1: IsNewVersion = IsNewVersion(
+    id = "1",
+    value = true,
+    timestamp = DateTime.now(),
+  )
+  val isNewVersion2: IsNewVersion = IsNewVersion(
+    id = "2",
+    value = false,
+    timestamp = DateTime.now(),
+  )
+  val isCurationRequired1: IsCurationRequired = IsCurationRequired(
+    id = "1",
+    value = true,
+    timestamp = DateTime.now(),
+  )
+  val isCurationRequired2: IsCurationRequired = IsCurationRequired(
+    id = "2",
+    value = false,
+    timestamp = DateTime.now(),
+  )
+  val isCurationPerformed1: IsCurationPerformed = IsCurationPerformed(
+    id = "1",
+    value = true,
+    timestamp = DateTime.now(),
+  )
+  val isCurationPerformed2: IsCurationPerformed = IsCurationPerformed(
+    id = "2",
+    value = false,
+    timestamp = DateTime.now(),
+  )
+  val springfield1: Springfield = Springfield(
     id = "1",
     domain = "domain1",
     user = "user1",
@@ -165,7 +190,7 @@ trait GraphQLResolveSpecTestObjects {
     playmode = SpringfieldPlayMode.CONTINUOUS,
     timestamp = DateTime.now(),
   )
-  val springfield2 = Springfield(
+  val springfield2: Springfield = Springfield(
     id = "2",
     domain = "domain2",
     user = "user2",
@@ -173,12 +198,12 @@ trait GraphQLResolveSpecTestObjects {
     playmode = SpringfieldPlayMode.MENU,
     timestamp = DateTime.now(),
   )
-  val contentType1 = ContentType(
+  val contentType1: ContentType = ContentType(
     id = "1",
     value = ContentTypeValue.ZIP,
     timestamp = DateTime.now(),
   )
-  val contentType2 = ContentType(
+  val contentType2: ContentType = ContentType(
     id = "2",
     value = ContentTypeValue.OCTET,
     timestamp = DateTime.now(),
@@ -200,10 +225,13 @@ class GraphQLResolveSpec extends TestSupportFixture
   private val identifierDao = mock[IdentifierDao]
   private val doiRegisteredDao = mock[DoiRegisteredDao]
   private val doiActionDao = mock[DoiActionDao]
-  private val curationDao = mock[CurationDao]
+  private val curatorDao = mock[CuratorDao]
+  private val isNewVersionDao = mock[IsNewVersionDao]
+  private val isCurationRequiredDao = mock[IsCurationRequiredDao]
+  private val isCurationPerformedDao = mock[IsCurationPerformedDao]
   private val springfieldDao = mock[SpringfieldDao]
   private val contentTypeDao = mock[ContentTypeDao]
-  private val repository = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
+  private val repository = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curatorDao, isNewVersionDao, isCurationRequiredDao, isCurationPerformedDao, springfieldDao, contentTypeDao)
   private val servlet = new GraphQLServlet(
     database = databaseAccess,
     repository = _ => repository,
@@ -234,9 +262,21 @@ class GraphQLResolveSpec extends TestSupportFixture
         doiActionDao.getAll _ expects Seq(depositId1) once() returning Seq(
           depositId1 -> Seq(doiActionEvent1, doiActionEvent2),
         ).asRight
-        curationDao.getCurrent _ expects Seq(depositId1) once() returning Seq(depositId1 -> curation1).asRight
-        curationDao.getAll _ expects Seq(depositId1) once() returning Seq(
-          depositId1 -> Seq(curation1, curation2),
+        curatorDao.getCurrent _ expects Seq(depositId1) once() returning Seq(depositId1 -> curator1).asRight
+        curatorDao.getAll _ expects Seq(depositId1) once() returning Seq(
+          depositId1 -> Seq(curator1, curator2),
+        ).asRight
+        isNewVersionDao.getCurrent _ expects Seq(depositId1) once() returning Seq(depositId1 -> isNewVersion1).asRight
+        isNewVersionDao.getAll _ expects Seq(depositId1) once() returning Seq(
+          depositId1 -> Seq(isNewVersion1, isNewVersion2),
+        ).asRight
+        isCurationRequiredDao.getCurrent _ expects Seq(depositId1) once() returning Seq(depositId1 -> isCurationRequired1).asRight
+        isCurationRequiredDao.getAll _ expects Seq(depositId1) once() returning Seq(
+          depositId1 -> Seq(isCurationRequired1, isCurationRequired2),
+        ).asRight
+        isCurationPerformedDao.getCurrent _ expects Seq(depositId1) once() returning Seq(depositId1 -> isCurationPerformed1).asRight
+        isCurationPerformedDao.getAll _ expects Seq(depositId1) once() returning Seq(
+          depositId1 -> Seq(isCurationPerformed1, isCurationPerformed2),
         ).asRight
         springfieldDao.getCurrent _ expects Seq(depositId1) once() returning Seq(depositId1 -> springfield1).asRight
         springfieldDao.getAll _ expects Seq(depositId1) once() returning Seq(
@@ -323,8 +363,8 @@ class GraphQLResolveSpec extends TestSupportFixture
 
     inSequence {
       depositDao.find _ expects Seq(depositId1) once() returning Seq(deposit1).asRight
-      curationDao.getAll _ expects Seq(depositId1) once() returning Seq(
-        depositId1 -> Seq(curation1, curation2),
+      curatorDao.getAll _ expects Seq(depositId1) once() returning Seq(
+        depositId1 -> Seq(curator1, curator2),
       ).asRight
     }
 
@@ -390,8 +430,8 @@ class GraphQLResolveSpec extends TestSupportFixture
 
     inSequence {
       depositDao.find _ expects Seq(depositId1) once() returning Seq(deposit1).asRight
-      curationDao.getAll _ expects Seq(depositId1) once() returning Seq(
-        depositId1 -> Seq(curation1),
+      curatorDao.getAll _ expects Seq(depositId1) once() returning Seq(
+        depositId1 -> Seq(curator1),
       ).asRight
       val filters = DepositFilters(curatorFilter = Some(DepositCuratorFilter("archie001", SeriesFilter.ALL)))
       depositDao.search _ expects Seq(filters) once() returning Seq(
@@ -437,8 +477,8 @@ class GraphQLResolveSpec extends TestSupportFixture
 
     inSequence {
       depositDao.find _ expects Seq(depositId1) once() returning Seq(deposit1).asRight
-      curationDao.getAll _ expects Seq(depositId1) once() returning Seq(
-        depositId1 -> Seq(curation2),
+      curatorDao.getAll _ expects Seq(depositId1) once() returning Seq(
+        depositId1 -> Seq(curator2),
       ).asRight
       val filters = DepositFilters(curatorFilter = Some(DepositCuratorFilter("archie002")))
       depositDao.search _ expects Seq(filters) once() returning Seq(
@@ -565,8 +605,8 @@ class GraphQLResolveSpec extends TestSupportFixture
         ingestStepDao.getAll _ expects Seq(depositId1) once() returning Seq(
           depositId1 -> Seq(step1, step2, step3, step1, step2),
         ).asRight
-        curationDao.getAll _ expects Seq(depositId1) once() returning Seq(
-          depositId1 -> Seq(curation1, curation2, curation1),
+        curatorDao.getAll _ expects Seq(depositId1) once() returning Seq(
+          depositId1 -> Seq(curator1, curator2, curator1),
         ).asRight
         springfieldDao.getAll _ expects Seq(depositId1) once() returning Seq(
           depositId1 -> Seq(springfield1, springfield2, springfield1),
@@ -618,7 +658,7 @@ class GraphQLResolveSpec extends TestSupportFixture
   it should "resolve 'depositor/listDepositsWithCurationPerformedAndDepositor/plain.graphql' with 1 calls to the repository" in {
     val input = graphqlExamplesDir / "depositor" / "listDepositsWithCurationPerformedAndDepositor" / "plain.graphql"
 
-    val filters = DepositFilters(depositorId = Some("user001"), curationPerformedFilter = Some(DepositCurationPerformedFilter(curationPerformed = true)))
+    val filters = DepositFilters(depositorId = Some("user001"), curationPerformedFilter = Some(DepositIsCurationPerformedFilter(curationPerformed = true)))
     depositDao.search _ expects Seq(filters) once() returning Seq(
       filters -> Seq(deposit2, deposit3),
     ).asRight
@@ -629,7 +669,7 @@ class GraphQLResolveSpec extends TestSupportFixture
   it should "resolve 'depositor/listDepositsWithCurationRequiredAndDepositor/plain.graphql' with 1 calls to the repository" in {
     val input = graphqlExamplesDir / "depositor" / "listDepositsWithCurationRequiredAndDepositor" / "plain.graphql"
 
-    val filters = DepositFilters(depositorId = Some("user001"), curationRequiredFilter = Some(DepositCurationRequiredFilter(curationRequired = true)))
+    val filters = DepositFilters(depositorId = Some("user001"), curationRequiredFilter = Some(DepositIsCurationRequiredFilter(curationRequired = true)))
     depositDao.search _ expects Seq(filters) once() returning Seq(
       filters -> Seq(deposit2, deposit3),
     ).asRight
@@ -802,13 +842,40 @@ class GraphQLResolveSpec extends TestSupportFixture
           depositId2 -> Seq(doiActionEvent2),
           depositId3 -> Seq.empty,
         ).asRight
-        (curationDao.getCurrent(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-          depositId1 -> curation1,
-          depositId2 -> curation2,
+        (curatorDao.getCurrent(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+          depositId1 -> curator1,
+          depositId2 -> curator2,
         ).asRight
-        (curationDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-          depositId1 -> Seq(curation1),
-          depositId2 -> Seq(curation1, curation2),
+        (curatorDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+          depositId1 -> Seq(curator1),
+          depositId2 -> Seq(curator1, curator2),
+          depositId3 -> Seq.empty,
+        ).asRight
+        (isNewVersionDao.getCurrent(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+          depositId1 -> isNewVersion1,
+          depositId2 -> isNewVersion2,
+        ).asRight
+        (isNewVersionDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+          depositId1 -> Seq(isNewVersion1),
+          depositId2 -> Seq(isNewVersion1, isNewVersion2),
+          depositId3 -> Seq.empty,
+        ).asRight
+        (isCurationRequiredDao.getCurrent(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+          depositId1 -> isCurationRequired1,
+          depositId2 -> isCurationRequired2,
+        ).asRight
+        (isCurationRequiredDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+          depositId1 -> Seq(isCurationRequired1),
+          depositId2 -> Seq(isCurationRequired1, isCurationRequired2),
+          depositId3 -> Seq.empty,
+        ).asRight
+        (isCurationPerformedDao.getCurrent(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+          depositId1 -> isCurationPerformed1,
+          depositId2 -> isCurationPerformed2,
+        ).asRight
+        (isCurationPerformedDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+          depositId1 -> Seq(isCurationPerformed1),
+          depositId2 -> Seq(isCurationPerformed1, isCurationPerformed2),
           depositId3 -> Seq.empty,
         ).asRight
         (springfieldDao.getCurrent(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
@@ -843,10 +910,10 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      (curationDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curation2, curation1),
-        depositId2 -> Seq(curation2, curation1),
-        depositId3 -> Seq(curation2, curation1),
+      (curatorDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> Seq(curator2, curator1),
+        depositId2 -> Seq(curator2, curator1),
+        depositId3 -> Seq(curator2, curator1),
       ).asRight
     }
 
@@ -910,13 +977,13 @@ class GraphQLResolveSpec extends TestSupportFixture
     val input = graphqlExamplesDir / "deposits" / "listDepositsWithCurationPerformed" / "plain.graphql"
 
     inSequence {
-      val filters = DepositFilters(curationPerformedFilter = Some(DepositCurationPerformedFilter(curationPerformed = true)))
+      val filters = DepositFilters(curationPerformedFilter = Some(DepositIsCurationPerformedFilter(curationPerformed = true)))
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      (curationDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curation1),
-        depositId2 -> Seq(curation2),
+      (isCurationPerformedDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> Seq(isCurationPerformed1),
+        depositId2 -> Seq(isCurationPerformed2),
         depositId3 -> Seq.empty,
       ).asRight
     }
@@ -928,13 +995,13 @@ class GraphQLResolveSpec extends TestSupportFixture
     val input = graphqlExamplesDir / "deposits" / "listDepositsWithCurationRequired" / "plain.graphql"
 
     inSequence {
-      val filters = DepositFilters(curationRequiredFilter = Some(DepositCurationRequiredFilter(curationRequired = true)))
+      val filters = DepositFilters(curationRequiredFilter = Some(DepositIsCurationRequiredFilter(curationRequired = true)))
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      (curationDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curation1),
-        depositId2 -> Seq(curation2),
+      (isCurationRequiredDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> Seq(isCurationRequired1),
+        depositId2 -> Seq(isCurationRequired2),
         depositId3 -> Seq.empty,
       ).asRight
     }
@@ -950,9 +1017,9 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      (curationDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curation1),
-        depositId2 -> Seq(curation2),
+      (curatorDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> Seq(curator1),
+        depositId2 -> Seq(curator2),
         depositId3 -> Seq.empty,
       ).asRight
     }
@@ -1020,9 +1087,9 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      (curationDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curation1),
-        depositId2 -> Seq(curation2),
+      (isNewVersionDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> Seq(isNewVersion1),
+        depositId2 -> Seq(isNewVersion2),
         depositId3 -> Seq.empty,
       ).asRight
     }
@@ -1134,14 +1201,14 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      curationDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curation1),
-        depositId2 -> Seq(curation2),
-        depositId3 -> Seq(curation1),
+      curatorDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> Seq(curator1),
+        depositId2 -> Seq(curator2),
+        depositId3 -> Seq(curator1),
       ).asRight
-      curationDao.getDepositsById _ expects Seq(curation1.id, curation2.id) once() returning Seq(
-        curation1.id -> deposit1,
-        curation2.id -> deposit2,
+      curatorDao.getDepositsById _ expects Seq(curator1.id, curator2.id) once() returning Seq(
+        curator1.id -> deposit1,
+        curator2.id -> deposit2,
       ).asRight
     }
 
@@ -1156,14 +1223,14 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      curationDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curation1, curation2),
-        depositId2 -> Seq(curation2, curation1),
+      curatorDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> Seq(curator1, curator2),
+        depositId2 -> Seq(curator2, curator1),
         depositId3 -> Seq.empty,
       ).asRight
-      curationDao.getDepositsById _ expects Seq(curation1.id, curation2.id) once() returning Seq(
-        curation1.id -> deposit1,
-        curation2.id -> deposit2,
+      curatorDao.getDepositsById _ expects Seq(curator1.id, curator2.id) once() returning Seq(
+        curator1.id -> deposit1,
+        curator2.id -> deposit2,
       ).asRight
     }
 
@@ -1409,14 +1476,14 @@ class GraphQLResolveSpec extends TestSupportFixture
 
     inSequence {
       val filters1 = DepositFilters()
-      val filters2 = DepositFilters(curatorFilter = Some(DepositCuratorFilter(curation1.datamanagerUserId, SeriesFilter.LATEST)))
-      val filters3 = DepositFilters(curatorFilter = Some(DepositCuratorFilter(curation2.datamanagerUserId, SeriesFilter.LATEST)))
+      val filters2 = DepositFilters(curatorFilter = Some(DepositCuratorFilter(curator1.userId, SeriesFilter.LATEST)))
+      val filters3 = DepositFilters(curatorFilter = Some(DepositCuratorFilter(curator2.userId, SeriesFilter.LATEST)))
       depositDao.search _ expects Seq(filters1) once() returning Seq(
         filters1 -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      curationDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curation1, curation2),
-        depositId2 -> Seq(curation2, curation1),
+      curatorDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> Seq(curator1, curator2),
+        depositId2 -> Seq(curator2, curator1),
         depositId3 -> Seq.empty,
       ).asRight
       depositDao.search _ expects Seq(filters2, filters3) once() returning Seq(
@@ -1433,14 +1500,14 @@ class GraphQLResolveSpec extends TestSupportFixture
 
     inSequence {
       val filters1 = DepositFilters()
-      val filters2 = DepositFilters(curatorFilter = Some(DepositCuratorFilter(curation1.datamanagerUserId, SeriesFilter.LATEST)))
-      val filters3 = DepositFilters(curatorFilter = Some(DepositCuratorFilter(curation2.datamanagerUserId, SeriesFilter.LATEST)))
+      val filters2 = DepositFilters(curatorFilter = Some(DepositCuratorFilter(curator1.userId, SeriesFilter.LATEST)))
+      val filters3 = DepositFilters(curatorFilter = Some(DepositCuratorFilter(curator2.userId, SeriesFilter.LATEST)))
       depositDao.search _ expects Seq(filters1) once() returning Seq(
         filters1 -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      curationDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curation1, curation2),
-        depositId2 -> Seq(curation2, curation1),
+      curatorDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> Seq(curator1, curator2),
+        depositId2 -> Seq(curator2, curator1),
         depositId3 -> Seq.empty,
       ).asRight
       depositDao.search _ expects Seq(filters2, filters3) once() returning Seq(
@@ -1629,12 +1696,12 @@ class GraphQLResolveSpec extends TestSupportFixture
 
   it should "resolve 'node/onCurator.graphql' with 3 calls to the repository" in {
     val input = graphqlExamplesDir / "node" / "onCurator.graphql"
-    val curation9 = curation1.copy(id = "9")
+    val curator9 = curator1.copy(id = "9")
 
     inSequence {
-      curationDao.getById _ expects Seq(curation9.id) once() returning Seq(curation9).asRight
+      curatorDao.getById _ expects Seq(curator9.id) once() returning Seq(curator9).asRight
       inAnyOrder {
-        curationDao.getDepositsById _ expects Seq(curation9.id) once() returning Seq(curation9.id -> deposit1).asRight
+        curatorDao.getDepositsById _ expects Seq(curator9.id) once() returning Seq(curator9.id -> deposit1).asRight
         val filters = DepositFilters(
           curatorFilter = Some(DepositCuratorFilter("archie001", SeriesFilter.ALL)),
           sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.ASC)),
@@ -1745,7 +1812,7 @@ class GraphQLResolveSpec extends TestSupportFixture
   it should "resolve 'nodes/onCurator.graphql' with 1 calls to the repository" in {
     val input = graphqlExamplesDir / "nodes" / "onCurator.graphql"
 
-    curationDao.getById _ expects Seq("0", "1") once() returning Seq(curation1, curation1).asRight
+    curatorDao.getById _ expects Seq("0", "1") once() returning Seq(curator1, curator1).asRight
 
     runQuery(input)
   }

@@ -103,10 +103,10 @@ class SQLContentTypeDaoSpec extends TestSupportFixture
     val contentTypes = new SQLContentTypeDao
     val timestamp = new DateTime(2019, 7, 19, 22, 45, timeZone)
     val inputContentType = InputContentType(ContentTypeValue.OCTET, timestamp)
-    val expectedContentType = ContentType("32", ContentTypeValue.OCTET, timestamp)
+    val expectedContentType = ContentType("47", ContentTypeValue.OCTET, timestamp)
 
     contentTypes.store(depositId4, inputContentType).value shouldBe expectedContentType
-    contentTypes.getById(Seq("32")).value should contain only expectedContentType
+    contentTypes.getById(Seq("47")).value should contain only expectedContentType
     contentTypes.getCurrent(Seq(depositId4)).value should contain only (depositId4 -> expectedContentType)
     contentTypes.getAll(Seq(depositId4)).value.toMap.apply(depositId4) should contain(expectedContentType)
   }

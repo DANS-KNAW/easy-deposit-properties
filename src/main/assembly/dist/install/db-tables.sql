@@ -27,18 +27,15 @@ CREATE TABLE IF NOT EXISTS Identifier (
     UNIQUE (identifierSchema, identifierValue)
 );
 
-CREATE TABLE IF NOT EXISTS Curation (
-    curationId SERIAL NOT NULL PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS Curator (
+    curatorEntryId SERIAL NOT NULL PRIMARY KEY,
     depositId CHAR(36) NOT NULL,
-    isNewVersion BOOLEAN,
-    isRequired BOOLEAN NOT NULL,
-    isPerformed BOOLEAN NOT NULL,
     datamanagerUserId VARCHAR(64) NOT NULL,
     datamanagerEmail TEXT NOT NULL,
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (depositId) REFERENCES Deposit (depositId),
     UNIQUE (depositId, timestamp)
-);
+)
 
 CREATE TABLE IF NOT EXISTS Springfield (
     springfieldId SERIAL NOT NULL PRIMARY KEY,
@@ -65,7 +62,7 @@ CREATE TABLE IF NOT EXISTS SimpleProperties (
 GRANT INSERT, SELECT, DELETE, UPDATE ON Deposit TO easy_deposit_properties;
 GRANT INSERT, SELECT, DELETE ON State TO easy_deposit_properties;
 GRANT INSERT, SELECT, DELETE ON Identifier TO easy_deposit_properties;
-GRANT INSERT, SELECT, DELETE ON Curation TO easy_deposit_properties;
+GRANT INSERT, SELECT, DELETE ON Curator TO easy_deposit_properties;
 GRANT INSERT, SELECT, DELETE ON Springfield TO easy_deposit_properties;
 GRANT INSERT, SELECT, DELETE ON SimpleProperties TO easy_deposit_properties;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO easy_deposit_properties;

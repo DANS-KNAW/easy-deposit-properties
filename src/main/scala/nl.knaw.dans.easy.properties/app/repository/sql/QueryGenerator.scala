@@ -186,7 +186,7 @@ object QueryGenerator {
       "Deposit" -> "creationTimestamp",
       "State" -> "timestamp",
       "Identifier" -> "timestamp",
-      "Curation" -> "timestamp",
+      "Curator" -> "timestamp",
       "Springfield" -> "timestamp",
       "SimpleProperties" -> "timestamp",
     )
@@ -302,6 +302,7 @@ object QueryGenerator {
 
   lazy val storeBagName: String = "UPDATE Deposit SET bagName = ? WHERE depositId = ? AND (bagName IS NULL OR bagName='');"
 
+  @deprecated
   def storeCuration(isNewVersionDefined: Boolean): String = {
     // Note: this is a hack: as `isNewVersion` is an optional property, but it is also a `Boolean`, we cannot use `null` in `prepStatement.setBoolean`. This is not allowed by Scala.
     // Workaround applied here is to add the `isNewVersion` to the end, only if it is defined.
@@ -318,6 +319,8 @@ object QueryGenerator {
   lazy val storeSpringfield: String = "INSERT INTO Springfield (depositId, domain, springfield_user, collection, playmode, timestamp) VALUES (?, ?, ?, ?, ?, ?);"
 
   lazy val storeState: String = "INSERT INTO State (depositId, label, description, timestamp) VALUES (?, ?, ?, ?);"
+
+  lazy val storeCurator: String = "INSERT INTO Curator (depositId, datamanagerUserId, datamanagerEmail, timestamp) VALUES (?, ?, ?, ?);"
 
   def deleteByDepositId(tableName: String)(ids: NonEmptyList[DepositId]): String = {
     s"DELETE FROM $tableName WHERE depositId IN (${ ids.toList.map(_ => "?").mkString(", ") });"

@@ -15,8 +15,9 @@
  */
 package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
+import nl.knaw.dans.easy.properties.app.model.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
-import nl.knaw.dans.easy.properties.app.model.{ DepositIsNewVersionFilter, SeriesFilter }
+import nl.knaw.dans.easy.properties.app.model.isnewversion.DepositIsNewVersionFilter
 import sangria.macros.derive.{ DocumentInputField, InputObjectTypeDescription, RenameInputField, deriveInputObjectType }
 import sangria.marshalling.FromInput
 import sangria.schema.InputObjectType

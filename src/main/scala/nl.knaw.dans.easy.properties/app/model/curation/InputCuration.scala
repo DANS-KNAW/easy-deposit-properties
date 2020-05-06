@@ -17,6 +17,7 @@ package nl.knaw.dans.easy.properties.app.model.curation
 
 import nl.knaw.dans.easy.properties.app.model.Timestamp
 
+@deprecated
 case class InputCuration(isNewVersion: Option[Boolean],
                          isRequired: Boolean,
                          isPerformed: Boolean,
@@ -25,6 +26,7 @@ case class InputCuration(isNewVersion: Option[Boolean],
                          timestamp: Timestamp,
                         ) {
 
+  @deprecated
   def toOutput(id: String): Curation = {
     Curation(id, isNewVersion, isRequired, isPerformed, datamanagerUserId, datamanagerEmail, timestamp)
   }

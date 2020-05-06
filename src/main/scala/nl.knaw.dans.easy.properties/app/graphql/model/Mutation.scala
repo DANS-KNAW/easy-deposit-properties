@@ -22,11 +22,14 @@ import nl.knaw.dans.easy.properties.app.model.DoiAction.DoiAction
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
 import nl.knaw.dans.easy.properties.app.model.contentType.ContentTypeValue.ContentTypeValue
 import nl.knaw.dans.easy.properties.app.model.contentType.InputContentType
-import nl.knaw.dans.easy.properties.app.model.curation.InputCuration
+import nl.knaw.dans.easy.properties.app.model.curator.InputCurator
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.identifier.InputIdentifier
 import nl.knaw.dans.easy.properties.app.model.ingestStep.IngestStepLabel.IngestStepLabel
 import nl.knaw.dans.easy.properties.app.model.ingestStep.InputIngestStep
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.InputIsCurationPerformed
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.InputIsCurationRequired
+import nl.knaw.dans.easy.properties.app.model.isnewversion.InputIsNewVersion
 import nl.knaw.dans.easy.properties.app.model.springfield.InputSpringfield
 import nl.knaw.dans.easy.properties.app.model.springfield.SpringfieldPlayMode.SpringfieldPlayMode
 import nl.knaw.dans.easy.properties.app.model.state.InputState
@@ -74,15 +77,27 @@ case class SetDoiActionInput(clientMutationId: Option[String],
                              @GraphQLDescription("Whether the DOI must be 'created' or 'updated' when registering in DataCite.") value: DoiAction,
                              @GraphQLDescription("The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
                             )
-case class SetCurationInput(clientMutationId: Option[String],
-                            @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
-                            @GraphQLDescription("The data manager's username in EASY.") datamanagerUserId: String,
-                            @GraphQLDescription("The data manager's email address.") datamanagerEmail: String,
-                            @GraphQLDescription("True if the deposit is a new version.") isNewVersion: Option[Boolean],
-                            @GraphQLDescription("True if curation by a data manager is required.") isCurationRequired: Boolean,
-                            @GraphQLDescription("True if curation by the data manager has been performed.") isCurationPerformed: Boolean,
-                            @GraphQLDescription("The timestamp at which the curation event was assigned to this deposit. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
-                           )
+case class SetCuratorInput(clientMutationId: Option[String],
+                           @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
+                           @GraphQLDescription("The data manager's username in EASY.") datamanagerUserId: String,
+                           @GraphQLDescription("The data manager's email address.") datamanagerEmail: String,
+                           @GraphQLDescription("The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
+                          )
+case class SetIsNewVersionInput(clientMutationId: Option[String],
+                                @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
+                                @GraphQLDescription("True if the deposit is a new version.") isNewVersion: Boolean,
+                                @GraphQLDescription("The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
+                               )
+case class SetIsCurationRequiredInput(clientMutationId: Option[String],
+                                      @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
+                                      @GraphQLDescription("True if curation by a data manager is required.") isCurationRequired: Boolean,
+                                      @GraphQLDescription("The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
+                                   )
+case class SetIsCurationPerformedInput(clientMutationId: Option[String],
+                                       @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
+                                       @GraphQLDescription("True if curation by the data manager has been performed.") isCurationPerformed: Boolean,
+                                       @GraphQLDescription("The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.") timestamp: Option[DateTime],
+                                    )
 case class SetSpringfieldInput(clientMutationId: Option[String],
                                @GraphQLDescription("The deposit's identifier.") depositId: DepositId,
                                @GraphQLDescription("The domain of Springfield.") domain: String,
@@ -172,14 +187,44 @@ class SetDoiActionPayload(cmi: Option[String], obj: DoiActionEvent) {
     new GraphQLDoiAction(obj)
   }
 }
-class SetCurationPayload(cmi: Option[String], objectId: String) {
+class SetCuratorPayload(cmi: Option[String], objectId: String) {
   @GraphQLField
   val clientMutationId: Option[String] = cmi
 
   @GraphQLField
-  def curation(implicit ctx: Context[DataContext, SetCurationPayload]): DeferredValue[DataContext, Option[GraphQLCuration]] = {
-    CurationResolver.curationById(objectId)
-      .map(_.map(new GraphQLCuration(_)))
+  def curator(implicit ctx: Context[DataContext, SetCuratorPayload]): DeferredValue[DataContext, Option[GraphQLCurator]] = {
+    CuratorResolver.curationById(objectId)
+      .map(_.map(new GraphQLCurator(_)))
+  }
+}
+class SetIsNewVersionPayload(cmi: Option[String], objectId: String) {
+  @GraphQLField
+  val clientMutationId: Option[String] = cmi
+
+  @GraphQLField
+  def isNewVersion(implicit ctx: Context[DataContext, SetIsNewVersionPayload]): DeferredValue[DataContext, Option[GraphQLIsNewVersion]] = {
+    IsNewVersionResolver.isNewVersionById(objectId)
+      .map(_.map(new GraphQLIsNewVersion(_)))
+  }
+}
+class SetIsCurationRequiredPayload(cmi: Option[String], objectId: String) {
+  @GraphQLField
+  val clientMutationId: Option[String] = cmi
+
+  @GraphQLField
+  def isCurationRequired(implicit ctx: Context[DataContext, SetIsCurationRequiredPayload]): DeferredValue[DataContext, Option[GraphQLCurationRequired]] = {
+    IsCurationRequiredResolver.isCurationRequiredById(objectId)
+      .map(_.map(new GraphQLCurationRequired(_)))
+  }
+}
+class SetIsCurationPerformedPayload(cmi: Option[String], objectId: String) {
+  @GraphQLField
+  val clientMutationId: Option[String] = cmi
+
+  @GraphQLField
+  def isCurationPerformed(implicit ctx: Context[DataContext, SetIsCurationPerformedPayload]): DeferredValue[DataContext, Option[GraphQLCurationPerformed]] = {
+    IsCurationPerformedResolver.isCurationPerformedById(objectId)
+      .map(_.map(new GraphQLCurationPerformed(_)))
   }
 }
 class SetSpringfieldPayload(cmi: Option[String], objectId: String) {
@@ -349,24 +394,78 @@ class Mutation {
   }
 
   @GraphQLField
-  @GraphQLDescription("Assign a curation event to the deposit identified by 'id'.")
+  @GraphQLDescription("Assign a curator to the deposit identified by 'id'.")
   @GraphQLFieldTags(RequiresAuthentication)
-  def setCuration(input: SetCurationInput)(implicit ctx: Context[DataContext, Unit]): Action[DataContext, SetCurationPayload] = {
-    ctx.ctx.repo.curation
+  def setCurator(input: SetCuratorInput)(implicit ctx: Context[DataContext, Unit]): Action[DataContext, SetCuratorPayload] = {
+    ctx.ctx.repo.curator
       .store(
         id = input.depositId,
-        curation = InputCuration(
-          isNewVersion = input.isNewVersion,
-          isRequired = input.isCurationRequired,
-          isPerformed = input.isCurationPerformed,
+        curator = InputCurator(
           datamanagerUserId = input.datamanagerUserId,
           datamanagerEmail = input.datamanagerEmail,
           timestamp = input.timestamp getOrElse now(),
         ),
       )
-      .map(curation => new SetCurationPayload(
+      .map(curator => new SetCuratorPayload(
         cmi = input.clientMutationId,
-        objectId = curation.id,
+        objectId = curator.id,
+      ))
+      .toTry
+  }
+
+  @GraphQLField
+  @GraphQLDescription("Indicate whether the deposit identified by 'id' is a new version.")
+  @GraphQLFieldTags(RequiresAuthentication)
+  def setIsNewVersion(input: SetIsNewVersionInput)(implicit ctx: Context[DataContext, Unit]): Action[DataContext, SetIsNewVersionPayload] = {
+    ctx.ctx.repo.isNewVersion
+      .store(
+        id = input.depositId,
+        isNewVersion = InputIsNewVersion(
+          value = input.isNewVersion,
+          timestamp = input.timestamp getOrElse now(),
+        ),
+      )
+      .map(isNewVersion => new SetIsNewVersionPayload(
+        cmi = input.clientMutationId,
+        objectId = isNewVersion.id,
+      ))
+      .toTry
+  }
+
+  @GraphQLField
+  @GraphQLDescription("Indicate whether the deposit identified by 'id' requires curation.")
+  @GraphQLFieldTags(RequiresAuthentication)
+  def setIsCurationRequired(input: SetIsCurationRequiredInput)(implicit ctx: Context[DataContext, Unit]): Action[DataContext, SetIsCurationRequiredPayload] = {
+    ctx.ctx.repo.isCurationRequired
+      .store(
+        id = input.depositId,
+        isCurationRequired = InputIsCurationRequired(
+          value = input.isCurationRequired,
+          timestamp = input.timestamp getOrElse now(),
+        ),
+      )
+      .map(isCurationRequired => new SetIsCurationRequiredPayload(
+        cmi = input.clientMutationId,
+        objectId = isCurationRequired.id,
+      ))
+      .toTry
+  }
+
+  @GraphQLField
+  @GraphQLDescription("Indicate whether the deposit identified by 'id' has been curated.")
+  @GraphQLFieldTags(RequiresAuthentication)
+  def setIsCurationPerformed(input: SetIsCurationPerformedInput)(implicit ctx: Context[DataContext, Unit]): Action[DataContext, SetIsCurationPerformedPayload] = {
+    ctx.ctx.repo.isCurationPerformed
+      .store(
+        id = input.depositId,
+        isCurationPerformed = InputIsCurationPerformed(
+          value = input.isCurationPerformed,
+          timestamp = input.timestamp getOrElse now(),
+        ),
+      )
+      .map(isCurationPerformed => new SetIsCurationPerformedPayload(
+        cmi = input.clientMutationId,
+        objectId = isCurationPerformed.id,
       ))
       .toTry
   }

@@ -26,6 +26,7 @@ import nl.knaw.dans.easy.properties.app.repository.{ CurationDao, DepositIdAndTi
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
 import resource.managed
 
+@deprecated
 class SQLCurationDao(override implicit val connection: Connection, errorHandler: SQLErrorHandler) extends CurationDao with SQLDeletable with CommonResultSetParsers with DebugEnhancedLogging {
 
   override private[sql] val tableName = "Curation"
@@ -62,24 +63,28 @@ class SQLCurationDao(override implicit val connection: Connection, errorHandler:
     } yield curationId -> deposit
   }
 
+  @deprecated
   override def getById(ids: Seq[String]): QueryErrorOr[Seq[Curation]] = {
     trace(ids)
 
     executeGetById(parseCuration)(QueryGenerator.getElementsById(tableName, "curationId"))(ids)
   }
 
+  @deprecated
   override def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Curation)]] = {
     trace(ids)
 
     executeGetCurrent(parseDepositIdAndCuration)(QueryGenerator.getCurrentElementByDepositId(tableName))(ids)
   }
 
+  @deprecated
   override def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[Curation])]] = {
     trace(ids)
 
     executeGetAll(parseDepositIdAndCuration)(QueryGenerator.getAllElementsByDepositId(tableName))(ids)
   }
 
+  @deprecated
   override def store(id: DepositId, curation: InputCuration): MutationErrorOr[Curation] = {
     trace(id, curation)
     val query = QueryGenerator.storeCuration(isNewVersionDefined = curation.isNewVersion.isDefined)
@@ -107,6 +112,7 @@ class SQLCurationDao(override implicit val connection: Connection, errorHandler:
       .map(curation.toOutput)
   }
 
+  @deprecated
   override def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]] = {
     trace(ids)
 

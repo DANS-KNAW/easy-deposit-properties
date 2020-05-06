@@ -18,15 +18,21 @@ package nl.knaw.dans.easy.properties.app.repository
 import nl.knaw.dans.easy.properties.app.model.curation.{ Curation, InputCuration }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
 
+@deprecated
 trait CurationDao extends Deletable {
 
+  @deprecated
   def getById(ids: Seq[String]): QueryErrorOr[Seq[Curation]]
 
+  @deprecated
   def getCurrent(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Curation)]]
 
+  @deprecated
   def getAll(ids: Seq[DepositId]): QueryErrorOr[Seq[(DepositId, Seq[Curation])]]
 
+  @deprecated
   def store(id: DepositId, curation: InputCuration): MutationErrorOr[Curation]
 
+  @deprecated
   def getDepositsById(ids: Seq[String]): QueryErrorOr[Seq[(String, Deposit)]]
 }

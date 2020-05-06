@@ -21,12 +21,9 @@ import cats.data.Validated.Invalid
 import cats.scalatest.{ EitherMatchers, EitherValues, ValidatedMatchers, ValidatedValues }
 import cats.syntax.either._
 import cats.syntax.foldable._
-import cats.syntax.option._
-import nl.knaw.dans.easy.properties.app.model.curation.InputCuration
-import nl.knaw.dans.easy.properties.app.model.{ Deposit, Origin }
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesImporter._
 import nl.knaw.dans.easy.properties.app.register.DepositPropertiesValidator._
-import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, InvalidValueError, Repository, SpringfieldDao, StateDao }
+import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CuratorDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, InvalidValueError, IsCurationPerformedDao, IsCurationRequiredDao, IsNewVersionDao, Repository, SpringfieldDao, StateDao }
 import nl.knaw.dans.easy.properties.fixture.{ RegistrationTestData, TestSupportFixture }
 import org.apache.commons.configuration.ConversionException
 import org.scalamock.scalatest.MockFactory
@@ -47,52 +44,6 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
   it should "parse the minimal example" in {
     val props = readDepositProperties(minimalDepositPropertiesBody).value
     validateDepositProperties(depositId)(props).value shouldBe minimalDepositProperties
-  }
-
-  it should "parse curation properties when only the datamanager is provided" in {
-    val props = readDepositProperties(
-      """bag-store.bag-name = bag
-        |creation.timestamp = 2019-01-01T00:00:00.000Z
-        |depositor.userId = user001
-        |deposit.origin = SWORD2
-        |
-        |curation.datamanager.userId = archie001
-        |curation.datamanager.email = does.not.exists@dans.knaw.nl""".stripMargin
-    ).value
-    validateDepositProperties(depositId)(props).value shouldBe DepositProperties(
-      deposit = Deposit(depositId, "bag".some, timestamp, "user001", Origin.SWORD2),
-      state = none,
-      ingestStep = none,
-      identifiers = Seq.empty,
-      doiAction = none,
-      doiRegistered = none,
-      curation = InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", timestamp).some,
-      springfield = none,
-      contentType = none,
-    )
-  }
-
-  it should "parse curation properties when only the required/performed is provided" in {
-    val props = readDepositProperties(
-      """bag-store.bag-name = bag
-        |creation.timestamp = 2019-01-01T00:00:00.000Z
-        |depositor.userId = user001
-        |deposit.origin = SWORD2
-        |
-        |curation.required = true
-        |curation.performed = false""".stripMargin
-    ).value
-    validateDepositProperties(depositId)(props).value shouldBe DepositProperties(
-      deposit = Deposit(depositId, "bag".some, timestamp, "user001", Origin.SWORD2),
-      state = none,
-      ingestStep = none,
-      identifiers = Seq.empty,
-      doiAction = none,
-      doiRegistered = none,
-      curation = InputCuration(isNewVersion = none, isRequired = true, isPerformed = false, "", "", timestamp).some,
-      springfield = none,
-      contentType = none,
-    )
   }
 
   it should "fail when creation.timestamp cannot be parsed" in {
@@ -204,10 +155,13 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
     val identifierDao = mock[IdentifierDao]
     val doiRegisteredDao = mock[DoiRegisteredDao]
     val doiActionDao = mock[DoiActionDao]
-    val curationDao = mock[CurationDao]
+    val curatorDao = mock[CuratorDao]
+    val isNewVersionDao = mock[IsNewVersionDao]
+    val isCurationRequiredDao = mock[IsCurationRequiredDao]
+    val isCurationPerformedDao = mock[IsCurationPerformedDao]
     val springfieldDao = mock[SpringfieldDao]
     val contentTypeDao = mock[ContentTypeDao]
-    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
+    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curatorDao, isNewVersionDao, isCurationRequiredDao, isCurationPerformedDao, springfieldDao, contentTypeDao)
 
     val depositId = UUID.randomUUID()
     depositDao.find _ expects Seq(depositId) once() returning Seq.empty.asRight
@@ -222,10 +176,13 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
     val identifierDao = mock[IdentifierDao]
     val doiRegisteredDao = mock[DoiRegisteredDao]
     val doiActionDao = mock[DoiActionDao]
-    val curationDao = mock[CurationDao]
+    val curatorDao = mock[CuratorDao]
+    val isNewVersionDao = mock[IsNewVersionDao]
+    val isCurationRequiredDao = mock[IsCurationRequiredDao]
+    val isCurationPerformedDao = mock[IsCurationPerformedDao]
     val springfieldDao = mock[SpringfieldDao]
     val contentTypeDao = mock[ContentTypeDao]
-    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
+    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curatorDao, isNewVersionDao, isCurationRequiredDao, isCurationPerformedDao, springfieldDao, contentTypeDao)
 
     val depositId = UUID.randomUUID()
     depositDao.find _ expects Seq(depositId) once() returning Seq(validDepositProperties.deposit).asRight
@@ -240,10 +197,13 @@ class DepositPropertiesValidatorSpec extends TestSupportFixture
     val identifierDao = mock[IdentifierDao]
     val doiRegisteredDao = mock[DoiRegisteredDao]
     val doiActionDao = mock[DoiActionDao]
-    val curationDao = mock[CurationDao]
+    val curatorDao = mock[CuratorDao]
+    val isNewVersionDao = mock[IsNewVersionDao]
+    val isCurationRequiredDao = mock[IsCurationRequiredDao]
+    val isCurationPerformedDao = mock[IsCurationPerformedDao]
     val springfieldDao = mock[SpringfieldDao]
     val contentTypeDao = mock[ContentTypeDao]
-    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
+    val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curatorDao, isNewVersionDao, isCurationRequiredDao, isCurationPerformedDao, springfieldDao, contentTypeDao)
 
     val depositId = UUID.randomUUID()
     val error = InvalidValueError("abc")

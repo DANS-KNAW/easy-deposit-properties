@@ -57,17 +57,26 @@ mutation RegisterDepositAlreadyExists {
                     }
                 }
             }
-            isNewVersion
+            isNewVersion {
+                value
+                timestamp
+            }
             isNewVersionEvents {
                 value
                 timestamp
             }
-            curationRequired
+            curationRequired {
+                value
+                timestamp
+            }
             curationRequiredEvents {
                 value
                 timestamp
             }
-            curationPerformed
+            curationPerformed {
+                value
+                timestamp
+            }
             curationPerformedEvents {
                 value
                 timestamp

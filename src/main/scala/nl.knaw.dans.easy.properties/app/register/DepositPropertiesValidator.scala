@@ -19,13 +19,15 @@ import cats.data.Validated
 import cats.instances.list._
 import cats.instances.option._
 import cats.syntax.apply._
-import cats.syntax.option._
 import cats.syntax.traverse._
 import cats.syntax.validated._
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, InputContentType }
-import nl.knaw.dans.easy.properties.app.model.curation.InputCuration
+import nl.knaw.dans.easy.properties.app.model.curator.InputCurator
 import nl.knaw.dans.easy.properties.app.model.identifier.{ IdentifierType, InputIdentifier }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStepLabel, InputIngestStep }
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.InputIsCurationPerformed
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.InputIsCurationRequired
+import nl.knaw.dans.easy.properties.app.model.isnewversion.InputIsNewVersion
 import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, StateLabel }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin, Timestamp }
@@ -72,7 +74,10 @@ object DepositPropertiesValidator {
           validateIdentifiers,
           validateDoiAction,
           validateDoiRegistered,
-          validateCuration,
+          validateCurator,
+          validateIsNewVersion,
+          validateIsCurationRequired,
+          validateIsCurationPerformed,
           validateSpringfield,
           validateContentType,
         ).mapN(DepositProperties)
@@ -180,9 +185,9 @@ object DepositPropertiesValidator {
       .map(_.map(DoiRegisteredEvent(_, timestamp)))
   }
 
-  private def validateCuration(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Option[InputCuration]] = {
+  private def validateCurator(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Option[InputCurator]] = {
     // @formatter:off
-    val optionalDatamanager: ValidationImportErrorsOr[Option[(String, String)]] = (
+    (
       getOptionalStringProp(datamanagerUserIdKey),
       getOptionalStringProp(datamanagerEmailKey),
     ).tupled
@@ -190,36 +195,29 @@ object DepositPropertiesValidator {
         case tuple @ (userId, email) => requireAllOrNone(
           datamanagerUserIdKey -> userId,
           datamanagerEmailKey -> email,
-        ).map(_ => tuple.mapN((_, _)))
+        ).map(_ => tuple.mapN(InputCurator(_, _, timestamp)))
       }
+    // @formatter:on
+  }
 
-    val optionalCuration: ValidationImportErrorsOr[Option[(Boolean, Boolean)]] = (
-      getOptionalProp[Boolean, ConversionException](isCurationRequiredKey)(PropertyConverter.toBoolean),
-      getOptionalProp[Boolean, ConversionException](isCurationPerformedKey)(PropertyConverter.toBoolean),
-    ).tupled
-      .andThen {
-        case tuple @ (curationRequired, curationPerformed) => requireAllOrNone(
-          isCurationRequiredKey -> curationRequired,
-          isCurationPerformedKey -> curationPerformed,
-        ).map(_ => tuple.mapN((_, _)))
-      }
+  private def validateIsNewVersion(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Option[InputIsNewVersion]] = {
+    // @formatter:off
+    getOptionalProp[Boolean, ConversionException](isNewVersionKey)(PropertyConverter.toBoolean)
+      .map(_.map(InputIsNewVersion(_, timestamp)))
+    // @formatter:on
+  }
 
-    (
-      getOptionalProp[Boolean, ConversionException](isNewVersionKey)(PropertyConverter.toBoolean),
-      optionalCuration,
-      optionalDatamanager
-    ).mapN { 
-      case (newVersion, curation, datamanager) =>
-        curation
-          .fold(datamanager.fold(none[InputCuration]) {
-            case (userId, email) => InputCuration(newVersion, isRequired = false, isPerformed = false, userId, email, timestamp).some
-          }) {
-            case (curationRequired, curationPerformed) =>
-              datamanager.fold(InputCuration(newVersion, curationRequired, curationPerformed, "", "", timestamp).some) {
-                case (userId, email) => InputCuration(newVersion, curationRequired, curationPerformed, userId, email, timestamp).some
-              }
-          }
-    }
+  private def validateIsCurationRequired(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Option[InputIsCurationRequired]] = {
+    // @formatter:off
+    getOptionalProp[Boolean, ConversionException](isCurationRequiredKey)(PropertyConverter.toBoolean)
+      .map(_.map(InputIsCurationRequired(_, timestamp)))
+    // @formatter:on
+  }
+
+  private def validateIsCurationPerformed(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Option[InputIsCurationPerformed]] = {
+    // @formatter:off
+    getOptionalProp[Boolean, ConversionException](isCurationPerformedKey)(PropertyConverter.toBoolean)
+      .map(_.map(InputIsCurationPerformed(_, timestamp)))
     // @formatter:on
   }
 

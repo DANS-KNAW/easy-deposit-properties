@@ -49,25 +49,4 @@ package object resolvers {
   private[resolvers] def fetchDepositsById(f: DataContext => Seq[String] => QueryErrorOr[Seq[(String, Deposit)]]): DepositByIdFetcher = {
     Fetcher.caching(f(_)(_).toFuture)
   }
-
-  private[resolvers] implicit class CollectionExtensions[T](val xs: Seq[T]) extends AnyVal {
-    def distinctUntilChanged: Seq[T] = distinctUntilChanged(identity)
-
-    def distinctUntilChanged[S](f: T => S): Seq[T] = {
-      var latest: Option[S] = None
-      val builder = Seq.newBuilder[T]
-
-      for (x <- xs;
-           s = f(x)) {
-        latest match {
-          case Some(`s`) => // do nothing
-          case _ =>
-            builder += x
-            latest = Some(s)
-        }
-      }
-
-      builder.result()
-    }
-  }
 }

@@ -19,6 +19,7 @@ import nl.knaw.dans.easy.properties.app.model.curator.Curator
 import nl.knaw.dans.easy.properties.app.model.{ CurationPerformedEvent, CurationRequiredEvent, IsNewVersionEvent, Timestamp, Timestamped }
 import sangria.relay.Node
 
+@deprecated
 case class Curation(id: String,
                     isNewVersion: Option[Boolean],
                     isRequired: Boolean,
@@ -28,18 +29,22 @@ case class Curation(id: String,
                     timestamp: Timestamp,
                    ) extends Node with Timestamped {
 
+  @deprecated
   def getCurator: Curator = {
     Curator(id, datamanagerUserId, datamanagerEmail, timestamp)
   }
 
+  @deprecated
   def getIsNewVersionEvent: IsNewVersionEvent = {
     IsNewVersionEvent(isNewVersion, timestamp)
   }
 
+  @deprecated
   def getCurationRequiredEvent: CurationRequiredEvent = {
     CurationRequiredEvent(isRequired, timestamp)
   }
 
+  @deprecated
   def getCurationPerformedEvent: CurationPerformedEvent = {
     CurationPerformedEvent(isPerformed, timestamp)
   }

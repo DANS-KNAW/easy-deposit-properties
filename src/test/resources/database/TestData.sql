@@ -59,17 +59,13 @@ VALUES ('00000000-0000-0000-0000-000000000001', 'bag-store', '00000000-0000-0000
        ('00000000-0000-0000-0000-000000000004', 'fedora'   , 'easy-dataset:4'                      , '2019-04-04 00:03:00'),
        ('00000000-0000-0000-0000-000000000005', 'bag-store', '00000000-0000-0000-0000-000000000005', '2019-05-05 00:00:00');
 
-INSERT INTO Curation (depositId, isNewVersion, isRequired, isPerformed, datamanagerUserId, datamanagerEmail, timestamp)
-VALUES ('00000000-0000-0000-0000-000000000001', null   , 'true', 'false', 'archie002', 'does.not.exists2@dans.knaw.nl', '2019-01-01 00:00:00'),
-       ('00000000-0000-0000-0000-000000000001', null   , 'true', 'false', 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-01-01 03:03:00'),
-       ('00000000-0000-0000-0000-000000000001', null   , 'true', 'true' , 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-01-01 04:04:00'),
-       ('00000000-0000-0000-0000-000000000003', null   , 'true', 'false', 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-03-03 00:00:00'),
-       ('00000000-0000-0000-0000-000000000003', null   , 'true', 'false', 'archie002', 'does.not.exists2@dans.knaw.nl', '2019-03-03 04:04:00'),
-       ('00000000-0000-0000-0000-000000000003', 'true' , 'true', 'true' , 'archie002', 'does.not.exists2@dans.knaw.nl', '2019-03-03 06:06:00'),
-       ('00000000-0000-0000-0000-000000000004', 'false', 'true', 'false', 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-04-04 00:00:00'),
-       ('00000000-0000-0000-0000-000000000004', 'false', 'true', 'true' , 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-04-04 04:04:00'),
-       ('00000000-0000-0000-0000-000000000005', 'false', 'true', 'false', 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-05-05 00:00:00'),
-       ('00000000-0000-0000-0000-000000000005', 'false', 'true', 'true' , 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-05-05 04:04:00');
+INSERT INTO Curator (depositId, datamanagerUserId, datamanagerEmail, timestamp)
+VALUES ('00000000-0000-0000-0000-000000000001', 'archie002', 'does.not.exists2@dans.knaw.nl', '2019-01-01 00:00:00'),
+       ('00000000-0000-0000-0000-000000000001', 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-01-01 03:03:00'),
+       ('00000000-0000-0000-0000-000000000003', 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-03-03 00:00:00'),
+       ('00000000-0000-0000-0000-000000000003', 'archie002', 'does.not.exists2@dans.knaw.nl', '2019-03-03 04:04:00'),
+       ('00000000-0000-0000-0000-000000000004', 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-04-04 00:00:00'),
+       ('00000000-0000-0000-0000-000000000005', 'archie001', 'does.not.exists1@dans.knaw.nl', '2019-05-05 00:00:00');
 
 INSERT INTO Springfield (depositId, domain, springfield_user, collection, playmode, timestamp)
 VALUES ('00000000-0000-0000-0000-000000000001', 'domain1', 'user1', 'collection1', 'continuous', '2019-01-01 00:00:00'),
@@ -111,4 +107,22 @@ VALUES ('00000000-0000-0000-0000-000000000001', 'ingest-step', 'VALIDATE'     , 
        ('00000000-0000-0000-0000-000000000002', 'content-type', 'application/zip'         , '2019-02-02 00:05:00'),
        ('00000000-0000-0000-0000-000000000003', 'content-type', 'application/zip'         , '2019-03-03 00:05:00'),
        ('00000000-0000-0000-0000-000000000004', 'content-type', 'application/zip'         , '2019-04-04 00:05:00'),
-       ('00000000-0000-0000-0000-000000000005', 'content-type', 'application/zip'         , '2019-05-05 00:05:00');
+       ('00000000-0000-0000-0000-000000000005', 'content-type', 'application/zip'         , '2019-05-05 00:05:00'),
+
+       ('00000000-0000-0000-0000-000000000003', 'is-new-version', 'true' , '2019-03-03 06:06:00'),
+       ('00000000-0000-0000-0000-000000000004', 'is-new-version', 'false', '2019-04-04 00:00:00'),
+       ('00000000-0000-0000-0000-000000000005', 'is-new-version', 'false', '2019-05-05 00:00:00'),
+
+       ('00000000-0000-0000-0000-000000000001', 'is-curation-required', 'true', '2019-01-01 00:00:00'),
+       ('00000000-0000-0000-0000-000000000003', 'is-curation-required', 'true', '2019-03-03 00:00:00'),
+       ('00000000-0000-0000-0000-000000000004', 'is-curation-required', 'true', '2019-04-04 00:00:00'),
+       ('00000000-0000-0000-0000-000000000005', 'is-curation-required', 'true', '2019-05-05 00:00:00'),
+
+       ('00000000-0000-0000-0000-000000000001', 'is-curation-performed', 'false', '2019-01-01 00:00:00'),
+       ('00000000-0000-0000-0000-000000000001', 'is-curation-performed', 'true' , '2019-01-01 04:04:00'),
+       ('00000000-0000-0000-0000-000000000003', 'is-curation-performed', 'false', '2019-03-03 00:00:00'),
+       ('00000000-0000-0000-0000-000000000003', 'is-curation-performed', 'true' , '2019-03-03 06:06:00'),
+       ('00000000-0000-0000-0000-000000000004', 'is-curation-performed', 'false', '2019-04-04 00:00:00'),
+       ('00000000-0000-0000-0000-000000000004', 'is-curation-performed', 'true' , '2019-04-04 04:04:00'),
+       ('00000000-0000-0000-0000-000000000005', 'is-curation-performed', 'false', '2019-05-05 00:00:00'),
+       ('00000000-0000-0000-0000-000000000005', 'is-curation-performed', 'true' , '2019-05-05 04:04:00');

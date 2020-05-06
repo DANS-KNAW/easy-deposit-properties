@@ -26,13 +26,16 @@ import cats.syntax.functor._
 import cats.syntax.option._
 import nl.knaw.dans.easy.properties.app.legacyImport.{ ImportProps, Interactor, NoDepositIdError, NoSuchPropertiesFileError }
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue, InputContentType }
-import nl.knaw.dans.easy.properties.app.model.curation.{ Curation, InputCuration }
+import nl.knaw.dans.easy.properties.app.model.curator.{ Curator, InputCurator }
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType, InputIdentifier }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestStepLabel, InputIngestStep }
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.{ InputIsCurationPerformed, IsCurationPerformed }
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.{ InputIsCurationRequired, IsCurationRequired }
+import nl.knaw.dans.easy.properties.app.model.isnewversion.{ InputIsNewVersion, IsNewVersion }
 import nl.knaw.dans.easy.properties.app.model.springfield.{ InputSpringfield, Springfield, SpringfieldPlayMode }
 import nl.knaw.dans.easy.properties.app.model.state.{ InputState, State, StateLabel }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId, DoiAction, DoiActionEvent, DoiRegisteredEvent, Origin, Timestamp }
-import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CurationDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, Repository, SpringfieldDao, StateDao }
+import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, CuratorDao, DepositDao, DoiActionDao, DoiRegisteredDao, IdentifierDao, IngestStepDao, IsCurationPerformedDao, IsCurationRequiredDao, IsNewVersionDao, Repository, SpringfieldDao, StateDao }
 import nl.knaw.dans.easy.properties.fixture.{ FileSystemSupport, TestSupportFixture }
 import nl.knaw.dans.easy.{ DataciteService, DataciteServiceConfiguration, DataciteServiceException }
 import org.apache.commons.configuration.PropertiesConfiguration
@@ -62,10 +65,13 @@ class ImportPropsSpec extends TestSupportFixture
   private val identifierDao = mock[IdentifierDao]
   private val doiRegisteredDao = mock[DoiRegisteredDao]
   private val doiActionDao = mock[DoiActionDao]
-  private val curationDao = mock[CurationDao]
+  private val curatorDao = mock[CuratorDao]
+  private val isNewVersionDao = mock[IsNewVersionDao]
+  private val isCurationRequiredDao = mock[IsCurationRequiredDao]
+  private val isCurationPerformedDao = mock[IsCurationPerformedDao]
   private val springfieldDao = mock[SpringfieldDao]
   private val contentTypeDao = mock[ContentTypeDao]
-  private val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curationDao, springfieldDao, contentTypeDao)
+  private val repo = Repository(depositDao, stateDao, ingestStepDao, identifierDao, doiRegisteredDao, doiActionDao, curatorDao, isNewVersionDao, isCurationRequiredDao, isCurationPerformedDao, springfieldDao, contentTypeDao)
   private val interactor = mock[Interactor]
   private val datacite = mock[MockDataciteService]
   private val timeZone = DateTimeZone.forTimeZone(TimeZone.getTimeZone("Europe/Amsterdam"))
@@ -86,7 +92,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -108,7 +117,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -134,7 +146,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -166,7 +181,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, depositId.toString, lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, depositId.toString, lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.CREATE, lastModified)) returning DoiActionEvent(DoiAction.CREATE, lastModified).asRight
-      // no curationDao.store
+      // no curatorDao.store
+      // no isNewVersionDao.store
+      // no isCurationRequiredDao.store
+      // no isCurationPerformedDao.store
       // no springfieldDao.store
       // no contentTypeDao.store
     }
@@ -202,7 +220,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -229,7 +250,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -256,7 +280,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -283,7 +310,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -311,7 +341,10 @@ class ImportPropsSpec extends TestSupportFixture
       datacite.doiExists _ expects "my-doi-value" returning true
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -340,7 +373,10 @@ class ImportPropsSpec extends TestSupportFixture
       expectInteractFunc(true)
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -367,7 +403,10 @@ class ImportPropsSpec extends TestSupportFixture
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       expectInteractEnum(DoiAction)(_.CREATE)
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.CREATE, lastModified)) returning DoiActionEvent(DoiAction.CREATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
     }
@@ -394,7 +433,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       expectInteractEnum(SpringfieldPlayMode)(_.MENU)
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.MENU, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.MENU, lastModified).asRight
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight
@@ -422,7 +464,10 @@ class ImportPropsSpec extends TestSupportFixture
       identifierDao.store _ expects(depositId, InputIdentifier(IdentifierType.BAG_STORE, "my-bag-store-value", lastModified)) returning Identifier("my-id", IdentifierType.BAG_STORE, "my-bag-store-value", lastModified).asRight
       doiRegisteredDao.store _ expects(depositId, DoiRegisteredEvent(value = true, lastModified)) returning DoiRegisteredEvent(value = true, lastModified).asRight
       doiActionDao.store _ expects(depositId, DoiActionEvent(DoiAction.UPDATE, lastModified)) returning DoiActionEvent(DoiAction.UPDATE, lastModified).asRight
-      curationDao.store _ expects(depositId, InputCuration(isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curation("my-id", isNewVersion = none, isRequired = false, isPerformed = false, "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      curatorDao.store _ expects(depositId, InputCurator("archie001", "does.not.exists@dans.knaw.nl", lastModified)) returning Curator("my-id", "archie001", "does.not.exists@dans.knaw.nl", lastModified).asRight
+      isNewVersionDao.store _ expects(depositId, InputIsNewVersion(value = true, lastModified)) returning IsNewVersion("my-id", value = true, lastModified).asRight
+      isCurationRequiredDao.store _ expects(depositId, InputIsCurationRequired(value = false, lastModified)) returning IsCurationRequired("my-id", value = false, lastModified).asRight
+      isCurationPerformedDao.store _ expects(depositId, InputIsCurationPerformed(value = false, lastModified)) returning IsCurationPerformed("my-id", value = false, lastModified).asRight
       springfieldDao.store _ expects(depositId, InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified)) returning Springfield("my-id", "domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, lastModified).asRight
       expectInteractEnum(ContentTypeValue)(_.ZIP)
       contentTypeDao.store _ expects(depositId, InputContentType(ContentTypeValue.ZIP, lastModified)) returning ContentType("my-id", ContentTypeValue.ZIP, lastModified).asRight

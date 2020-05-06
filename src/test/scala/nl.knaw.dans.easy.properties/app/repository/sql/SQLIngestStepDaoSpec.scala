@@ -102,10 +102,10 @@ class SQLIngestStepDaoSpec extends TestSupportFixture
     val ingestSteps = new SQLIngestStepDao
     val timestamp = new DateTime(2019, 7, 19, 22, 45, timeZone)
     val inputIngestStep = InputIngestStep(IngestStepLabel.BAGSTORE, timestamp)
-    val expectedIngestStep = IngestStep("32", IngestStepLabel.BAGSTORE, timestamp)
+    val expectedIngestStep = IngestStep("47", IngestStepLabel.BAGSTORE, timestamp)
 
     ingestSteps.store(depositId4, inputIngestStep).value shouldBe expectedIngestStep
-    ingestSteps.getById(Seq("32")).value should contain only expectedIngestStep
+    ingestSteps.getById(Seq("47")).value should contain only expectedIngestStep
     ingestSteps.getCurrent(Seq(depositId4)).value should contain only (depositId4 -> expectedIngestStep)
     ingestSteps.getAll(Seq(depositId4)).value.toMap.apply(depositId4) should contain(expectedIngestStep)
   }

@@ -24,6 +24,7 @@ import nl.knaw.dans.easy.properties.app.repository.{ DepositIdAndTimestampAlread
 import nl.knaw.dans.easy.properties.fixture.{ DatabaseDataFixture, DatabaseFixture, FileSystemSupport, TestSupportFixture }
 import org.joda.time.DateTime
 
+@deprecated
 class SQLCurationDaoSpec extends TestSupportFixture
   with FileSystemSupport
   with DatabaseFixture
@@ -31,51 +32,51 @@ class SQLCurationDaoSpec extends TestSupportFixture
   with EitherValues
   with EitherMatchers {
 
-  "getById" should "find curation configurations identified by their curationId" in {
+  "getById" should "find curation configurations identified by their curationId" ignore {
     val curations = new SQLCurationDao
 
     curations.getById(Seq("2", "4", "9")).value should contain inOrderOnly(curation2, curation4, curation9)
   }
 
-  it should "return an empty collection if the curationId is unknown" in {
+  it should "return an empty collection if the curationId is unknown" ignore {
     val curations = new SQLCurationDao
     val unknowncurationId = "102"
 
     curations.getById(Seq(unknowncurationId)).value shouldBe empty
   }
 
-  it should "return an empty collection when the input collection is empty" in {
+  it should "return an empty collection when the input collection is empty" ignore {
     val curations = new SQLCurationDao
 
     curations.getById(Seq.empty).value shouldBe empty
   }
 
-  it should "fail when an invalid curationId is given" in {
+  it should "fail when an invalid curationId is given" ignore {
     val curations = new SQLCurationDao
 
     curations.getById(Seq("2", "invalid-id", "29")).leftValue shouldBe InvalidValueError("invalid id 'invalid-id'")
   }
 
-  "getCurrent" should "return the current curation configurations of the given deposits" in {
+  "getCurrent" should "return the current curation configurations of the given deposits" ignore {
     val curations = new SQLCurationDao
 
     curations.getCurrent(Seq(depositId1, depositId2)).value should contain only (depositId1 -> curation2)
   }
 
-  it should "return an empty collection if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" ignore {
     val curations = new SQLCurationDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
     curations.getCurrent(Seq(depositId6)).value shouldBe empty
   }
 
-  it should "return an empty collection when the input collection is empty" in {
+  it should "return an empty collection when the input collection is empty" ignore {
     val curations = new SQLCurationDao
 
     curations.getCurrent(Seq.empty).value shouldBe empty
   }
 
-  "getAll" should "return all curation configurations associated with the given deposits" in {
+  "getAll" should "return all curation configurations associated with the given deposits" ignore {
     val curations = new SQLCurationDao
 
     curations.getAll(Seq(depositId4, depositId2)).value should contain only(
@@ -84,20 +85,20 @@ class SQLCurationDaoSpec extends TestSupportFixture
     )
   }
 
-  it should "return an empty collection if the depositId is unknown" in {
+  it should "return an empty collection if the depositId is unknown" ignore {
     val curations = new SQLCurationDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
 
     curations.getAll(Seq(depositId6)).value should contain only (depositId6 -> Seq.empty)
   }
 
-  it should "return an empty collection when the input collection is empty" in {
+  it should "return an empty collection when the input collection is empty" ignore {
     val curations = new SQLCurationDao
 
     curations.getAll(Seq.empty).value shouldBe empty
   }
 
-  "store" should "insert a new curation into the database" in {
+  "store" should "insert a new curation into the database" ignore {
     val curations = new SQLCurationDao
     val timestamp = new DateTime(2019, 7, 20, 21, 12, timeZone)
     val inputCuration = InputCuration(isNewVersion = true.some, isRequired = true, isPerformed = false, "my-username", "foo@bar.com", timestamp)
@@ -109,7 +110,7 @@ class SQLCurationDaoSpec extends TestSupportFixture
     curations.getAll(Seq(depositId1)).value.toMap.apply(depositId1) should contain(expectedCuration)
   }
 
-  it should "insert a new curation into the database with NULL for isNewVersion" in {
+  it should "insert a new curation into the database with NULL for isNewVersion" ignore {
     val curations = new SQLCurationDao
     val timestamp = new DateTime(2019, 7, 20, 21, 12, timeZone)
     val inputCuration = InputCuration(isNewVersion = none, isRequired = true, isPerformed = false, "my-username", "foo@bar.com", timestamp)
@@ -121,7 +122,7 @@ class SQLCurationDaoSpec extends TestSupportFixture
     curations.getAll(Seq(depositId1)).value.toMap.apply(depositId1) should contain(expectedCuration)
   }
 
-  it should "fail when the given depositId does not exist" in {
+  it should "fail when the given depositId does not exist" ignore {
     val curations = new SQLCurationDao
     val depositId6 = UUID.fromString("00000000-0000-0000-0000-000000000006")
     val timestamp = new DateTime(2019, 7, 18, 22, 38, timeZone)
@@ -130,7 +131,7 @@ class SQLCurationDaoSpec extends TestSupportFixture
     curations.store(depositId6, inputCuration).leftValue shouldBe NoSuchDepositError(depositId6)
   }
 
-  it should "fail when the depositId and timestamp combination is already present, even though the other values are different" in {
+  it should "fail when the depositId and timestamp combination is already present, even though the other values are different" ignore {
     val curations = new SQLCurationDao
     val depositId = depositId1
     val timestamp = new DateTime(2019, 1, 1, 5, 5, timeZone)
@@ -141,7 +142,7 @@ class SQLCurationDaoSpec extends TestSupportFixture
     curations.store(depositId, inputCuration2).leftValue shouldBe DepositIdAndTimestampAlreadyExistError(depositId, timestamp, objName = "curation")
   }
 
-  "getDepositsById" should "find deposits identified by these curationIds" in {
+  "getDepositsById" should "find deposits identified by these curationIds" ignore {
     val curations = new SQLCurationDao
 
     curations.getDepositsById(Seq("1", "4", "7", "10")).value should contain only(
@@ -151,20 +152,20 @@ class SQLCurationDaoSpec extends TestSupportFixture
     )
   }
 
-  it should "return an empty collection if the curationId is unknown" in {
+  it should "return an empty collection if the curationId is unknown" ignore {
     val curations = new SQLCurationDao
     val unknowncurationId = "102"
 
     curations.getDepositsById(Seq(unknowncurationId)).value shouldBe empty
   }
 
-  it should "return an empty collection when the input collection is empty" in {
+  it should "return an empty collection when the input collection is empty" ignore {
     val curations = new SQLCurationDao
 
     curations.getDepositsById(Seq.empty).value shouldBe empty
   }
 
-  it should "fail when an invalid curationId is given" in {
+  it should "fail when an invalid curationId is given" ignore {
     val curations = new SQLCurationDao
 
     curations.getDepositsById(Seq("12", "invalid-id", "29")).leftValue shouldBe InvalidValueError("invalid id 'invalid-id'")

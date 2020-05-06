@@ -53,7 +53,10 @@ object GraphQLSchema extends Scalars
     IdentifierResolver.byIdFetcher, IdentifierResolver.identifiersByTypeFetcher, IdentifierResolver.identifierTypesAndValuesFetcher, IdentifierResolver.identifiersByDepositIdFetcher, IdentifierResolver.depositByIdentifierIdFetcher,
     DoiEventResolver.currentDoisRegisteredFetcher, DoiEventResolver.allDoisRegisteredFetcher,
     DoiEventResolver.currentDoisActionFetcher, DoiEventResolver.allDoisActionFetcher,
-    CurationResolver.byIdFetcher, CurationResolver.currentCurationsFetcher, CurationResolver.allCurationsFetcher, CurationResolver.depositByCurationIdFetcher,
+    CuratorResolver.byIdFetcher, CuratorResolver.currentCuratorsFetcher, CuratorResolver.allCuratorsFetcher, CuratorResolver.depositByCuratorIdFetcher,
+    IsNewVersionResolver.byIdFetcher, IsNewVersionResolver.currentIsNewVersionsFetcher, IsNewVersionResolver.allIsNewVersionsFetcher, IsNewVersionResolver.depositByIsNewVersionIdFetcher,
+    IsCurationRequiredResolver.byIdFetcher, IsCurationRequiredResolver.currentIsCurationRequiredsFetcher, IsCurationRequiredResolver.allIsCurationRequiredsFetcher, IsCurationRequiredResolver.depositByIsCurationRequiredIdFetcher,
+    IsCurationPerformedResolver.byIdFetcher, IsCurationPerformedResolver.currentIsCurationPerformedsFetcher, IsCurationPerformedResolver.allIsCurationPerformedsFetcher, IsCurationPerformedResolver.depositByIsCurationPerformedIdFetcher,
     SpringfieldResolver.byIdFetcher, SpringfieldResolver.currentSpringfieldsFetcher, SpringfieldResolver.allSpringfieldsFetcher, SpringfieldResolver.depositBySpringfieldIdFetcher,
     ContentTypeResolver.byIdFetcher, ContentTypeResolver.currentContentTypesFetcher, ContentTypeResolver.allContentTypesFetcher, ContentTypeResolver.depositByContentTypeIdFetcher,
   )

@@ -22,9 +22,12 @@ import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ DepositIngestStepFilter, IngestStepLabel }
+import nl.knaw.dans.easy.properties.app.model.iscurationperformed.DepositIsCurationPerformedFilter
+import nl.knaw.dans.easy.properties.app.model.iscurationrequired.DepositIsCurationRequiredFilter
+import nl.knaw.dans.easy.properties.app.model.isnewversion.DepositIsNewVersionFilter
 import nl.knaw.dans.easy.properties.app.model.sort.{ DepositOrder, DepositOrderField, OrderDirection }
 import nl.knaw.dans.easy.properties.app.model.state.{ DepositStateFilter, StateLabel }
-import nl.knaw.dans.easy.properties.app.model.{ AtTime, Between, DepositCurationPerformedFilter, DepositCurationRequiredFilter, DepositDoiActionFilter, DepositDoiRegisteredFilter, DepositIsNewVersionFilter, DoiAction, EarlierThan, LaterThan, NotBetween, Origin, SeriesFilter, TimeFilter, Timestamp }
+import nl.knaw.dans.easy.properties.app.model.{ AtTime, Between, DepositDoiActionFilter, DepositDoiRegisteredFilter, DoiAction, EarlierThan, LaterThan, NotBetween, Origin, SeriesFilter, TimeFilter, Timestamp }
 import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
 import org.joda.time.DateTime
 import org.scalacheck.Arbitrary._
@@ -60,8 +63,8 @@ class QueryGeneratorPropSpec extends AnyPropSpec with ScalaCheckDrivenPropertyCh
   implicit val arbitraryDoiActionFilter: Arbitrary[DepositDoiActionFilter] = genDepositFilter(DoiAction)(DepositDoiActionFilter)
   implicit val arbitraryCurationFilter: Arbitrary[DepositCuratorFilter] = genDepositFilter(DepositCuratorFilter)
   implicit val arbitraryIsNewVersionFilter: Arbitrary[DepositIsNewVersionFilter] = genDepositFilter(DepositIsNewVersionFilter)
-  implicit val arbitraryCurationRequiredFilter: Arbitrary[DepositCurationRequiredFilter] = genDepositFilter(DepositCurationRequiredFilter)
-  implicit val arbitraryCurationPerformedFilter: Arbitrary[DepositCurationPerformedFilter] = genDepositFilter(DepositCurationPerformedFilter)
+  implicit val arbitraryCurationRequiredFilter: Arbitrary[DepositIsCurationRequiredFilter] = genDepositFilter(DepositIsCurationRequiredFilter)
+  implicit val arbitraryCurationPerformedFilter: Arbitrary[DepositIsCurationPerformedFilter] = genDepositFilter(DepositIsCurationPerformedFilter)
   implicit val arbitraryContentTypeFilter: Arbitrary[DepositContentTypeFilter] = genDepositFilter(ContentTypeValue)(DepositContentTypeFilter)
   implicit val arbitraryDepositOrder: Arbitrary[DepositOrder] = Arbitrary {
     for {
@@ -99,8 +102,8 @@ class QueryGeneratorPropSpec extends AnyPropSpec with ScalaCheckDrivenPropertyCh
         Option[DepositDoiActionFilter],
         Option[DepositCuratorFilter],
         Option[DepositIsNewVersionFilter],
-        Option[DepositCurationRequiredFilter],
-        Option[DepositCurationPerformedFilter],
+        Option[DepositIsCurationRequiredFilter],
+        Option[DepositIsCurationPerformedFilter],
         Option[DepositContentTypeFilter],
         Option[Origin.Origin],
         Option[TimeFilter],
@@ -117,8 +120,8 @@ class QueryGeneratorPropSpec extends AnyPropSpec with ScalaCheckDrivenPropertyCh
         Option[DepositDoiActionFilter],
         Option[DepositCuratorFilter],
         Option[DepositIsNewVersionFilter],
-        Option[DepositCurationRequiredFilter],
-        Option[DepositCurationPerformedFilter],
+        Option[DepositIsCurationRequiredFilter],
+        Option[DepositIsCurationPerformedFilter],
         Option[DepositContentTypeFilter],
         Option[Origin.Origin],
       )]
