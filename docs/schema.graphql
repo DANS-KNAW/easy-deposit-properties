@@ -143,130 +143,6 @@ enum ContentTypeValue {
   ZIP
 }
 
-"""
-Curation event containing the data manager and status of curation for this deposit.
-"""
-type Curation implements Node {
-  """The data manager's username in EASY."""
-  datamanagerUserId: String!
-
-  """The data manager's email address."""
-  datamanagerEmail: String!
-
-  """True if the deposit is a new version."""
-  isNewVersion: Boolean
-
-  """True if curation by a data manager is required."""
-  curationRequired: Boolean!
-
-  """True if curation by the data manager has been performed."""
-  curationPerformed: Boolean!
-
-  """
-  The timestamp at which this curation event was assigned to this deposit.
-  """
-  timestamp: DateTime!
-
-  """
-  Returns the deposit that is associated with this particular curation object.
-  """
-  deposit: Deposit
-
-  """List all deposits with the same data manager."""
-  deposits(
-    """
-    Determine whether to search in current curators (`LATEST`, default) only or
-    all current and past curators (`ALL`) of this deposit.
-    """
-    curatorFilter: SeriesFilter = LATEST
-
-    """Find only those deposits that have this specified bag name."""
-    bagName: String
-
-    """Find only those deposits that have this specified origin."""
-    origin: Origin
-
-    """List only those deposits that have this specified state label."""
-    state: DepositStateFilter
-
-    """List only those deposits that have this specified ingest step label."""
-    ingestStep: DepositIngestStepFilter
-
-    """
-    List only those deposits that have this specified value for DOI registered.
-    """
-    doiRegistered: DepositDoiRegisteredFilter
-
-    """
-    List only those deposits that have this specified value for DOI action.
-    """
-    doiAction: DepositDoiActionFilter
-
-    """
-    List only those deposits that have this specified value for 'is-new-version'.
-    """
-    isNewVersion: DepositIsNewVersionFilter
-
-    """
-    List only those deposits that have this specified value for 'curation required'.
-    """
-    curationRequired: DepositCurationRequiredFilter
-
-    """
-    List only those deposits that have this specified value for 'curation performed'.
-    """
-    curationPerformed: DepositCurationPerformedFilter
-
-    """List only those deposits that have this specified content type."""
-    contentType: DepositContentTypeFilter
-
-    """Ordering options for the returned deposits."""
-    orderBy: DepositOrder
-
-    """
-    List only those elements that have a timestamp earlier than this given timestamp.
-    """
-    earlierThan: DateTime
-
-    """
-    List only those elements that have a timestamp later than this given timestamp.
-    """
-    laterThan: DateTime
-
-    """
-    List only those elements that have a timestamp equal to the given timestamp.
-    """
-    atTimestamp: DateTime
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): DepositConnection!
-
-  """The ID of an object"""
-  id: ID!
-}
-
-"""Whether the deposit has been curated by the data manager."""
-type CurationPerformedEvent {
-  """True if curation by the data manager has been performed."""
-  value: Boolean!
-
-  """The timestamp at which the curation was completed."""
-  timestamp: DateTime!
-}
-
-"""Whether curation by data manager is required."""
-type CurationRequiredEvent {
-  """True if curation by a data manager is required."""
-  value: Boolean!
-
-  """
-  The timestamp at which was decided that this deposit requires curation.
-  """
-  timestamp: DateTime!
-}
-
 """Data manager responsible for curating this deposit."""
 type Curator implements Node {
   """The data manager's username in EASY."""
@@ -321,12 +197,12 @@ type Curator implements Node {
     """
     List only those deposits that have this specified value for 'curation required'.
     """
-    curationRequired: DepositCurationRequiredFilter
+    curationRequired: DepositIsCurationRequiredFilter
 
     """
     List only those deposits that have this specified value for 'curation performed'.
     """
-    curationPerformed: DepositCurationPerformedFilter
+    curationPerformed: DepositIsCurationPerformedFilter
 
     """List only those deposits that have this specified content type."""
     contentType: DepositContentTypeFilter
@@ -549,22 +425,22 @@ type Deposit implements Node {
   ): CuratorConnection!
 
   """Whether this deposit is a new version."""
-  isNewVersion: Boolean
+  isNewVersion: IsNewVersion
 
   """List the present and past values for 'is-new-version'."""
-  isNewVersionEvents: [IsNewVersionEvent!]!
+  isNewVersionEvents: [IsNewVersion!]!
 
   """Whether this deposit requires curation."""
-  curationRequired: Boolean
+  curationRequired: IsCurationRequired
 
   """List the present and past values for 'curation-required'."""
-  curationRequiredEvents: [CurationRequiredEvent!]!
+  curationRequiredEvents: [IsCurationRequired!]!
 
   """Whether curation on this deposit has been performed."""
-  curationPerformed: Boolean
+  curationPerformed: IsCurationPerformed
 
   """List the present and past values for 'curation-performed'."""
-  curationPerformedEvents: [CurationPerformedEvent!]!
+  curationPerformedEvents: [IsCurationPerformed!]!
 
   """The springfield configuration currently associated with this deposit."""
   springfield: Springfield
@@ -643,36 +519,6 @@ input DepositContentTypeFilter {
   filter: SeriesFilter = LATEST
 }
 
-"""
-The value and filter to be used in searching for deposits by 'curation-performed'.
-"""
-input DepositCurationPerformedFilter {
-  """
-  If provided, only show deposits with this value for 'curation-performed'.
-  """
-  value: Boolean!
-
-  """
-  Determine whether to search in current values (`LATEST`, default) or all current and past values (`ALL`).
-  """
-  filter: SeriesFilter = LATEST
-}
-
-"""
-The value and filter to be used in searching for deposits by 'curation-required'.
-"""
-input DepositCurationRequiredFilter {
-  """
-  If provided, only show deposits with this value for 'curation-required'.
-  """
-  value: Boolean!
-
-  """
-  Determine whether to search in current values (`LATEST`, default) or all current and past values (`ALL`).
-  """
-  filter: SeriesFilter = LATEST
-}
-
 """The label and filter to be used in searching for deposits by curator."""
 input DepositCuratorFilter {
   """If provided, only show deposits with this curator."""
@@ -737,6 +583,36 @@ input DepositIngestStepFilter {
 }
 
 """
+The value and filter to be used in searching for deposits by 'curation-performed'.
+"""
+input DepositIsCurationPerformedFilter {
+  """
+  If provided, only show deposits with this value for 'curation-performed'.
+  """
+  value: Boolean!
+
+  """
+  Determine whether to search in current values (`LATEST`, default) or all current and past values (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""
+The value and filter to be used in searching for deposits by 'curation-required'.
+"""
+input DepositIsCurationRequiredFilter {
+  """
+  If provided, only show deposits with this value for 'curation-required'.
+  """
+  value: Boolean!
+
+  """
+  Determine whether to search in current values (`LATEST`, default) or all current and past values (`ALL`).
+  """
+  filter: SeriesFilter = LATEST
+}
+
+"""
 The value and filter to be used in searching for deposits by 'is-new-version'.
 """
 input DepositIsNewVersionFilter {
@@ -789,12 +665,12 @@ type Depositor {
     """
     List only those deposits that have this specified value for 'curation required'.
     """
-    curationRequired: DepositCurationRequiredFilter
+    curationRequired: DepositIsCurationRequiredFilter
 
     """
     List only those deposits that have this specified value for 'curation performed'.
     """
-    curationPerformed: DepositCurationPerformedFilter
+    curationPerformed: DepositIsCurationPerformedFilter
 
     """List only those deposits that have this specified content type."""
     contentType: DepositContentTypeFilter
@@ -1060,15 +936,154 @@ enum IngestStepOrderField {
   STEP
 }
 
+"""Whether the deposit has been curated by the data manager."""
+type IsCurationPerformed implements Node {
+  """True if curation by the data manager has been performed."""
+  value: Boolean!
+
+  """The timestamp at which the curation was completed."""
+  timestamp: DateTime!
+
+  """
+  Returns the deposit that is associated with this particular IsCurationPerformedEvent
+  """
+  deposit: Deposit
+
+  """
+  List all deposits with the same current IsCurationPerformedEvent value.
+  """
+  deposits(
+    """
+    Determine whether to search in current IsCurationPerformedEvents (`LATEST`,
+    default) or all current and past IsCurationPerformedEvents (`ALL`).
+    """
+    stateFilter: SeriesFilter = LATEST
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection!
+
+  """The ID of an object"""
+  id: ID!
+}
+
+"""Whether curation by data manager is required."""
+type IsCurationRequired implements Node {
+  """True if curation by a data manager is required."""
+  value: Boolean!
+
+  """
+  The timestamp at which was decided that this deposit requires curation.
+  """
+  timestamp: DateTime!
+
+  """
+  Returns the deposit that is associated with this particular IsCurationRequiredEvent
+  """
+  deposit: Deposit
+
+  """List all deposits with the same current IsCurationRequiredEvent value."""
+  deposits(
+    """
+    Determine whether to search in current IsCurationRequiredEvents (`LATEST`,
+    default) or all current and past IsCurationRequiredEvents (`ALL`).
+    """
+    stateFilter: SeriesFilter = LATEST
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection!
+
+  """The ID of an object"""
+  id: ID!
+}
+
 """
 State whether this deposit is a new version, requiring a new DOI and deposit agreement to be generated by easy-ingest-flow.
 """
-type IsNewVersionEvent {
+type IsNewVersion implements Node {
   """True if the deposit is a new version."""
-  value: Boolean
+  value: Boolean!
 
   """The timestamp at which was decided that this is a new version."""
   timestamp: DateTime!
+
+  """
+  Returns the deposit that is associated with this particular IsNewVersionEvent
+  """
+  deposit: Deposit
+
+  """List all deposits with the same current IsNewVersion value."""
+  deposits(
+    """
+    Determine whether to search in current IsNewVersionEvents (`LATEST`,
+    default) or all current and past IsNewVersionEvents (`ALL`).
+    """
+    stateFilter: SeriesFilter = LATEST
+
+    """Ordering options for the returned deposits."""
+    orderBy: DepositOrder
+
+    """
+    List only those elements that have a timestamp earlier than this given timestamp.
+    """
+    earlierThan: DateTime
+
+    """
+    List only those elements that have a timestamp later than this given timestamp.
+    """
+    laterThan: DateTime
+
+    """
+    List only those elements that have a timestamp equal to the given timestamp.
+    """
+    atTimestamp: DateTime
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DepositConnection!
+
+  """The ID of an object"""
+  id: ID!
 }
 
 """The root query for implementing GraphQL mutations."""
@@ -1098,8 +1113,17 @@ type Mutation {
   """
   setDoiAction(input: SetDoiActionInput!): SetDoiActionPayload!
 
-  """Assign a curation event to the deposit identified by 'id'."""
-  setCuration(input: SetCurationInput!): SetCurationPayload!
+  """Assign a curator to the deposit identified by 'id'."""
+  setCurator(input: SetCuratorInput!): SetCuratorPayload!
+
+  """Indicate whether the deposit identified by 'id' is a new version."""
+  setIsNewVersion(input: SetIsNewVersionInput!): SetIsNewVersionPayload!
+
+  """Indicate whether the deposit identified by 'id' requires curation."""
+  setIsCurationRequired(input: SetIsCurationRequiredInput!): SetIsCurationRequiredPayload!
+
+  """Indicate whether the deposit identified by 'id' has been curated."""
+  setIsCurationPerformed(input: SetIsCurationPerformedInput!): SetIsCurationPerformedPayload!
 
   """Set the springfield configuration for this deposit."""
   setSpringfield(input: SetSpringfieldInput!): SetSpringfieldPayload!
@@ -1203,12 +1227,12 @@ type Query {
     """
     List only those deposits that have this specified value for 'curation required'.
     """
-    curationRequired: DepositCurationRequiredFilter
+    curationRequired: DepositIsCurationRequiredFilter
 
     """
     List only those deposits that have this specified value for 'curation performed'.
     """
-    curationPerformed: DepositCurationPerformedFilter
+    curationPerformed: DepositIsCurationPerformedFilter
 
     """List only those deposits that have this specified content type."""
     contentType: DepositContentTypeFilter
@@ -1274,12 +1298,12 @@ type Query {
     """
     Find only those depositors that have deposits with this 'curation required' value.
     """
-    curationRequired: DepositCurationRequiredFilter
+    curationRequired: DepositIsCurationRequiredFilter
 
     """
     Find only those depositors that have deposits with this 'curation performed' value.
     """
-    curationPerformed: DepositCurationPerformedFilter
+    curationPerformed: DepositIsCurationPerformedFilter
 
     """Find only those depositors that have deposits with this content type."""
     contentType: DepositContentTypeFilter
@@ -1358,7 +1382,7 @@ type SetContentTypePayload {
   contentType: ContentType
 }
 
-input SetCurationInput {
+input SetCuratorInput {
   clientMutationId: String
 
   """The deposit's identifier."""
@@ -1370,25 +1394,15 @@ input SetCurationInput {
   """The data manager's email address."""
   datamanagerEmail: String!
 
-  """True if the deposit is a new version."""
-  isNewVersion: Boolean
-
-  """True if curation by a data manager is required."""
-  isCurationRequired: Boolean!
-
-  """True if curation by the data manager has been performed."""
-  isCurationPerformed: Boolean!
-
   """
-  The timestamp at which the curation event was assigned to this deposit. If not
-  provided, the current date/timestamp is used instead.
+  The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.
   """
   timestamp: DateTime
 }
 
-type SetCurationPayload {
+type SetCuratorPayload {
   clientMutationId: String
-  curation: Curation
+  curator: Curator
 }
 
 input SetDoiActionInput {
@@ -1431,6 +1445,66 @@ input SetDoiRegisteredInput {
 type SetDoiRegisteredPayload {
   clientMutationId: String
   doiRegistered: DoiRegisteredEvent!
+}
+
+input SetIsCurationPerformedInput {
+  clientMutationId: String
+
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """True if curation by the data manager has been performed."""
+  isCurationPerformed: Boolean!
+
+  """
+  The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.
+  """
+  timestamp: DateTime
+}
+
+type SetIsCurationPerformedPayload {
+  clientMutationId: String
+  isCurationPerformed: IsCurationPerformed
+}
+
+input SetIsCurationRequiredInput {
+  clientMutationId: String
+
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """True if curation by a data manager is required."""
+  isCurationRequired: Boolean!
+
+  """
+  The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.
+  """
+  timestamp: DateTime
+}
+
+type SetIsCurationRequiredPayload {
+  clientMutationId: String
+  isCurationRequired: IsCurationRequired
+}
+
+input SetIsNewVersionInput {
+  clientMutationId: String
+
+  """The deposit's identifier."""
+  depositId: UUID!
+
+  """True if the deposit is a new version."""
+  isNewVersion: Boolean!
+
+  """
+  The timestamp at which this value was added. If not provided, the current date/timestamp is used instead.
+  """
+  timestamp: DateTime
+}
+
+type SetIsNewVersionPayload {
+  clientMutationId: String
+  isNewVersion: IsNewVersion
 }
 
 input SetSpringfieldInput {
