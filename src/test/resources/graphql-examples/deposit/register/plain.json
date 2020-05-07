@@ -79,27 +79,30 @@
             }
           ]
         },
-        "isNewVersion": true,
-        "isNewVersionEvents": [
+        "isNewVersion":{
+          "value":true,
+          "timestamp":"2019-01-01T00:00:00.000Z"
+        },
+        "isNewVersionEvents":[
           {
-            "value": true,
-            "timestamp": "2019-01-01T00:00:00.000Z"
+            "value":true,
+            "timestamp":"2019-01-01T00:00:00.000Z"
           }
         ],
-        "curationRequired": false,
-        "curationRequiredEvents": [
+        "curationRequired":{
+          "value":false,
+          "timestamp":"2019-01-01T00:00:00.000Z"
+        },
+        "curationRequiredEvents":[
           {
-            "value": false,
-            "timestamp": "2019-01-01T00:00:00.000Z"
+            "value":false,
+            "timestamp":"2019-01-01T00:00:00.000Z"
           }
         ],
-        "curationPerformed": false,
-        "curationPerformedEvents": [
-          {
-            "value": false,
-            "timestamp": "2019-01-01T00:00:00.000Z"
-          }
-        ],
+        "curationPerformed":{
+          "value":false,
+          "timestamp":"2019-01-01T00:00:00.000Z"
+        },
         "springfields": [
           {
             "domain": "domain",
