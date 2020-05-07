@@ -20,6 +20,7 @@ import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.Identifi
 import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
 import nl.knaw.dans.easy.properties.app.model.{ AtTime, Between, DepositFilter, DepositId, EarlierThan, LaterThan, NotBetween, SeriesFilter }
 import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
+import org.apache.commons.lang.BooleanUtils
 
 object QueryGenerator {
 
@@ -98,9 +99,9 @@ object QueryGenerator {
       filters.doiRegisteredFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
       filters.doiActionFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-action", _.value.toString)),
       filters.curatorFilter.map(createSearchSubQuery(_)("Curator", "datamanagerUserId", _.curator)),
-      filters.isNewVersionFilter.map(createSearchSimplePropertiesSubQuery(_)("is-new-version", _.isNewVersion.toString)),
-      filters.curationRequiredFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-required", _.curationRequired.toString)),
-      filters.curationPerformedFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-performed", _.curationPerformed.toString)),
+      filters.isNewVersionFilter.map(createSearchSimplePropertiesSubQuery(_)("is-new-version", filter => BooleanUtils.toStringTrueFalse(filter.isNewVersion))),
+      filters.curationRequiredFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-required", filter => BooleanUtils.toStringTrueFalse(filter.curationRequired))),
+      filters.curationPerformedFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-performed", filter => BooleanUtils.toStringTrueFalse(filter.curationPerformed))),
       filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
     )
       .collect {
@@ -126,6 +127,7 @@ object QueryGenerator {
         val query = s"SELECT * FROM (SELECT * FROM Deposit WHERE $queryWherePart) AS SelectedDeposits $queryJoinPart"
         query -> (whereValues.reverse ::: joinValues.reverse)
     }
+    println(query)
 
     filters.sort.fold(s"$query;") {
       case DepositOrder(field, direction) => s"$query ORDER BY $field $direction;"
@@ -150,9 +152,9 @@ object QueryGenerator {
       filters.doiRegisteredFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
       filters.doiActionFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-action", _.value.toString)),
       filters.curatorFilter.map(createSearchSubQuery(_)("Curator", "datamanagerUserId", _.curator)),
-      filters.isNewVersionFilter.map(createSearchSimplePropertiesSubQuery(_)("is-new-version", _.isNewVersion.toString)),
-      filters.curationRequiredFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-required", _.curationRequired.toString)),
-      filters.curationPerformedFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-performed", _.curationPerformed.toString)),
+      filters.isNewVersionFilter.map(createSearchSimplePropertiesSubQuery(_)("is-new-version", filter => BooleanUtils.toStringTrueFalse(filter.isNewVersion))),
+      filters.curationRequiredFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-required", filter => BooleanUtils.toStringTrueFalse(filter.curationRequired))),
+      filters.curationPerformedFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-performed", filter => BooleanUtils.toStringTrueFalse(filter.curationPerformed))),
       filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
     )
       .collect {
