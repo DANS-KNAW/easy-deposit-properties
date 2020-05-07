@@ -35,7 +35,7 @@ CREATE TABLE IF NOT EXISTS Curator (
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (depositId) REFERENCES Deposit (depositId),
     UNIQUE (depositId, timestamp)
-)
+);
 
 CREATE TABLE IF NOT EXISTS Springfield (
     springfieldId SERIAL NOT NULL PRIMARY KEY,

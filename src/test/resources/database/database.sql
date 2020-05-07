@@ -39,7 +39,7 @@ CREATE TABLE Curator (
     timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
     FOREIGN KEY (depositId) REFERENCES Deposit (depositId),
     UNIQUE (depositId, timestamp)
-)
+);
 
 CREATE TABLE Springfield (
     springfieldId INTEGER IDENTITY NOT NULL PRIMARY KEY,
