@@ -171,21 +171,30 @@
                 }
               ]
             },
-            "isNewVersion": false,
-            "isNewVersionEvents": [
+            "isNewVersion": {
+              "value":false,
+              "timestamp":"2019-05-05T00:00:00.000Z"
+            },
+            "isNewVersionEvents":[
               {
-                "value": false,
-                "timestamp": "2019-05-05T00:00:00.000Z"
+                "value":false,
+                "timestamp":"2019-05-05T00:00:00.000Z"
               }
             ],
-            "curationRequired": true,
-            "curationRequiredEvents": [
+            "curationRequired":{
+              "value":true,
+              "timestamp":"2019-05-05T00:00:00.000Z"
+            },
+            "curationRequiredEvents":[
               {
-                "value": true,
-                "timestamp": "2019-05-05T00:00:00.000Z"
+                "value":true,
+                "timestamp":"2019-05-05T00:00:00.000Z"
               }
             ],
-            "curationPerformed": true,
+            "curationPerformed":{
+              "value":true,
+              "timestamp":"2019-05-05T04:04:00.000Z"
+            },
             "curationPerformedEvents": [
               {
                 "value": false,
@@ -279,21 +288,30 @@
                 }
               ]
             },
-            "isNewVersion": false,
-            "isNewVersionEvents": [
+            "isNewVersion": {
+              "value":false,
+              "timestamp":"2019-04-04T00:00:00.000Z"
+            },
+            "isNewVersionEvents":[
               {
-                "value": false,
-                "timestamp": "2019-04-04T00:00:00.000Z"
+                "value":false,
+                "timestamp":"2019-04-04T00:00:00.000Z"
               }
             ],
-            "curationRequired": true,
-            "curationRequiredEvents": [
+            "curationRequired":{
+              "value":true,
+              "timestamp":"2019-04-04T00:00:00.000Z"
+            },
+            "curationRequiredEvents":[
               {
-                "value": true,
-                "timestamp": "2019-04-04T00:00:00.000Z"
+                "value":true,
+                "timestamp":"2019-04-04T00:00:00.000Z"
               }
             ],
-            "curationPerformed": true,
+            "curationPerformed":{
+              "value":true,
+              "timestamp":"2019-04-04T04:04:00.000Z"
+            },
             "curationPerformedEvents": [
               {
                 "value": false,
@@ -376,25 +394,30 @@
                 }
               ]
             },
-            "isNewVersion": true,
-            "isNewVersionEvents": [
+            "isNewVersion": {
+              "value":true,
+              "timestamp":"2019-03-03T06:06:00.000Z"
+            },
+            "isNewVersionEvents":[
               {
-                "value": null,
-                "timestamp": "2019-03-03T00:00:00.000Z"
-              },
-              {
-                "value": true,
-                "timestamp": "2019-03-03T06:06:00.000Z"
+                "value":true,
+                "timestamp":"2019-03-03T06:06:00.000Z"
               }
             ],
-            "curationRequired": true,
-            "curationRequiredEvents": [
+            "curationRequired":{
+              "value":true,
+              "timestamp":"2019-03-03T00:00:00.000Z"
+            },
+            "curationRequiredEvents":[
               {
-                "value": true,
-                "timestamp": "2019-03-03T00:00:00.000Z"
+                "value":true,
+                "timestamp":"2019-03-03T00:00:00.000Z"
               }
             ],
-            "curationPerformed": true,
+            "curationPerformed":{
+              "value":true,
+              "timestamp":"2019-03-03T06:06:00.000Z"
+            },
             "curationPerformedEvents": [
               {
                 "value": false,
@@ -512,19 +535,22 @@
             },
             "isNewVersion": null,
             "isNewVersionEvents": [
+
+            ],
+            "curationRequired":{
+              "value":true,
+              "timestamp":"2019-01-01T00:00:00.000Z"
+            },
+            "curationRequiredEvents":[
               {
-                "value": null,
-                "timestamp": "2019-01-01T00:00:00.000Z"
+                "value":true,
+                "timestamp":"2019-01-01T00:00:00.000Z"
               }
             ],
-            "curationRequired": true,
-            "curationRequiredEvents": [
-              {
-                "value": true,
-                "timestamp": "2019-01-01T00:00:00.000Z"
-              }
-            ],
-            "curationPerformed": true,
+            "curationPerformed":{
+              "value":true,
+              "timestamp":"2019-01-01T04:04:00.000Z"
+            },
             "curationPerformedEvents": [
               {
                 "value": false,

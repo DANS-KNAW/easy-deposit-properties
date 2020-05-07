@@ -20,7 +20,6 @@ import java.util.UUID
 import better.files.File
 import cats.syntax.option._
 import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue }
-import nl.knaw.dans.easy.properties.app.model.curation.Curation
 import nl.knaw.dans.easy.properties.app.model.curator.Curator
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestStepLabel }
@@ -94,20 +93,6 @@ trait DatabaseDataFixture extends BeforeAndAfterEach {
   val identifier12 = Identifier("12", IdentifierType.FEDORA, "easy-dataset:4", new DateTime(2019, 4, 4, 0, 3, timeZone))
 
   val identifier13 = Identifier("13", IdentifierType.BAG_STORE, depositId5.toString, new DateTime(2019, 5, 5, 0, 0, timeZone))
-
-  @deprecated val curation0 = Curation("0", isNewVersion = none, isRequired = true, isPerformed = false, "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 1, 1, 0, 0, timeZone))
-  @deprecated val curation1 = Curation("1", isNewVersion = none, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 1, 1, 3, 3, timeZone))
-  @deprecated val curation2 = Curation("2", isNewVersion = none, isRequired = true, isPerformed = true, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 1, 1, 4, 4, timeZone))
-
-  @deprecated val curation3 = Curation("3", isNewVersion = none, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 3, 3, 0, 0, timeZone))
-  @deprecated val curation4 = Curation("4", isNewVersion = none, isRequired = true, isPerformed = false, "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 3, 3, 4, 4, timeZone))
-  @deprecated val curation5 = Curation("5", isNewVersion = true.some, isRequired = true, isPerformed = true, "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 3, 3, 6, 6, timeZone))
-
-  @deprecated val curation6 = Curation("6", isNewVersion = false.some, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 4, 4, 0, 0, timeZone))
-  @deprecated val curation7 = Curation("7", isNewVersion = false.some, isRequired = true, isPerformed = true, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 4, 4, 4, 4, timeZone))
-
-  @deprecated val curation8 = Curation("8", isNewVersion = false.some, isRequired = true, isPerformed = false, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 5, 5, 0, 0, timeZone))
-  @deprecated val curation9 = Curation("9", isNewVersion = false.some, isRequired = true, isPerformed = true, "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 5, 5, 4, 4, timeZone))
 
   val curator0 = Curator("0", "archie002", "does.not.exists2@dans.knaw.nl", new DateTime(2019, 1, 1, 0, 0, timeZone))
   val curator1 = Curator("1", "archie001", "does.not.exists1@dans.knaw.nl", new DateTime(2019, 1, 1, 3, 3, timeZone))

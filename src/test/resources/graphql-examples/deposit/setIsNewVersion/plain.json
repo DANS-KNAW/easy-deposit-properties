@@ -1,0 +1,12 @@
+{
+  "data": {
+    "setIsNewVersion":{
+      "clientMutationId":"my-mutation-id",
+      "isNewVersion":{
+        "id":"SXNOZXdWZXJzaW9uOjQ3",
+        "value":true,
+        "timestamp": "2019-05-30T21:32:00.000Z"
+      }
+    }
+  }
+}

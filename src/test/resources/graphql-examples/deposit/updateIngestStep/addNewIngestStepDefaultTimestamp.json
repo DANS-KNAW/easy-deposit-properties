@@ -3,7 +3,7 @@
     "updateIngestStep": {
       "clientMutationId": "my-mutation-id",
       "ingestStep": {
-        "id": "SW5nZXN0U3RlcDozMg==",
+        "id": "SW5nZXN0U3RlcDo0Nw==",
         "step": "VALIDATE",
         "timestamp": "2020-02-02T20:20:02.000Z"
       }

@@ -97,10 +97,10 @@ object QueryGenerator {
       filters.ingestStepFilter.map(createSearchSimplePropertiesSubQuery(_)("ingest-step", _.label.toString)),
       filters.doiRegisteredFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
       filters.doiActionFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-action", _.value.toString)),
-      filters.curatorFilter.map(createSearchSubQuery(_)("Curation", "datamanagerUserId", _.curator)),
-      filters.isNewVersionFilter.map(createSearchSubQuery(_)("Curation", "isNewVersion", _.isNewVersion.toString)),
-      filters.curationRequiredFilter.map(createSearchSubQuery(_)("Curation", "isRequired", _.curationRequired.toString)),
-      filters.curationPerformedFilter.map(createSearchSubQuery(_)("Curation", "isPerformed", _.curationPerformed.toString)),
+      filters.curatorFilter.map(createSearchSubQuery(_)("Curator", "datamanagerUserId", _.curator)),
+      filters.isNewVersionFilter.map(createSearchSimplePropertiesSubQuery(_)("is-new-version", _.isNewVersion.toString)),
+      filters.curationRequiredFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-required", _.curationRequired.toString)),
+      filters.curationPerformedFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-performed", _.curationPerformed.toString)),
       filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
     )
       .collect {
@@ -149,10 +149,10 @@ object QueryGenerator {
       filters.ingestStepFilter.map(createSearchSimplePropertiesSubQuery(_)("ingest-step", _.label.toString)),
       filters.doiRegisteredFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
       filters.doiActionFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-action", _.value.toString)),
-      filters.curatorFilter.map(createSearchSubQuery(_)("Curation", "datamanagerUserId", _.curator)),
-      filters.isNewVersionFilter.map(createSearchSubQuery(_)("Curation", "isNewVersion", _.isNewVersion.toString)),
-      filters.curationRequiredFilter.map(createSearchSubQuery(_)("Curation", "isRequired", _.curationRequired.toString)),
-      filters.curationPerformedFilter.map(createSearchSubQuery(_)("Curation", "isPerformed", _.curationPerformed.toString)),
+      filters.curatorFilter.map(createSearchSubQuery(_)("Curator", "datamanagerUserId", _.curator)),
+      filters.isNewVersionFilter.map(createSearchSimplePropertiesSubQuery(_)("is-new-version", _.isNewVersion.toString)),
+      filters.curationRequiredFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-required", _.curationRequired.toString)),
+      filters.curationPerformedFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-performed", _.curationPerformed.toString)),
       filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
     )
       .collect {
@@ -301,16 +301,6 @@ object QueryGenerator {
   lazy val storeDeposit: String = "INSERT INTO Deposit (depositId, bagName, creationTimestamp, depositorId, origin) VALUES (?, ?, ?, ?, ?);"
 
   lazy val storeBagName: String = "UPDATE Deposit SET bagName = ? WHERE depositId = ? AND (bagName IS NULL OR bagName='');"
-
-  @deprecated
-  def storeCuration(isNewVersionDefined: Boolean): String = {
-    // Note: this is a hack: as `isNewVersion` is an optional property, but it is also a `Boolean`, we cannot use `null` in `prepStatement.setBoolean`. This is not allowed by Scala.
-    // Workaround applied here is to add the `isNewVersion` to the end, only if it is defined.
-    if (isNewVersionDefined)
-      "INSERT INTO Curation (depositId, isRequired, isPerformed, datamanagerUserId, datamanagerEmail, timestamp, isNewVersion) VALUES (?, ?, ?, ?, ?, ?, ?);"
-    else
-      "INSERT INTO Curation (depositId, isRequired, isPerformed, datamanagerUserId, datamanagerEmail, timestamp) VALUES (?, ?, ?, ?, ?, ?);"
-  }
 
   lazy val storeIdentifier: String = "INSERT INTO Identifier (depositId, identifierSchema, identifierValue, timestamp) VALUES (?, ?, ?, ?);"
 
