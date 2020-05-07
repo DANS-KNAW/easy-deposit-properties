@@ -430,9 +430,7 @@ class GraphQLResolveSpec extends TestSupportFixture
 
     inSequence {
       depositDao.find _ expects Seq(depositId1) once() returning Seq(deposit1).asRight
-      curatorDao.getAll _ expects Seq(depositId1) once() returning Seq(
-        depositId1 -> Seq(curator1),
-      ).asRight
+      curatorDao.getCurrent _ expects Seq(depositId1) once() returning Seq(depositId1 -> curator1).asRight
       val filters = DepositFilters(curatorFilter = Some(DepositCuratorFilter("archie001", SeriesFilter.ALL)))
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit3),
@@ -477,9 +475,7 @@ class GraphQLResolveSpec extends TestSupportFixture
 
     inSequence {
       depositDao.find _ expects Seq(depositId1) once() returning Seq(deposit1).asRight
-      curatorDao.getAll _ expects Seq(depositId1) once() returning Seq(
-        depositId1 -> Seq(curator2),
-      ).asRight
+      curatorDao.getCurrent _ expects Seq(depositId1) once() returning Seq(depositId1 -> curator2).asRight
       val filters = DepositFilters(curatorFilter = Some(DepositCuratorFilter("archie002")))
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2),
@@ -1017,10 +1013,9 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      (curatorDao.getAll(_: Seq[DepositId])) expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curator1),
-        depositId2 -> Seq(curator2),
-        depositId3 -> Seq.empty,
+      curatorDao.getCurrent _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> curator1,
+        depositId2 -> curator2,
       ).asRight
     }
 
@@ -1201,10 +1196,10 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      curatorDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curator1),
-        depositId2 -> Seq(curator2),
-        depositId3 -> Seq(curator1),
+      curatorDao.getCurrent _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> curator1,
+        depositId2 -> curator2,
+        depositId3 -> curator1,
       ).asRight
       curatorDao.getDepositsById _ expects Seq(curator1.id, curator2.id) once() returning Seq(
         curator1.id -> deposit1,
@@ -1481,10 +1476,9 @@ class GraphQLResolveSpec extends TestSupportFixture
       depositDao.search _ expects Seq(filters1) once() returning Seq(
         filters1 -> Seq(deposit1, deposit2, deposit3),
       ).asRight
-      curatorDao.getAll _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
-        depositId1 -> Seq(curator1, curator2),
-        depositId2 -> Seq(curator2, curator1),
-        depositId3 -> Seq.empty,
+      curatorDao.getCurrent _ expects Seq(depositId1, depositId2, depositId3) once() returning Seq(
+        depositId1 -> curator1,
+        depositId2 -> curator2,
       ).asRight
       depositDao.search _ expects Seq(filters2, filters3) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),

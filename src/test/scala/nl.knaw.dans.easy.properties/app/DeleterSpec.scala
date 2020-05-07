@@ -31,8 +31,9 @@ class DeleterSpec extends TestSupportFixture
   private val uuid6: UUID = UUID.fromString("00000000-0000-0000-0000-000000000006") // does not exist
 
   "delete" should "fail with a foreign key violation" in {
-    repository.deposits.deleteBy(Seq(uuid5)).leftValue.msg shouldBe
-      "integrity constraint violation: foreign key no action; SYS_FK_10153 table: STATE"
+    repository.deposits.deleteBy(Seq(uuid5)).leftValue.msg should {
+      include("integrity constraint violation: foreign key no action") and include("table: STATE")
+    }
   }
 
   it should "succeed with a mix of existing and non existing IDs" in {

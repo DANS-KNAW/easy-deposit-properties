@@ -39,6 +39,15 @@ query Deposit {
             email
             timestamp
         }
+        curators(first: 10) {
+            edges {
+                node {
+                    userId
+                    email
+                    timestamp
+                }
+            }
+        }
         isNewVersion {
             value
             timestamp
