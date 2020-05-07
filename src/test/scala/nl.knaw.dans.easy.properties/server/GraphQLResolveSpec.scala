@@ -1690,12 +1690,12 @@ class GraphQLResolveSpec extends TestSupportFixture
 
   it should "resolve 'node/onCurator.graphql' with 3 calls to the repository" in {
     val input = graphqlExamplesDir / "node" / "onCurator.graphql"
-    val curator9 = curator1.copy(id = "9")
+    val curator5 = curator1.copy(id = "5")
 
     inSequence {
-      curatorDao.getById _ expects Seq(curator9.id) once() returning Seq(curator9).asRight
+      curatorDao.getById _ expects Seq(curator5.id) once() returning Seq(curator5).asRight
       inAnyOrder {
-        curatorDao.getDepositsById _ expects Seq(curator9.id) once() returning Seq(curator9.id -> deposit1).asRight
+        curatorDao.getDepositsById _ expects Seq(curator5.id) once() returning Seq(curator5.id -> deposit1).asRight
         val filters = DepositFilters(
           curatorFilter = Some(DepositCuratorFilter("archie001", SeriesFilter.ALL)),
           sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.ASC)),
