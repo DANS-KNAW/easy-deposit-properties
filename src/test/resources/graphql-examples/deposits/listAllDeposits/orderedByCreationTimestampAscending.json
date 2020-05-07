@@ -94,454 +94,487 @@
             },
             "isNewVersion": null,
             "isNewVersionEvents": [
+            ],
+            "curationRequired":{
+              "value":true,
+              "timestamp":"2019-01-01T00:00:00.000Z"
+            },
+            "curationRequiredEvents":[
               {
-                "value": null,
-                "timestamp": "2019-01-01T00:00:00.000Z"
+                "value":true,
+                "timestamp":"2019-01-01T00:00:00.000Z"
               }
             ],
-            "curationRequired": true,
-            "curationRequiredEvents": [
+            "curationPerformed":{
+              "value":true,
+              "timestamp":"2019-01-01T04:04:00.000Z"
+            },
+            "curationPerformedEvents":[
               {
-                "value": true,
-                "timestamp": "2019-01-01T00:00:00.000Z"
-              }
-            ],
-            "curationPerformed": true,
-            "curationPerformedEvents": [
-              {
-                "value": false,
-                "timestamp": "2019-01-01T00:00:00.000Z"
+                "value":false,
+                "timestamp":"2019-01-01T00:00:00.000Z"
               },
               {
-                "value": true,
-                "timestamp": "2019-01-01T04:04:00.000Z"
+                "value":true,
+                "timestamp":"2019-01-01T04:04:00.000Z"
               }
             ],
-            "springfield": {
-              "domain": "domain1",
-              "user": "user1",
-              "collection": "collection1",
-              "playmode": "CONTINUOUS",
-              "timestamp": "2019-01-01T00:00:00.000Z"
+            "springfield":{
+              "domain":"domain1",
+              "user":"user1",
+              "collection":"collection1",
+              "playmode":"CONTINUOUS",
+              "timestamp":"2019-01-01T00:00:00.000Z"
             },
-            "springfields": [
+            "springfields":[
               {
-                "domain": "domain1",
-                "user": "user1",
-                "collection": "collection1",
-                "playmode": "CONTINUOUS",
-                "timestamp": "2019-01-01T00:00:00.000Z"
+                "domain":"domain1",
+                "user":"user1",
+                "collection":"collection1",
+                "playmode":"CONTINUOUS",
+                "timestamp":"2019-01-01T00:00:00.000Z"
               }
             ],
-            "contentType": {
-              "value": "application/octet-stream",
-              "timestamp": "2019-01-01T00:10:00.000Z"
+            "contentType":{
+              "value":"application/octet-stream",
+              "timestamp":"2019-01-01T00:10:00.000Z"
             },
-            "contentTypes": [
+            "contentTypes":[
               {
-                "value": "application/zip",
-                "timestamp": "2019-01-01T00:05:00.000Z"
+                "value":"application/zip",
+                "timestamp":"2019-01-01T00:05:00.000Z"
               },
               {
-                "value": "application/octet-stream",
-                "timestamp": "2019-01-01T00:10:00.000Z"
+                "value":"application/octet-stream",
+                "timestamp":"2019-01-01T00:10:00.000Z"
               }
             ]
           }
         },
         {
-          "node": {
-            "depositId": "00000000-0000-0000-0000-000000000002",
-            "depositor": {
-              "depositorId": "user001"
+          "node":{
+            "depositId":"00000000-0000-0000-0000-000000000002",
+            "depositor":{
+              "depositorId":"user001"
             },
-            "bagName": null,
-            "origin": "API",
-            "creationTimestamp": "2019-02-02T00:00:00.000Z",
-            "lastModified": "2019-02-02T03:03:00.000Z",
-            "state": {
-              "label": "ARCHIVED",
-              "description": "deposit is archived",
-              "timestamp": "2019-02-02T03:03:00.000Z"
+            "bagName":null,
+            "origin":"API",
+            "creationTimestamp":"2019-02-02T00:00:00.000Z",
+            "lastModified":"2019-02-02T03:03:00.000Z",
+            "state":{
+              "label":"ARCHIVED",
+              "description":"deposit is archived",
+              "timestamp":"2019-02-02T03:03:00.000Z"
             },
-            "ingestStep": {
-              "step": "COMPLETED",
-              "timestamp": "2019-02-02T02:11:00.000Z"
+            "ingestStep":{
+              "step":"COMPLETED",
+              "timestamp":"2019-02-02T02:11:00.000Z"
             },
-            "identifiers": [
+            "identifiers":[
               {
-                "id": "SWRlbnRpZmllcjo0",
-                "type": "BAG_STORE",
-                "value": "00000000-0000-0000-0000-000000000002",
-                "timestamp": "2019-02-02T00:00:00.000Z"
+                "id":"SWRlbnRpZmllcjo0",
+                "type":"BAG_STORE",
+                "value":"00000000-0000-0000-0000-000000000002",
+                "timestamp":"2019-02-02T00:00:00.000Z"
               },
               {
-                "id": "SWRlbnRpZmllcjo1",
-                "type": "DOI",
-                "value": "10.5072/dans-f3g-hij4",
-                "timestamp": "2019-02-02T00:01:00.000Z"
+                "id":"SWRlbnRpZmllcjo1",
+                "type":"DOI",
+                "value":"10.5072/dans-f3g-hij4",
+                "timestamp":"2019-02-02T00:01:00.000Z"
               },
               {
-                "id": "SWRlbnRpZmllcjo3",
-                "type": "FEDORA",
-                "value": "easy-dataset:2",
-                "timestamp": "2019-02-02T00:03:00.000Z"
+                "id":"SWRlbnRpZmllcjo3",
+                "type":"FEDORA",
+                "value":"easy-dataset:2",
+                "timestamp":"2019-02-02T00:03:00.000Z"
               },
               {
-                "id": "SWRlbnRpZmllcjo2",
-                "type": "URN",
-                "value": "urn:nbn:789012",
-                "timestamp": "2019-02-02T00:02:00.000Z"
+                "id":"SWRlbnRpZmllcjo2",
+                "type":"URN",
+                "value":"urn:nbn:789012",
+                "timestamp":"2019-02-02T00:02:00.000Z"
               }
             ],
-            "doiRegistered": true,
-            "doiRegisteredEvents": [
+            "doiRegistered":true,
+            "doiRegisteredEvents":[
               {
-                "value": false,
-                "timestamp": "2019-02-02T00:00:00.000Z"
+                "value":false,
+                "timestamp":"2019-02-02T00:00:00.000Z"
               },
               {
-                "value": true,
-                "timestamp": "2019-02-02T02:07:00.000Z"
+                "value":true,
+                "timestamp":"2019-02-02T02:07:00.000Z"
               }
             ],
-            "doiAction": "CREATE",
-            "doiActionEvents": [
+            "doiAction":"CREATE",
+            "doiActionEvents":[
               {
-                "value": "CREATE",
-                "timestamp": "2019-02-02T00:00:00.000Z"
+                "value":"CREATE",
+                "timestamp":"2019-02-02T00:00:00.000Z"
               }
             ],
-            "curator": null,
-            "curators": {
-              "edges": [
+            "curator":null,
+            "curators":{
+              "edges":[
+
               ]
             },
-            "isNewVersion": null,
-            "isNewVersionEvents": [
+            "isNewVersion":null,
+            "isNewVersionEvents":[
+
             ],
-            "curationRequired": null,
-            "curationRequiredEvents": [
+            "curationRequired":null,
+            "curationRequiredEvents":[
+
             ],
-            "curationPerformed": null,
-            "curationPerformedEvents": [
+            "curationPerformed":null,
+            "curationPerformedEvents":[
+
             ],
-            "springfield": {
-              "domain": "domain2",
-              "user": "user2",
-              "collection": "collection2",
-              "playmode": "MENU",
-              "timestamp": "2019-02-02T02:02:00.000Z"
+            "springfield":{
+              "domain":"domain2",
+              "user":"user2",
+              "collection":"collection2",
+              "playmode":"MENU",
+              "timestamp":"2019-02-02T02:02:00.000Z"
             },
-            "springfields": [
+            "springfields":[
               {
-                "domain": "domain1",
-                "user": "user1",
-                "collection": "collection1",
-                "playmode": "CONTINUOUS",
-                "timestamp": "2019-02-02T00:00:00.000Z"
+                "domain":"domain1",
+                "user":"user1",
+                "collection":"collection1",
+                "playmode":"CONTINUOUS",
+                "timestamp":"2019-02-02T00:00:00.000Z"
               },
               {
-                "domain": "domain2",
-                "user": "user2",
-                "collection": "collection2",
-                "playmode": "MENU",
-                "timestamp": "2019-02-02T02:02:00.000Z"
+                "domain":"domain2",
+                "user":"user2",
+                "collection":"collection2",
+                "playmode":"MENU",
+                "timestamp":"2019-02-02T02:02:00.000Z"
               }
             ],
-            "contentType": {
-              "value": "application/zip",
-              "timestamp": "2019-02-02T00:05:00.000Z"
+            "contentType":{
+              "value":"application/zip",
+              "timestamp":"2019-02-02T00:05:00.000Z"
             },
-            "contentTypes": [
+            "contentTypes":[
               {
-                "value": "application/zip",
-                "timestamp": "2019-02-02T00:05:00.000Z"
+                "value":"application/zip",
+                "timestamp":"2019-02-02T00:05:00.000Z"
               }
             ]
           }
         },
         {
-          "node": {
-            "depositId": "00000000-0000-0000-0000-000000000003",
-            "depositor": {
-              "depositorId": "user002"
+          "node":{
+            "depositId":"00000000-0000-0000-0000-000000000003",
+            "depositor":{
+              "depositorId":"user002"
             },
-            "bagName": "bag3",
-            "origin": "SWORD2",
-            "creationTimestamp": "2019-03-03T00:00:00.000Z",
-            "lastModified": "2019-03-03T06:06:00.000Z",
-            "state": {
-              "label": "INVALID",
-              "description": "deposit is invalid",
-              "timestamp": "2019-03-03T02:02:00.000Z"
+            "bagName":"bag3",
+            "origin":"SWORD2",
+            "creationTimestamp":"2019-03-03T00:00:00.000Z",
+            "lastModified":"2019-03-03T06:06:00.000Z",
+            "state":{
+              "label":"INVALID",
+              "description":"deposit is invalid",
+              "timestamp":"2019-03-03T02:02:00.000Z"
             },
-            "ingestStep": null,
-            "identifiers": [
+            "ingestStep":null,
+            "identifiers":[
               {
-                "id": "SWRlbnRpZmllcjo4",
-                "type": "BAG_STORE",
-                "value": "00000000-0000-0000-0000-000000000003",
-                "timestamp": "2019-03-03T00:00:00.000Z"
+                "id":"SWRlbnRpZmllcjo4",
+                "type":"BAG_STORE",
+                "value":"00000000-0000-0000-0000-000000000003",
+                "timestamp":"2019-03-03T00:00:00.000Z"
               }
             ],
-            "doiRegistered": null,
-            "doiRegisteredEvents": [
+            "doiRegistered":null,
+            "doiRegisteredEvents":[
+
             ],
-            "doiAction": "CREATE",
-            "doiActionEvents": [
+            "doiAction":"CREATE",
+            "doiActionEvents":[
               {
-                "value": "CREATE",
-                "timestamp": "2019-03-03T00:00:00.000Z"
+                "value":"CREATE",
+                "timestamp":"2019-03-03T00:00:00.000Z"
               }
             ],
-            "curator": {
-              "userId": "archie002",
-              "email": "does.not.exists2@dans.knaw.nl",
-              "timestamp": "2019-03-03T04:04:00.000Z"
+            "curator":{
+              "userId":"archie002",
+              "email":"does.not.exists2@dans.knaw.nl",
+              "timestamp":"2019-03-03T04:04:00.000Z"
             },
-            "curators": {
-              "edges": [
+            "curators":{
+              "edges":[
                 {
-                  "node": {
-                    "userId": "archie001",
-                    "email": "does.not.exists1@dans.knaw.nl",
-                    "timestamp": "2019-03-03T00:00:00.000Z"
+                  "node":{
+                    "userId":"archie001",
+                    "email":"does.not.exists1@dans.knaw.nl",
+                    "timestamp":"2019-03-03T00:00:00.000Z"
                   }
                 },
                 {
-                  "node": {
-                    "userId": "archie002",
-                    "email": "does.not.exists2@dans.knaw.nl",
-                    "timestamp": "2019-03-03T04:04:00.000Z"
+                  "node":{
+                    "userId":"archie002",
+                    "email":"does.not.exists2@dans.knaw.nl",
+                    "timestamp":"2019-03-03T04:04:00.000Z"
                   }
                 }
               ]
             },
-            "isNewVersion": true,
-            "isNewVersionEvents": [
-              {
-                "value": null,
-                "timestamp": "2019-03-03T00:00:00.000Z"
-              },
-              {
-                "value": true,
-                "timestamp": "2019-03-03T06:06:00.000Z"
-              }
-            ],
-            "curationRequired": true,
-            "curationRequiredEvents": [
-              {
-                "value": true,
-                "timestamp": "2019-03-03T00:00:00.000Z"
-              }
-            ],
-            "curationPerformed": true,
-            "curationPerformedEvents": [
-              {
-                "value": false,
-                "timestamp": "2019-03-03T00:00:00.000Z"
-              },
-              {
-                "value": true,
-                "timestamp": "2019-03-03T06:06:00.000Z"
-              }
-            ],
-            "springfield": null,
-            "springfields": [
-            ],
-            "contentType": {
-              "value": "application/zip",
-              "timestamp": "2019-03-03T00:05:00.000Z"
+            "isNewVersion":{
+              "value":true,
+              "timestamp":"2019-03-03T06:06:00.000Z"
             },
-            "contentTypes": [
+            "isNewVersionEvents":[
               {
-                "value": "application/zip",
-                "timestamp": "2019-03-03T00:05:00.000Z"
+                "value":true,
+                "timestamp":"2019-03-03T06:06:00.000Z"
+              }
+            ],
+            "curationRequired":{
+              "value":true,
+              "timestamp":"2019-03-03T00:00:00.000Z"
+            },
+            "curationRequiredEvents":[
+              {
+                "value":true,
+                "timestamp":"2019-03-03T00:00:00.000Z"
+              }
+            ],
+            "curationPerformed":{
+              "value":true,
+              "timestamp":"2019-03-03T06:06:00.000Z"
+            },
+            "curationPerformedEvents":[
+              {
+                "value":false,
+                "timestamp":"2019-03-03T00:00:00.000Z"
+              },
+              {
+                "value":true,
+                "timestamp":"2019-03-03T06:06:00.000Z"
+              }
+            ],
+            "springfield":null,
+            "springfields":[
+
+            ],
+            "contentType":{
+              "value":"application/zip",
+              "timestamp":"2019-03-03T00:05:00.000Z"
+            },
+            "contentTypes":[
+              {
+                "value":"application/zip",
+                "timestamp":"2019-03-03T00:05:00.000Z"
               }
             ]
           }
         },
         {
-          "node": {
-            "depositId": "00000000-0000-0000-0000-000000000004",
-            "depositor": {
-              "depositorId": "user001"
+          "node":{
+            "depositId":"00000000-0000-0000-0000-000000000004",
+            "depositor":{
+              "depositorId":"user001"
             },
-            "bagName": "bag4",
-            "origin": "SMD",
-            "creationTimestamp": "2019-04-04T00:00:00.000Z",
-            "lastModified": "2019-04-04T04:04:00.000Z",
-            "state": {
-              "label": "ARCHIVED",
-              "description": "deposit is archived",
-              "timestamp": "2019-04-04T02:02:00.000Z"
+            "bagName":"bag4",
+            "origin":"SMD",
+            "creationTimestamp":"2019-04-04T00:00:00.000Z",
+            "lastModified":"2019-04-04T04:04:00.000Z",
+            "state":{
+              "label":"ARCHIVED",
+              "description":"deposit is archived",
+              "timestamp":"2019-04-04T02:02:00.000Z"
             },
-            "ingestStep": null,
-            "identifiers": [
+            "ingestStep":null,
+            "identifiers":[
               {
-                "id": "SWRlbnRpZmllcjo5",
-                "type": "BAG_STORE",
-                "value": "00000000-0000-0000-0000-000000000004",
-                "timestamp": "2019-04-04T00:00:00.000Z"
+                "id":"SWRlbnRpZmllcjo5",
+                "type":"BAG_STORE",
+                "value":"00000000-0000-0000-0000-000000000004",
+                "timestamp":"2019-04-04T00:00:00.000Z"
               },
               {
-                "id": "SWRlbnRpZmllcjoxMA==",
-                "type": "DOI",
-                "value": "10.5072/dans-p7q-rst8",
-                "timestamp": "2019-04-04T00:01:00.000Z"
+                "id":"SWRlbnRpZmllcjoxMA==",
+                "type":"DOI",
+                "value":"10.5072/dans-p7q-rst8",
+                "timestamp":"2019-04-04T00:01:00.000Z"
               },
               {
-                "id": "SWRlbnRpZmllcjoxMg==",
-                "type": "FEDORA",
-                "value": "easy-dataset:4",
-                "timestamp": "2019-04-04T00:03:00.000Z"
+                "id":"SWRlbnRpZmllcjoxMg==",
+                "type":"FEDORA",
+                "value":"easy-dataset:4",
+                "timestamp":"2019-04-04T00:03:00.000Z"
               },
               {
-                "id": "SWRlbnRpZmllcjoxMQ==",
-                "type": "URN",
-                "value": "urn:nbn:901234",
-                "timestamp": "2019-04-04T00:02:00.000Z"
+                "id":"SWRlbnRpZmllcjoxMQ==",
+                "type":"URN",
+                "value":"urn:nbn:901234",
+                "timestamp":"2019-04-04T00:02:00.000Z"
               }
             ],
-            "doiRegistered": null,
-            "doiRegisteredEvents": [
+            "doiRegistered":null,
+            "doiRegisteredEvents":[
+
             ],
-            "doiAction": "CREATE",
-            "doiActionEvents": [
+            "doiAction":"CREATE",
+            "doiActionEvents":[
               {
-                "value": "CREATE",
-                "timestamp": "2019-04-04T00:00:00.000Z"
+                "value":"CREATE",
+                "timestamp":"2019-04-04T00:00:00.000Z"
               }
             ],
-            "curator": {
-              "userId": "archie001",
-              "email": "does.not.exists1@dans.knaw.nl",
-              "timestamp": "2019-04-04T00:00:00.000Z"
+            "curator":{
+              "userId":"archie001",
+              "email":"does.not.exists1@dans.knaw.nl",
+              "timestamp":"2019-04-04T00:00:00.000Z"
             },
-            "curators": {
-              "edges": [
+            "curators":{
+              "edges":[
                 {
-                  "node": {
-                    "userId": "archie001",
-                    "email": "does.not.exists1@dans.knaw.nl",
-                    "timestamp": "2019-04-04T00:00:00.000Z"
+                  "node":{
+                    "userId":"archie001",
+                    "email":"does.not.exists1@dans.knaw.nl",
+                    "timestamp":"2019-04-04T00:00:00.000Z"
                   }
                 }
               ]
             },
-            "isNewVersion": false,
-            "isNewVersionEvents": [
+            "isNewVersion":{
+              "value":false,
+              "timestamp":"2019-04-04T00:00:00.000Z"
+            },
+            "isNewVersionEvents":[
               {
-                "value": false,
-                "timestamp": "2019-04-04T00:00:00.000Z"
+                "value":false,
+                "timestamp":"2019-04-04T00:00:00.000Z"
               }
             ],
-            "curationRequired": true,
-            "curationRequiredEvents": [
+            "curationRequired":{
+              "value":true,
+              "timestamp":"2019-04-04T00:00:00.000Z"
+            },
+            "curationRequiredEvents":[
               {
-                "value": true,
-                "timestamp": "2019-04-04T00:00:00.000Z"
+                "value":true,
+                "timestamp":"2019-04-04T00:00:00.000Z"
               }
             ],
-            "curationPerformed": true,
-            "curationPerformedEvents": [
+            "curationPerformed":{
+              "value":true,
+              "timestamp":"2019-04-04T04:04:00.000Z"
+            },
+            "curationPerformedEvents":[
               {
-                "value": false,
-                "timestamp": "2019-04-04T00:00:00.000Z"
+                "value":false,
+                "timestamp":"2019-04-04T00:00:00.000Z"
               },
               {
-                "value": true,
-                "timestamp": "2019-04-04T04:04:00.000Z"
+                "value":true,
+                "timestamp":"2019-04-04T04:04:00.000Z"
               }
             ],
-            "springfield": null,
-            "springfields": [
+            "springfield":null,
+            "springfields":[
+
             ],
-            "contentType": {
-              "value": "application/zip",
-              "timestamp": "2019-04-04T00:05:00.000Z"
+            "contentType":{
+              "value":"application/zip",
+              "timestamp":"2019-04-04T00:05:00.000Z"
             },
-            "contentTypes": [
+            "contentTypes":[
               {
-                "value": "application/zip",
-                "timestamp": "2019-04-04T00:05:00.000Z"
+                "value":"application/zip",
+                "timestamp":"2019-04-04T00:05:00.000Z"
               }
             ]
           }
         },
         {
-          "node": {
-            "depositId": "00000000-0000-0000-0000-000000000005",
-            "depositor": {
-              "depositorId": "user002"
+          "node":{
+            "depositId":"00000000-0000-0000-0000-000000000005",
+            "depositor":{
+              "depositorId":"user002"
             },
-            "bagName": "bag5",
-            "origin": "SWORD2",
-            "creationTimestamp": "2019-05-05T00:00:00.000Z",
-            "lastModified": "2019-05-05T04:05:00.000Z",
-            "state": {
-              "label": "REJECTED",
-              "description": "deposit is rejected",
-              "timestamp": "2019-05-05T03:03:00.000Z"
+            "bagName":"bag5",
+            "origin":"SWORD2",
+            "creationTimestamp":"2019-05-05T00:00:00.000Z",
+            "lastModified":"2019-05-05T04:05:00.000Z",
+            "state":{
+              "label":"REJECTED",
+              "description":"deposit is rejected",
+              "timestamp":"2019-05-05T03:03:00.000Z"
             },
-            "ingestStep": {
-              "step": "VALIDATE",
-              "timestamp": "2019-05-05T04:05:00.000Z"
+            "ingestStep":{
+              "step":"VALIDATE",
+              "timestamp":"2019-05-05T04:05:00.000Z"
             },
-            "identifiers": [
+            "identifiers":[
               {
-                "id": "SWRlbnRpZmllcjoxMw==",
-                "type": "BAG_STORE",
-                "value": "00000000-0000-0000-0000-000000000005",
-                "timestamp": "2019-05-05T00:00:00.000Z"
+                "id":"SWRlbnRpZmllcjoxMw==",
+                "type":"BAG_STORE",
+                "value":"00000000-0000-0000-0000-000000000005",
+                "timestamp":"2019-05-05T00:00:00.000Z"
               }
             ],
-            "doiRegistered": false,
-            "doiRegisteredEvents": [
+            "doiRegistered":false,
+            "doiRegisteredEvents":[
               {
-                "value": false,
-                "timestamp": "2019-05-05T00:00:00.000Z"
+                "value":false,
+                "timestamp":"2019-05-05T00:00:00.000Z"
               }
             ],
-            "doiAction": "UPDATE",
-            "doiActionEvents": [
+            "doiAction":"UPDATE",
+            "doiActionEvents":[
               {
-                "value": "UPDATE",
-                "timestamp": "2019-05-05T00:00:00.000Z"
+                "value":"UPDATE",
+                "timestamp":"2019-05-05T00:00:00.000Z"
               }
             ],
-            "curator": {
-              "userId": "archie001",
-              "email": "does.not.exists1@dans.knaw.nl",
-              "timestamp": "2019-05-05T00:00:00.000Z"
+            "curator":{
+              "userId":"archie001",
+              "email":"does.not.exists1@dans.knaw.nl",
+              "timestamp":"2019-05-05T00:00:00.000Z"
             },
-            "curators": {
-              "edges": [
+            "curators":{
+              "edges":[
                 {
-                  "node": {
-                    "userId": "archie001",
-                    "email": "does.not.exists1@dans.knaw.nl",
-                    "timestamp": "2019-05-05T00:00:00.000Z"
+                  "node":{
+                    "userId":"archie001",
+                    "email":"does.not.exists1@dans.knaw.nl",
+                    "timestamp":"2019-05-05T00:00:00.000Z"
                   }
                 }
               ]
             },
-            "isNewVersion": false,
-            "isNewVersionEvents": [
+            "isNewVersion":{
+              "value":false,
+              "timestamp":"2019-05-05T00:00:00.000Z"
+            },
+            "isNewVersionEvents":[
               {
-                "value": false,
-                "timestamp": "2019-05-05T00:00:00.000Z"
+                "value":false,
+                "timestamp":"2019-05-05T00:00:00.000Z"
               }
             ],
-            "curationRequired": true,
-            "curationRequiredEvents": [
+            "curationRequired":{
+              "value":true,
+              "timestamp":"2019-05-05T00:00:00.000Z"
+            },
+            "curationRequiredEvents":[
               {
-                "value": true,
-                "timestamp": "2019-05-05T00:00:00.000Z"
+                "value":true,
+                "timestamp":"2019-05-05T00:00:00.000Z"
               }
             ],
-            "curationPerformed": true,
+            "curationPerformed":{
+              "value":true,
+              "timestamp":"2019-05-05T04:04:00.000Z"
+            },
             "curationPerformedEvents": [
               {
                 "value": false,
