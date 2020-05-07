@@ -50,14 +50,14 @@ object QueryGenerator {
 
   private def createSearchSimplePropertiesSubQuery[T <: DepositFilter](filter: T)(keyValue: String, labelValue: T => String): (TableName, Query, List[PrepStatementResolver]) = {
     val tableName = "SimpleProperties"
-    val query = filter.filter match {
+    filter.filter match {
       case SeriesFilter.ALL =>
-        s"SELECT DISTINCT depositId FROM $tableName WHERE key = ? AND value = ?"
+        val query = s"SELECT DISTINCT depositId FROM $tableName WHERE key = ? AND value = ?"
+        (tableName, query, setString(labelValue(filter)) :: setString(keyValue) :: Nil)
       case SeriesFilter.LATEST =>
-        s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName WHERE key = ? GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE value = ?"
+        val query = s"SELECT $tableName.depositId FROM $tableName INNER JOIN (SELECT depositId, max(timestamp) AS max_timestamp FROM $tableName WHERE key = ? GROUP BY depositId) AS ${ tableName }WithMaxTimestamp ON $tableName.timestamp = ${ tableName }WithMaxTimestamp.max_timestamp WHERE key = ? AND value = ?"
+        (tableName, query, setString(labelValue(filter)) :: setString(keyValue) :: setString(keyValue) :: Nil)
     }
-
-    (tableName, query, setString(labelValue(filter)) :: setString(keyValue) :: Nil)
   }
 
   def searchDeposits(filters: DepositFilters): (String, Seq[PrepStatementResolver]) = {
@@ -93,6 +93,7 @@ object QueryGenerator {
         case (("", vs), (subQuery, values)) => subQuery -> (values ::: vs)
         case ((q, vs), (subQuery, values)) => s"$q AND $subQuery" -> (values ::: vs)
       }
+
     val (queryJoinPart, joinValues) = List(
       filters.stateFilter.map(createSearchSubQuery(_)("State", "label", _.label.toString)),
       filters.ingestStepFilter.map(createSearchSimplePropertiesSubQuery(_)("ingest-step", _.label.toString)),
@@ -127,8 +128,6 @@ object QueryGenerator {
         val query = s"SELECT * FROM (SELECT * FROM Deposit WHERE $queryWherePart) AS SelectedDeposits $queryJoinPart"
         query -> (whereValues.reverse ::: joinValues.reverse)
     }
-    println(query)
-    println(resolvers)
 
     filters.sort.fold(s"$query;") {
       case DepositOrder(field, direction) => s"$query ORDER BY $field $direction;"
