@@ -1,0 +1,8 @@
+query {
+    nodes(ids: ["SXNDdXJhdGlvblBlcmZvcm1lZDozOQ==", "SXNDdXJhdGlvblBlcmZvcm1lZDo0MA=="]) {
+        ... on IsCurationPerformed {
+            value
+            timestamp
+        }
+    }
+}

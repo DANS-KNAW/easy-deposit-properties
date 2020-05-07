@@ -957,7 +957,7 @@ type IsCurationPerformed implements Node {
     Determine whether to search in current IsCurationPerformedEvents (`LATEST`,
     default) or all current and past IsCurationPerformedEvents (`ALL`).
     """
-    stateFilter: SeriesFilter = LATEST
+    isCurationPerformedFilter: SeriesFilter = LATEST
 
     """Ordering options for the returned deposits."""
     orderBy: DepositOrder
@@ -1007,7 +1007,7 @@ type IsCurationRequired implements Node {
     Determine whether to search in current IsCurationRequiredEvents (`LATEST`,
     default) or all current and past IsCurationRequiredEvents (`ALL`).
     """
-    stateFilter: SeriesFilter = LATEST
+    isCurationRequiredFilter: SeriesFilter = LATEST
 
     """Ordering options for the returned deposits."""
     orderBy: DepositOrder
@@ -1057,7 +1057,7 @@ type IsNewVersion implements Node {
     Determine whether to search in current IsNewVersionEvents (`LATEST`,
     default) or all current and past IsNewVersionEvents (`ALL`).
     """
-    stateFilter: SeriesFilter = LATEST
+    isNewVersionFilter: SeriesFilter = LATEST
 
     """Ordering options for the returned deposits."""
     orderBy: DepositOrder

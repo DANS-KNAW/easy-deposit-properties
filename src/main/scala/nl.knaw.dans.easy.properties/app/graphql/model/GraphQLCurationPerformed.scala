@@ -51,7 +51,7 @@ class GraphQLCurationPerformed(curationPerformed: IsCurationPerformed) extends N
 
   @GraphQLField
   @GraphQLDescription("List all deposits with the same current IsCurationPerformedEvent value.")
-  def deposits(@GraphQLDescription("Determine whether to search in current IsCurationPerformedEvents (`LATEST`, default) or all current and past IsCurationPerformedEvents (`ALL`).") @GraphQLDefault(SeriesFilter.LATEST) stateFilter: SeriesFilter,
+  def deposits(@GraphQLDescription("Determine whether to search in current IsCurationPerformedEvents (`LATEST`, default) or all current and past IsCurationPerformedEvents (`ALL`).") @GraphQLDefault(SeriesFilter.LATEST) isCurationPerformedFilter: SeriesFilter,
                @GraphQLDescription("Ordering options for the returned deposits.") orderBy: Option[DepositOrder] = None,
                @GraphQLDescription("List only those elements that have a timestamp earlier than this given timestamp.") earlierThan: Option[DateTime] = None,
                @GraphQLDescription("List only those elements that have a timestamp later than this given timestamp.") laterThan: Option[DateTime] = None,
@@ -62,7 +62,7 @@ class GraphQLCurationPerformed(curationPerformed: IsCurationPerformed) extends N
                last: Option[Int] = None,
               )(implicit ctx: Context[DataContext, GraphQLCurationPerformed]): DeferredValue[DataContext, ExtendedConnection[GraphQLDeposit]] = {
     DepositResolver.findDeposit(DepositFilters(
-      curationPerformedFilter = Some(DepositIsCurationPerformedFilter(value, stateFilter)),
+      curationPerformedFilter = Some(DepositIsCurationPerformedFilter(value, isCurationPerformedFilter)),
       timeFilter = TimeFilter(earlierThan, laterThan, atTimestamp),
       sort = orderBy,
     ))

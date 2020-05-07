@@ -1,0 +1,18 @@
+query {
+    node(id: "SXNDdXJhdGlvblBlcmZvcm1lZDozOQ==") {
+        ... on IsCurationPerformed {
+            value
+            timestamp
+            deposit {
+                depositId
+            }
+            deposits(first: 10, isCurationPerformedFilter: ALL, orderBy: {field: DEPOSIT_ID, direction: ASC}) {
+                edges {
+                    node {
+                        depositId
+                    }
+                }
+            }
+        }
+    }
+}

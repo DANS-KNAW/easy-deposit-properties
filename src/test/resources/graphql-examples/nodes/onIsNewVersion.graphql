@@ -1,0 +1,8 @@
+query {
+    nodes(ids: ["SXNOZXdWZXJzaW9uOjMy", "SXNOZXdWZXJzaW9uOjMz"]) {
+        ... on IsNewVersion {
+            value
+            timestamp
+        }
+    }
+}

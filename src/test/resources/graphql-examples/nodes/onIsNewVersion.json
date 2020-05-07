@@ -1,0 +1,14 @@
+{
+  "data": {
+    "nodes": [
+      {
+        "value": true,
+        "timestamp": "2019-03-03T06:06:00.000Z"
+      },
+      {
+        "value": false,
+        "timestamp": "2019-04-04T00:00:00.000Z"
+      }
+    ]
+  }
+}

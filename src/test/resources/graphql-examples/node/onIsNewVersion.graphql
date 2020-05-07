@@ -1,0 +1,18 @@
+query {
+    node(id: "SXNOZXdWZXJzaW9uOjMy") {
+        ... on IsNewVersion {
+            value
+            timestamp
+            deposit {
+                depositId
+            }
+            deposits(first: 10, isNewVersionFilter: ALL, orderBy: {field: DEPOSIT_ID, direction: ASC}) {
+                edges {
+                    node {
+                        depositId
+                    }
+                }
+            }
+        }
+    }
+}

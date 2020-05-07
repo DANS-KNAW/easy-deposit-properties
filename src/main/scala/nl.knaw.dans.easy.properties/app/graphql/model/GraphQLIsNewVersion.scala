@@ -51,7 +51,7 @@ class GraphQLIsNewVersion(isNewVersion: IsNewVersion) extends Node {
 
   @GraphQLField
   @GraphQLDescription("List all deposits with the same current IsNewVersion value.")
-  def deposits(@GraphQLDescription("Determine whether to search in current IsNewVersionEvents (`LATEST`, default) or all current and past IsNewVersionEvents (`ALL`).") @GraphQLDefault(SeriesFilter.LATEST) stateFilter: SeriesFilter,
+  def deposits(@GraphQLDescription("Determine whether to search in current IsNewVersionEvents (`LATEST`, default) or all current and past IsNewVersionEvents (`ALL`).") @GraphQLDefault(SeriesFilter.LATEST) isNewVersionFilter: SeriesFilter,
                @GraphQLDescription("Ordering options for the returned deposits.") orderBy: Option[DepositOrder] = None,
                @GraphQLDescription("List only those elements that have a timestamp earlier than this given timestamp.") earlierThan: Option[DateTime] = None,
                @GraphQLDescription("List only those elements that have a timestamp later than this given timestamp.") laterThan: Option[DateTime] = None,
@@ -62,7 +62,7 @@ class GraphQLIsNewVersion(isNewVersion: IsNewVersion) extends Node {
                last: Option[Int] = None,
               )(implicit ctx: Context[DataContext, GraphQLIsNewVersion]): DeferredValue[DataContext, ExtendedConnection[GraphQLDeposit]] = {
     DepositResolver.findDeposit(DepositFilters(
-      isNewVersionFilter = Some(DepositIsNewVersionFilter(value, stateFilter)),
+      isNewVersionFilter = Some(DepositIsNewVersionFilter(value, isNewVersionFilter)),
       timeFilter = TimeFilter(earlierThan, laterThan, atTimestamp),
       sort = orderBy,
     ))

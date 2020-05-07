@@ -1765,6 +1765,69 @@ class GraphQLResolveSpec extends TestSupportFixture
     runQuery(input)
   }
 
+  it should "resolve 'node/onIsCurationPerformed.graphql' with 3 calls to the repository" in {
+    val input = graphqlExamplesDir / "node" / "onIsCurationPerformed.graphql"
+    val isCurationPerformed39 = isCurationPerformed1.copy(id = "39")
+
+    inSequence {
+      isCurationPerformedDao.getById _ expects Seq(isCurationPerformed39.id) once() returning Seq(isCurationPerformed39).asRight
+      inAnyOrder {
+        isCurationPerformedDao.getDepositsById _ expects Seq(isCurationPerformed39.id) once() returning Seq(isCurationPerformed39.id -> deposit1).asRight
+        val filters = DepositFilters(
+          curationPerformedFilter = Some(DepositIsCurationPerformedFilter(curationPerformed = true, SeriesFilter.ALL)),
+          sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.ASC)),
+        )
+        depositDao.search _ expects Seq(filters) once() returning Seq(
+          filters -> Seq(deposit1, deposit2),
+        ).asRight
+      }
+    }
+
+    runQuery(input)
+  }
+
+  it should "resolve 'node/onIsCurationRequired.graphql' with 3 calls to the repository" in {
+    val input = graphqlExamplesDir / "node" / "onIsCurationRequired.graphql"
+    val isCurationRequired35 = isCurationRequired1.copy(id = "35")
+
+    inSequence {
+      isCurationRequiredDao.getById _ expects Seq(isCurationRequired35.id) once() returning Seq(isCurationRequired35).asRight
+      inAnyOrder {
+        isCurationRequiredDao.getDepositsById _ expects Seq(isCurationRequired35.id) once() returning Seq(isCurationRequired35.id -> deposit1).asRight
+        val filters = DepositFilters(
+          curationRequiredFilter = Some(DepositIsCurationRequiredFilter(curationRequired = true, SeriesFilter.ALL)),
+          sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.ASC)),
+        )
+        depositDao.search _ expects Seq(filters) once() returning Seq(
+          filters -> Seq(deposit1, deposit2),
+        ).asRight
+      }
+    }
+
+    runQuery(input)
+  }
+
+  it should "resolve 'node/onIsNewVersion.graphql' with 3 calls to the repository" in {
+    val input = graphqlExamplesDir / "node" / "onIsNewVersion.graphql"
+    val isNewVersion32 = isNewVersion1.copy(id = "32")
+
+    inSequence {
+      isNewVersionDao.getById _ expects Seq(isNewVersion32.id) once() returning Seq(isNewVersion32).asRight
+      inAnyOrder {
+        isNewVersionDao.getDepositsById _ expects Seq(isNewVersion32.id) once() returning Seq(isNewVersion32.id -> deposit1).asRight
+        val filters = DepositFilters(
+          isNewVersionFilter = Some(DepositIsNewVersionFilter(isNewVersion = true, SeriesFilter.ALL)),
+          sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.ASC)),
+        )
+        depositDao.search _ expects Seq(filters) once() returning Seq(
+          filters -> Seq(deposit1, deposit2),
+        ).asRight
+      }
+    }
+
+    runQuery(input)
+  }
+
   it should "resolve 'node/onSpringfield.graphql' with 2 calls to the repository" in {
     val input = graphqlExamplesDir / "node" / "onSpringfield.graphql"
     val springfield0 = springfield1.copy(id = "0")
@@ -1859,6 +1922,39 @@ class GraphQLResolveSpec extends TestSupportFixture
       step2,
       step3,
       step1,
+    ).asRight
+
+    runQuery(input)
+  }
+
+  it should "resolve 'nodes/onIsCurationPerformed.graphql' with 1 calls to the repository" in {
+    val input = graphqlExamplesDir / "nodes" / "onIsCurationPerformed.graphql"
+
+    isCurationPerformedDao.getById _ expects Seq("40", "39") once() returning Seq(
+      isCurationPerformed1.copy(id = "39"),
+      isCurationPerformed2.copy(id = "40"),
+    ).asRight
+
+    runQuery(input)
+  }
+
+  it should "resolve 'nodes/onIsCurationRequired.graphql' with 1 calls to the repository" in {
+    val input = graphqlExamplesDir / "nodes" / "onIsCurationRequired.graphql"
+
+    isCurationRequiredDao.getById _ expects Seq("36", "35") once() returning Seq(
+      isCurationRequired1.copy(id = "35"),
+      isCurationRequired2.copy(id = "36"),
+    ).asRight
+
+    runQuery(input)
+  }
+
+  it should "resolve 'nodes/onIsNewVersion.graphql' with 1 calls to the repository" in {
+    val input = graphqlExamplesDir / "nodes" / "onIsNewVersion.graphql"
+
+    isNewVersionDao.getById _ expects Seq("32", "33") once() returning Seq(
+      isNewVersion1.copy(id = "32"),
+      isNewVersion2.copy(id = "33"),
     ).asRight
 
     runQuery(input)
