@@ -87,8 +87,8 @@ trait RegistrationTestData {
     doiRegistered = DoiRegisteredEvent(value = true, timestamp).some,
     curator = InputCurator("archie001", "does.not.exists@dans.knaw.nl", timestamp).some,
     isNewVersion = InputIsNewVersion(value = true, timestamp).some,
-    isCurationRequired = InputIsCurationRequired(value = true, timestamp).some,
-    isCurationPerformed = InputIsCurationPerformed(value = true, timestamp).some,
+    isCurationRequired = InputIsCurationRequired(value = false, timestamp).some,
+    isCurationPerformed = InputIsCurationPerformed(value = false, timestamp).some,
     springfield = InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, timestamp).some,
     contentType = InputContentType(ContentTypeValue.ZIP, timestamp).some,
   )

@@ -56,9 +56,9 @@ class DepositPropertiesRegistrationSpec extends TestSupportFixture
     repository.curator.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only curator.toOutput("0")
     repository.isNewVersion.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only isNewVersion.toOutput("3")
     repository.isCurationRequired.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only isCurationRequired.toOutput("4")
-    repository.isCurationPerformed.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only isCurationPerformed.toOutput("0")
+    repository.isCurationPerformed.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only isCurationPerformed.toOutput("5")
     repository.springfield.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only springfield.toOutput("0")
-    repository.contentType.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only contentType.toOutput("3")
+    repository.contentType.getAll(Seq(depositId)).value.toMap.apply(depositId) should contain only contentType.toOutput("6")
   }
 
   it should "import the minimal example" in {

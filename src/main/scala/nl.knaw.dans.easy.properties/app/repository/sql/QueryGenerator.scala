@@ -128,6 +128,7 @@ object QueryGenerator {
         query -> (whereValues.reverse ::: joinValues.reverse)
     }
     println(query)
+    println(resolvers)
 
     filters.sort.fold(s"$query;") {
       case DepositOrder(field, direction) => s"$query ORDER BY $field $direction;"
@@ -251,7 +252,7 @@ object QueryGenerator {
   def getIdentifierByTypeAndValue(ids: NonEmptyList[(IdentifierType, String)]): (String, Seq[PrepStatementResolver]) = {
     val (queryWherePart, valuesWherePart) = ids
       .map {
-        case (idType, idValue) => "(identifierSchema = ? AND identifierValue = ?)" -> (setString(idType.toString) :: setString(idValue.toString) :: Nil)
+        case (idType, idValue) => "(identifierSchema = ? AND identifierValue = ?)" -> (setString(idType.toString) :: setString(idValue) :: Nil)
       }
       .foldLeft(("", List.empty[PrepStatementResolver])) {
         case (("", vs), (subQuery, values)) => subQuery -> (vs ::: values)
