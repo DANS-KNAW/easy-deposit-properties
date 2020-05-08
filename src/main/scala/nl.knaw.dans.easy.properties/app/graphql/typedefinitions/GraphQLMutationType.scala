@@ -19,7 +19,6 @@ import nl.knaw.dans.easy.properties.app.graphql.DataContext
 import nl.knaw.dans.easy.properties.app.graphql.model._
 import nl.knaw.dans.easy.properties.app.model.DoiAction.DoiAction
 import nl.knaw.dans.easy.properties.app.model.Origin.Origin
-import nl.knaw.dans.easy.properties.app.model.contentType.ContentTypeValue.ContentTypeValue
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.ingestStep.IngestStepLabel.IngestStepLabel
 import nl.knaw.dans.easy.properties.app.model.springfield.SpringfieldPlayMode.SpringfieldPlayMode
@@ -161,7 +160,7 @@ trait GraphQLMutationType {
   implicit val SetContentTypeInputFromInput: FromInput[SetContentTypeInput] = fromInput(ad => SetContentTypeInput(
     clientMutationId = ad.get("clientMutationId").flatMap(_.asInstanceOf[Option[String]]),
     depositId = ad("depositId").asInstanceOf[DepositId],
-    value = ad("value").asInstanceOf[ContentTypeValue],
+    value = ad("value").asInstanceOf[String],
     timestamp = ad.get("timestamp").flatMap(_.asInstanceOf[Option[DateTime]]),
   ))
   implicit val SetContentTypePayloadType: ObjectType[DataContext, SetContentTypePayload] = deriveObjectType[DataContext, SetContentTypePayload]()

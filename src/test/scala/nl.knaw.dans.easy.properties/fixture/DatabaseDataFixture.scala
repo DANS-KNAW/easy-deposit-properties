@@ -18,8 +18,7 @@ package nl.knaw.dans.easy.properties.fixture
 import java.util.UUID
 
 import better.files.File
-import cats.syntax.option._
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue }
+import nl.knaw.dans.easy.properties.app.model.contentType.ContentType
 import nl.knaw.dans.easy.properties.app.model.curator.Curator
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStep, IngestStepLabel }
@@ -139,12 +138,12 @@ trait DatabaseDataFixture extends BeforeAndAfterEach {
   val doiAction4 = DoiActionEvent(DoiAction.CREATE, new DateTime(2019, 4, 4, 0, 0, timeZone))
   val doiAction5 = DoiActionEvent(DoiAction.UPDATE, new DateTime(2019, 5, 5, 0, 0, timeZone))
 
-  val contentType0 = ContentType("26", ContentTypeValue.ZIP, new DateTime(2019, 1, 1, 0, 5, timeZone))
-  val contentType1 = ContentType("27", ContentTypeValue.OCTET, new DateTime(2019, 1, 1, 0, 10, timeZone))
-  val contentType2 = ContentType("28", ContentTypeValue.ZIP, new DateTime(2019, 2, 2, 0, 5, timeZone))
-  val contentType3 = ContentType("29", ContentTypeValue.ZIP, new DateTime(2019, 3, 3, 0, 5, timeZone))
-  val contentType4 = ContentType("30", ContentTypeValue.ZIP, new DateTime(2019, 4, 4, 0, 5, timeZone))
-  val contentType5 = ContentType("31", ContentTypeValue.ZIP, new DateTime(2019, 5, 5, 0, 5, timeZone))
+  val contentType0 = ContentType("26", "application/zip", new DateTime(2019, 1, 1, 0, 5, timeZone))
+  val contentType1 = ContentType("27", "application/octet-stream", new DateTime(2019, 1, 1, 0, 10, timeZone))
+  val contentType2 = ContentType("28", "application/zip", new DateTime(2019, 2, 2, 0, 5, timeZone))
+  val contentType3 = ContentType("29", "application/zip", new DateTime(2019, 3, 3, 0, 5, timeZone))
+  val contentType4 = ContentType("30", "application/zip", new DateTime(2019, 4, 4, 0, 5, timeZone))
+  val contentType5 = ContentType("31", "application/zip", new DateTime(2019, 5, 5, 0, 5, timeZone))
 
   val isNewVersion0 = IsNewVersion("32", value = true, new DateTime(2019, 3, 3, 6, 6, timeZone))
   val isNewVersion1 = IsNewVersion("33", value = false, new DateTime(2019, 4, 4, 0, 0, timeZone))

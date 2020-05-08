@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.fixture
 import java.util.UUID
 
 import cats.syntax.option._
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, InputContentType }
+import nl.knaw.dans.easy.properties.app.model.contentType.InputContentType
 import nl.knaw.dans.easy.properties.app.model.curator.InputCurator
 import nl.knaw.dans.easy.properties.app.model.identifier.{ IdentifierType, InputIdentifier }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStepLabel, InputIngestStep }
@@ -90,7 +90,7 @@ trait RegistrationTestData {
     isCurationRequired = InputIsCurationRequired(value = false, timestamp).some,
     isCurationPerformed = InputIsCurationPerformed(value = false, timestamp).some,
     springfield = InputSpringfield("domain", "user", "collection", SpringfieldPlayMode.CONTINUOUS, timestamp).some,
-    contentType = InputContentType(ContentTypeValue.ZIP, timestamp).some,
+    contentType = InputContentType("application/zip", timestamp).some,
   )
   val minimalDepositProperties: DepositProperties = DepositProperties(
     deposit = Deposit(UUID.fromString("9d507261-3b79-22e7-86d0-6fb9417d930d"), none, timestamp, "user001", Origin.SWORD2),

@@ -21,7 +21,7 @@ import cats.instances.option._
 import cats.syntax.apply._
 import cats.syntax.traverse._
 import cats.syntax.validated._
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, InputContentType }
+import nl.knaw.dans.easy.properties.app.model.contentType.InputContentType
 import nl.knaw.dans.easy.properties.app.model.curator.InputCurator
 import nl.knaw.dans.easy.properties.app.model.identifier.{ IdentifierType, InputIdentifier }
 import nl.knaw.dans.easy.properties.app.model.ingestStep.{ IngestStepLabel, InputIngestStep }
@@ -243,7 +243,7 @@ object DepositPropertiesValidator {
   }
 
   private def validateContentType(implicit props: PropertiesConfiguration, timestamp: Timestamp): ValidationImportErrorsOr[Option[InputContentType]] = {
-    getOptionalEnumProp(contentTypeKey)(ContentTypeValue)
+    getOptionalStringProp(contentTypeKey)
       .map(_.map(InputContentType(_, timestamp)))
   }
 

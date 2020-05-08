@@ -16,7 +16,6 @@
 package nl.knaw.dans.easy.properties.app.model.iscurationperformed
 
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
-import nl.knaw.dans.easy.properties.app.model.contentType.ContentTypeValue.ContentTypeValue
 import nl.knaw.dans.easy.properties.app.model.{ DepositFilter, SeriesFilter }
 
 case class DepositIsCurationPerformedFilter(curationPerformed: Boolean, filter: SeriesFilter = SeriesFilter.LATEST) extends DepositFilter

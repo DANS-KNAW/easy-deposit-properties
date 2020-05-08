@@ -17,8 +17,7 @@ package nl.knaw.dans.easy.properties.app.graphql.typedefinitions
 
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
-import nl.knaw.dans.easy.properties.app.model.contentType.ContentTypeValue.ContentTypeValue
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, DepositContentTypeFilter }
+import nl.knaw.dans.easy.properties.app.model.contentType.DepositContentTypeFilter
 import nl.knaw.dans.easy.properties.app.model.sort.{ ContentTypeOrder, ContentTypeOrderField, OrderDirection }
 import sangria.macros.derive._
 import sangria.marshalling.FromInput
@@ -27,19 +26,13 @@ import sangria.schema.{ EnumType, InputObjectType }
 trait GraphQLContentTypeType {
   this: GraphQLCommonTypes =>
 
-  implicit val ContentTypeValueType: EnumType[ContentTypeValue.Value] = deriveEnumType(
-    EnumTypeDescription("A SWORD2 internal property to record the type of messages sent by a client to create the deposit."),
-    DocumentValue("ZIP", "content type 'application/zip'"),
-    DocumentValue("OCTET", "content type 'application/octet-stream'"),
-  )
-
   implicit val DepositContentTypeFilterType: InputObjectType[DepositContentTypeFilter] = deriveInputObjectType(
     InputObjectTypeDescription("The label and filter to be used in searching for deposits by content type."),
     DocumentInputField("value", "If provided, only show deposits with this content type."),
     DocumentInputField("filter", "Determine whether to search in current content types (`LATEST`, default) or all current and past content types (`ALL`)."),
   )
   implicit val DepositContentTypeFilterFromInput: FromInput[DepositContentTypeFilter] = fromInput(ad => DepositContentTypeFilter(
-    value = ad("value").asInstanceOf[ContentTypeValue],
+    value = ad("value").asInstanceOf[String],
     filter = ad("filter").asInstanceOf[Option[SeriesFilter]].getOrElse(SeriesFilter.LATEST),
   ))
 

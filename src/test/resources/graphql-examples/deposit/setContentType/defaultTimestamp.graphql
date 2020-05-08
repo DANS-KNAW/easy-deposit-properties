@@ -2,7 +2,7 @@ mutation {
     setContentType(input: {
         clientMutationId: "my-mutation-id",
         depositId: "00000000-0000-0000-0000-000000000002",
-        value: OCTET,
+        value: "application/octet-stream",
 #        timestamp uses default
     }) {
         clientMutationId

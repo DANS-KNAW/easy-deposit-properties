@@ -20,7 +20,7 @@ import java.util.UUID
 import better.files.File
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.graphql.middleware.Authentication.Auth
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue, DepositContentTypeFilter }
+import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, DepositContentTypeFilter }
 import nl.knaw.dans.easy.properties.app.model.curator.{ Curator, DepositCuratorFilter }
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.identifier.{ Identifier, IdentifierType }
@@ -200,12 +200,12 @@ trait GraphQLResolveSpecTestObjects {
   )
   val contentType1: ContentType = ContentType(
     id = "1",
-    value = ContentTypeValue.ZIP,
+    value = "application/zip",
     timestamp = DateTime.now(),
   )
   val contentType2: ContentType = ContentType(
     id = "2",
-    value = ContentTypeValue.OCTET,
+    value = "application/octet-stream",
     timestamp = DateTime.now(),
   )
 }
@@ -416,7 +416,7 @@ class GraphQLResolveSpec extends TestSupportFixture
     inSequence {
       depositDao.find _ expects Seq(depositId2) once() returning Seq(deposit2).asRight
       contentTypeDao.getCurrent _ expects Seq(depositId2) once() returning Seq(depositId2 -> contentType2).asRight
-      val filters = DepositFilters(contentTypeFilter = Some(DepositContentTypeFilter(ContentTypeValue.OCTET, SeriesFilter.ALL)))
+      val filters = DepositFilters(contentTypeFilter = Some(DepositContentTypeFilter("application/octet-stream", SeriesFilter.ALL)))
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit2, deposit3),
       ).asRight
@@ -461,7 +461,7 @@ class GraphQLResolveSpec extends TestSupportFixture
     inSequence {
       depositDao.find _ expects Seq(depositId2) once() returning Seq(deposit2).asRight
       contentTypeDao.getCurrent _ expects Seq(depositId2) once() returning Seq(depositId2 -> contentType2).asRight
-      val filters = DepositFilters(contentTypeFilter = Some(DepositContentTypeFilter(ContentTypeValue.OCTET)))
+      val filters = DepositFilters(contentTypeFilter = Some(DepositContentTypeFilter("application/octet-stream")))
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit3, deposit2),
       ).asRight
@@ -643,7 +643,7 @@ class GraphQLResolveSpec extends TestSupportFixture
   it should "resolve 'depositor/listDepositsWithContentTypeAndDepositor/plain.graphql' with 1 calls to the repository" in {
     val input = graphqlExamplesDir / "depositor" / "listDepositsWithContentTypeAndDepositor" / "plain.graphql"
 
-    val filters = DepositFilters(depositorId = Some("user001"), contentTypeFilter = Some(DepositContentTypeFilter(ContentTypeValue.ZIP)))
+    val filters = DepositFilters(depositorId = Some("user001"), contentTypeFilter = Some(DepositContentTypeFilter("application/zip")))
     depositDao.search _ expects Seq(filters) once() returning Seq(
       filters -> Seq(deposit2, deposit3),
     ).asRight
@@ -956,7 +956,7 @@ class GraphQLResolveSpec extends TestSupportFixture
     val input = graphqlExamplesDir / "deposits" / "listDepositsWithContentType" / "plain.graphql"
 
     inSequence {
-      val filters = DepositFilters(contentTypeFilter = Some(DepositContentTypeFilter(ContentTypeValue.ZIP)))
+      val filters = DepositFilters(contentTypeFilter = Some(DepositContentTypeFilter("application/zip")))
       depositDao.search _ expects Seq(filters) once() returning Seq(
         filters -> Seq(deposit1, deposit2, deposit3),
       ).asRight
@@ -1433,7 +1433,7 @@ class GraphQLResolveSpec extends TestSupportFixture
         depositId2 -> contentType2,
         depositId3 -> contentType1,
       ).asRight
-      depositDao.search _ expects Seq(filters2, filters3) once() returning Seq(
+      depositDao.search _ expects Seq(filters3, filters2) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
       ).asRight
@@ -1457,7 +1457,7 @@ class GraphQLResolveSpec extends TestSupportFixture
         depositId2 -> Seq(contentType2, contentType1),
         depositId3 -> Seq.empty,
       ).asRight
-      depositDao.search _ expects Seq(filters2, filters3) once() returning Seq(
+      depositDao.search _ expects Seq(filters3, filters2) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
       ).asRight
@@ -1676,7 +1676,7 @@ class GraphQLResolveSpec extends TestSupportFixture
       inAnyOrder {
         contentTypeDao.getDepositsById _ expects Seq(contentType27.id) once() returning Seq(contentType27.id -> deposit1).asRight
         val filters = DepositFilters(
-          contentTypeFilter = Some(DepositContentTypeFilter(ContentTypeValue.ZIP, SeriesFilter.ALL)),
+          contentTypeFilter = Some(DepositContentTypeFilter("application/zip", SeriesFilter.ALL)),
           sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.ASC)),
         )
         depositDao.search _ expects Seq(filters) once() returning Seq(

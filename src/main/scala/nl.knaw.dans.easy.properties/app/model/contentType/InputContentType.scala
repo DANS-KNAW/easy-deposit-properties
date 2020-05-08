@@ -16,9 +16,8 @@
 package nl.knaw.dans.easy.properties.app.model.contentType
 
 import nl.knaw.dans.easy.properties.app.model.Timestamp
-import nl.knaw.dans.easy.properties.app.model.contentType.ContentTypeValue.ContentTypeValue
 
-case class InputContentType(value: ContentTypeValue, timestamp: Timestamp) {
+case class InputContentType(value: String, timestamp: Timestamp) {
 
   def toOutput(id: String): ContentType = {
     ContentType(id, value, timestamp)

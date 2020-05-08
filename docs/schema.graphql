@@ -132,17 +132,6 @@ enum ContentTypeOrderField {
   VALUE
 }
 
-"""
-A SWORD2 internal property to record the type of messages sent by a client to create the deposit.
-"""
-enum ContentTypeValue {
-  """content type 'application/octet-stream'"""
-  OCTET
-
-  """content type 'application/zip'"""
-  ZIP
-}
-
 """Data manager responsible for curating this deposit."""
 type Curator implements Node {
   """The data manager's username in EASY."""
@@ -511,7 +500,7 @@ The label and filter to be used in searching for deposits by content type.
 """
 input DepositContentTypeFilter {
   """If provided, only show deposits with this content type."""
-  value: ContentTypeValue!
+  value: String!
 
   """
   Determine whether to search in current content types (`LATEST`, default) or all current and past content types (`ALL`).
@@ -1368,7 +1357,7 @@ input SetContentTypeInput {
   depositId: UUID!
 
   """The content type associated with this deposit."""
-  value: ContentTypeValue!
+  value: String!
 
   """
   The timestamp at which this springfield configuration was associated with the

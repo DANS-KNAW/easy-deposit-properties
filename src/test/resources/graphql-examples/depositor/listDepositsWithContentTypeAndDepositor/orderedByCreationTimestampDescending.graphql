@@ -1,6 +1,6 @@
 query {
     depositor(id: "user001") {
-        deposits(first: 10, contentType: {value: ZIP}, orderBy: {field: CREATION_TIMESTAMP, direction: DESC}) {
+        deposits(first: 10, contentType: {value: "application/zip"}, orderBy: {field: CREATION_TIMESTAMP, direction: DESC}) {
             edges {
                 node {
                     depositId

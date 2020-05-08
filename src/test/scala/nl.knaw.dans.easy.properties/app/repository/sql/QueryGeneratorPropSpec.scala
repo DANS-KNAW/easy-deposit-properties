@@ -17,7 +17,7 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 
 import cats.data.NonEmptyList
 import nl.knaw.dans.easy.properties.app.model.SeriesFilter.SeriesFilter
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentTypeValue, DepositContentTypeFilter }
+import nl.knaw.dans.easy.properties.app.model.contentType.DepositContentTypeFilter
 import nl.knaw.dans.easy.properties.app.model.curator.DepositCuratorFilter
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
@@ -65,7 +65,7 @@ class QueryGeneratorPropSpec extends AnyPropSpec with ScalaCheckDrivenPropertyCh
   implicit val arbitraryIsNewVersionFilter: Arbitrary[DepositIsNewVersionFilter] = genDepositFilter(DepositIsNewVersionFilter)
   implicit val arbitraryCurationRequiredFilter: Arbitrary[DepositIsCurationRequiredFilter] = genDepositFilter(DepositIsCurationRequiredFilter)
   implicit val arbitraryCurationPerformedFilter: Arbitrary[DepositIsCurationPerformedFilter] = genDepositFilter(DepositIsCurationPerformedFilter)
-  implicit val arbitraryContentTypeFilter: Arbitrary[DepositContentTypeFilter] = genDepositFilter(ContentTypeValue)(DepositContentTypeFilter)
+  implicit val arbitraryContentTypeFilter: Arbitrary[DepositContentTypeFilter] = genDepositFilter(DepositContentTypeFilter)
   implicit val arbitraryDepositOrder: Arbitrary[DepositOrder] = Arbitrary {
     for {
       field <- genFromEnum(DepositOrderField).arbitrary
@@ -127,6 +127,7 @@ class QueryGeneratorPropSpec extends AnyPropSpec with ScalaCheckDrivenPropertyCh
       )]
       .map(DepositorIdFilters.tupled)
   }
+
   implicit def arbitraryNonEmptyList[T: Arbitrary]: Arbitrary[NonEmptyList[T]] = Arbitrary {
     arbitrary[(T, List[T])].map { case (t, ts) => NonEmptyList(t, ts) }
   }

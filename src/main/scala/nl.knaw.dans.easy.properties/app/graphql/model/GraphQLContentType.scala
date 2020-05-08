@@ -34,7 +34,7 @@ class GraphQLContentType(contentType: ContentType) extends Node {
 
   @GraphQLField
   @GraphQLDescription("The content type associated with this deposit.")
-  val value: String = contentType.value.toString
+  val value: String = contentType.value
 
   @GraphQLField
   @GraphQLDescription("The timestamp at which this springfield configuration was associated with the deposit.")

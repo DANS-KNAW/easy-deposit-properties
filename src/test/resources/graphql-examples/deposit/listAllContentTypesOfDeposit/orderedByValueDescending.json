@@ -3,12 +3,12 @@
     "deposit": {
       "contentTypes": [
         {
-          "value": "application/octet-stream",
-          "timestamp": "2019-01-01T00:10:00.000Z"
-        },
-        {
           "value": "application/zip",
           "timestamp": "2019-01-01T00:05:00.000Z"
+        },
+        {
+          "value": "application/octet-stream",
+          "timestamp": "2019-01-01T00:10:00.000Z"
         }
       ]
     }

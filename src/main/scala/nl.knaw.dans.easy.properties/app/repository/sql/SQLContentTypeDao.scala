@@ -19,7 +19,7 @@ import java.sql.{ Connection, ResultSet, Statement }
 
 import cats.syntax.either._
 import nl.knaw.dans.easy.properties.app.database.SQLErrorHandler
-import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, ContentTypeValue, InputContentType }
+import nl.knaw.dans.easy.properties.app.model.contentType.{ ContentType, InputContentType }
 import nl.knaw.dans.easy.properties.app.model.{ Deposit, DepositId }
 import nl.knaw.dans.easy.properties.app.repository.{ ContentTypeDao, DepositIdAndTimestampAlreadyExistError, InvalidValueError, MutationError, MutationErrorOr, NoSuchDepositError, QueryErrorOr }
 import nl.knaw.dans.lib.logging.DebugEnhancedLogging
@@ -32,9 +32,9 @@ class SQLContentTypeDao(override implicit val connection: Connection, errorHandl
 
   private def parseContentType(resultSet: ResultSet): Either[InvalidValueError, ContentType] = {
     for {
-      value <- parseEnumValue(ContentTypeValue, "content type")(resultSet.getString("value"))
-      id = resultSet.getString("propertyId")
       timestamp <- parseDateTime(resultSet.getTimestamp("timestamp", timeZone), timeZone)
+      value = resultSet.getString("value")
+      id = resultSet.getString("propertyId")
     } yield ContentType(id, value, timestamp)
   }
 
