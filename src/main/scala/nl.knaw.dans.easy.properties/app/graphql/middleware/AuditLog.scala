@@ -46,7 +46,7 @@ object AuditLog extends Middleware[Any] {
       .flatMap {
         case Field(_, name, arguments, _, _, _, _, _) =>
           s"$name(${ arguments.map(_.renderCompact).mkString(",") })".some
-        case _ => none
+        case _ => None
       }
       .mkString(",")
     val funcDef = (opDef.name, opDef.variables) match {
