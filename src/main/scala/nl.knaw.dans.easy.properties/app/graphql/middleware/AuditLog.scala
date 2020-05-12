@@ -35,10 +35,9 @@ object AuditLog extends Middleware[Any] {
 
   override def beforeQuery(context: MiddlewareQueryContext[Any, _, _]): Unit = {
     val variables = context.variables.asInstanceOf[JValue]
-    context.queryAst.operations
-      .values
-      .map(operationDefinitionToString(variables))
-      .foreach(auditLog.info)
+
+    for (operation <- context.queryAst.operations.values)
+      auditLog.info(operationDefinitionToString(variables)(operation))
   }
 
   private def operationDefinitionToString(variables: JValue)(opDef: OperationDefinition): String = {
@@ -47,7 +46,7 @@ object AuditLog extends Middleware[Any] {
       .flatMap {
         case Field(_, name, arguments, _, _, _, _, _) =>
           s"$name(${ arguments.map(_.renderCompact).mkString(",") })".some
-        case _ => None
+        case _ => none
       }
       .mkString(",")
     val funcDef = (opDef.name, opDef.variables) match {
