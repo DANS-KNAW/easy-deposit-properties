@@ -44,9 +44,9 @@ class GraphQLIsNewVersion(isNewVersion: IsNewVersion) extends Node {
 
   @GraphQLField
   @GraphQLDescription("Returns the deposit that is associated with this particular IsNewVersionEvent")
-  def deposit(implicit ctx: Context[DataContext, GraphQLIsNewVersion]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+  def deposit(implicit ctx: Context[DataContext, GraphQLIsNewVersion]): DeferredValue[DataContext, GraphQLDeposit] = {
     IsNewVersionResolver.depositByIsNewVersionId(id)
-      .map(_.map(new GraphQLDeposit(_)))
+      .map(new GraphQLDeposit(_))
   }
 
   @GraphQLField

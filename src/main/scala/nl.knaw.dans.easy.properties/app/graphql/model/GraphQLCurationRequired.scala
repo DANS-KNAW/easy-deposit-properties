@@ -44,9 +44,9 @@ class GraphQLCurationRequired(curationRequired: IsCurationRequired) extends Node
 
   @GraphQLField
   @GraphQLDescription("Returns the deposit that is associated with this particular IsCurationRequiredEvent")
-  def deposit(implicit ctx: Context[DataContext, GraphQLCurationRequired]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+  def deposit(implicit ctx: Context[DataContext, GraphQLCurationRequired]): DeferredValue[DataContext, GraphQLDeposit] = {
     IsCurationRequiredResolver.depositByIsCurationRequiredId(id)
-      .map(_.map(new GraphQLDeposit(_)))
+      .map(new GraphQLDeposit(_))
   }
 
   @GraphQLField

@@ -41,8 +41,8 @@ object IngestStepResolver {
       .map { case (_, ingestSteps) => ingestSteps }
   }
 
-  def depositByIngestStepId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
-    DeferredValue(depositByIngestStepIdFetcher.deferOpt(id))
-      .map(_.map { case (_, deposit) => deposit })
+  def depositByIngestStepId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Deposit] = {
+    DeferredValue(depositByIngestStepIdFetcher.defer(id))
+      .map { case (_, deposit) => deposit }
   }
 }

@@ -45,9 +45,9 @@ class GraphQLIngestStep(ingestStep: IngestStep) extends Node {
 
   @GraphQLField
   @GraphQLDescription("Returns the deposit that is associated with this particular ingest step.")
-  def deposit(implicit ctx: Context[DataContext, GraphQLIngestStep]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+  def deposit(implicit ctx: Context[DataContext, GraphQLIngestStep]): DeferredValue[DataContext, GraphQLDeposit] = {
     IngestStepResolver.depositByIngestStepId(id)
-      .map(_.map(new GraphQLDeposit(_)))
+      .map(new GraphQLDeposit(_))
   }
 
   @GraphQLField

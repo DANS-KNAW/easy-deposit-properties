@@ -41,8 +41,8 @@ object SpringfieldResolver {
       .map { case (_, springfields) => springfields }
   }
 
-  def depositBySpringfieldId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
-    DeferredValue(depositBySpringfieldIdFetcher.deferOpt(id))
-      .map(_.map { case (_, deposit) => deposit })
+  def depositBySpringfieldId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Deposit] = {
+    DeferredValue(depositBySpringfieldIdFetcher.defer(id))
+      .map { case (_, deposit) => deposit }
   }
 }

@@ -135,8 +135,8 @@ class Query {
   @GraphQLDescription("Find an identifier with the given type and value.")
   def identifier(@GraphQLName("type") @GraphQLDescription("The type of identifier to be found.") idType: IdentifierType.Value,
                  @GraphQLName("value") @GraphQLDescription("The value of the identifier to be found.") idValue: String,
-                )(implicit ctx: Context[DataContext, Unit]): DeferredValue[DataContext, Option[GraphQLIdentifier]] = {
+                )(implicit ctx: Context[DataContext, Unit]): DeferredValue[DataContext, GraphQLIdentifier] = {
     IdentifierResolver.identifierByTypeAndValue(idType, idValue)
-      .map(_.map(new GraphQLIdentifier(_)))
+      .map(new GraphQLIdentifier(_))
   }
 }

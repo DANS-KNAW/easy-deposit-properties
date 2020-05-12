@@ -55,9 +55,9 @@ class GraphQLCurator(curator: Curator) extends Node {
 
   @GraphQLField
   @GraphQLDescription("Returns the deposit that is associated with this particular curator object.")
-  def deposit(implicit ctx: Context[DataContext, GraphQLCurator]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+  def deposit(implicit ctx: Context[DataContext, GraphQLCurator]): DeferredValue[DataContext, GraphQLDeposit] = {
     CuratorResolver.depositByCuratorId(id)
-      .map(_.map(new GraphQLDeposit(_)))
+      .map(new GraphQLDeposit(_))
   }
 
   @GraphQLField

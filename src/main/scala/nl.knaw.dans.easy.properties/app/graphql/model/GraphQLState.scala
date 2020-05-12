@@ -49,9 +49,9 @@ class GraphQLState(state: State) extends Node {
 
   @GraphQLField
   @GraphQLDescription("Returns the deposit that is associated with this particular state")
-  def deposit(implicit ctx: Context[DataContext, GraphQLState]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+  def deposit(implicit ctx: Context[DataContext, GraphQLState]): DeferredValue[DataContext, GraphQLDeposit] = {
     StateResolver.depositByStateId(id)
-      .map(_.map(new GraphQLDeposit(_)))
+      .map(new GraphQLDeposit(_))
   }
 
   @GraphQLField

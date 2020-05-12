@@ -46,8 +46,8 @@ class GraphQLIdentifier(identifier: Identifier) extends Node {
 
   @GraphQLField
   @GraphQLDescription("Returns the deposit that is associated with this particular identifier.")
-  def deposit(implicit ctx: Context[DataContext, GraphQLIdentifier]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+  def deposit(implicit ctx: Context[DataContext, GraphQLIdentifier]): DeferredValue[DataContext, GraphQLDeposit] = {
     IdentifierResolver.depositByIdentifierId(ctx.value.id)
-      .map(_.map(new GraphQLDeposit(_)))
+      .map(new GraphQLDeposit(_))
   }
 }

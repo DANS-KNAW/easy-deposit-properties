@@ -41,8 +41,8 @@ object CuratorResolver {
       .map { case (_, curators) => curators }
   }
 
-  def depositByCuratorId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
-    DeferredValue(depositByCuratorIdFetcher.deferOpt(id))
-      .map(_.map { case (_, deposit) => deposit })
+  def depositByCuratorId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Deposit] = {
+    DeferredValue(depositByCuratorIdFetcher.defer(id))
+      .map { case (_, deposit) => deposit }
   }
 }

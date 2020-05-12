@@ -78,7 +78,7 @@ type ContentType implements Node {
   """
   Returns the deposit that is associated with this particular content type.
   """
-  deposit: Deposit
+  deposit: Deposit!
 
   """List all deposits with the same current content type."""
   deposits(
@@ -146,7 +146,7 @@ type Curator implements Node {
   """
   Returns the deposit that is associated with this particular curator object.
   """
-  deposit: Deposit
+  deposit: Deposit!
 
   """List all deposits with the same data manager."""
   deposits(
@@ -792,7 +792,7 @@ type Identifier implements Node {
   """
   Returns the deposit that is associated with this particular identifier.
   """
-  deposit: Deposit
+  deposit: Deposit!
 
   """The ID of an object"""
   id: ID!
@@ -824,7 +824,7 @@ type IngestStep implements Node {
   """
   Returns the deposit that is associated with this particular ingest step.
   """
-  deposit: Deposit
+  deposit: Deposit!
 
   """List all deposits with the same current ingest step."""
   deposits(
@@ -936,7 +936,7 @@ type IsCurationPerformed implements Node {
   """
   Returns the deposit that is associated with this particular IsCurationPerformedEvent
   """
-  deposit: Deposit
+  deposit: Deposit!
 
   """
   List all deposits with the same current IsCurationPerformedEvent value.
@@ -988,7 +988,7 @@ type IsCurationRequired implements Node {
   """
   Returns the deposit that is associated with this particular IsCurationRequiredEvent
   """
-  deposit: Deposit
+  deposit: Deposit!
 
   """List all deposits with the same current IsCurationRequiredEvent value."""
   deposits(
@@ -1038,7 +1038,7 @@ type IsNewVersion implements Node {
   """
   Returns the deposit that is associated with this particular IsNewVersionEvent
   """
-  deposit: Deposit
+  deposit: Deposit!
 
   """List all deposits with the same current IsNewVersion value."""
   deposits(
@@ -1309,7 +1309,7 @@ type Query {
 
     """The value of the identifier to be found."""
     value: String!
-  ): Identifier
+  ): Identifier!
 
   """Fetches an object given its ID"""
   node(
@@ -1548,7 +1548,7 @@ type Springfield implements Node {
   """
   Returns the deposit that is associated with this particular springfield configuration.
   """
-  deposit: Deposit
+  deposit: Deposit!
 
   """The ID of an object"""
   id: ID!
@@ -1590,7 +1590,7 @@ type State implements Node {
   timestamp: DateTime!
 
   """Returns the deposit that is associated with this particular state"""
-  deposit: Deposit
+  deposit: Deposit!
 
   """List all deposits with the same current state label."""
   deposits(

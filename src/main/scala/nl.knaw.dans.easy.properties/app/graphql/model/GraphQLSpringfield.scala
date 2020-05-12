@@ -52,8 +52,8 @@ class GraphQLSpringfield(springfield: Springfield) extends Node {
 
   @GraphQLField
   @GraphQLDescription("Returns the deposit that is associated with this particular springfield configuration.")
-  def deposit(implicit ctx: Context[DataContext, GraphQLSpringfield]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+  def deposit(implicit ctx: Context[DataContext, GraphQLSpringfield]): DeferredValue[DataContext, GraphQLDeposit] = {
     SpringfieldResolver.depositBySpringfieldId(id)
-      .map(_.map(new GraphQLDeposit(_)))
+      .map(new GraphQLDeposit(_))
   }
 }

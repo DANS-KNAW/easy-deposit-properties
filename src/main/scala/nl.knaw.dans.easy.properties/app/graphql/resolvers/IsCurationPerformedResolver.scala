@@ -41,8 +41,8 @@ object IsCurationPerformedResolver {
       .map { case (_, isCurationPerformeds) => isCurationPerformeds }
   }
 
-  def depositByIsCurationPerformedId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
-    DeferredValue(depositByIsCurationPerformedIdFetcher.deferOpt(id))
-      .map(_.map { case (_, deposit) => deposit })
+  def depositByIsCurationPerformedId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Deposit] = {
+    DeferredValue(depositByIsCurationPerformedIdFetcher.defer(id))
+      .map { case (_, deposit) => deposit }
   }
 }

@@ -42,9 +42,9 @@ object IdentifierResolver {
       .map(_.map { case (_, identifier) => identifier })
   }
   
-  def identifierByTypeAndValue(idType: IdentifierType, idValue: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Identifier]] = {
-    DeferredValue(identifierTypesAndValuesFetcher.deferOpt(idType -> idValue))
-      .map(_.map { case (_, identifier) => identifier })
+  def identifierByTypeAndValue(idType: IdentifierType, idValue: String)(implicit ctx: DataContext): DeferredValue[DataContext, Identifier] = {
+    DeferredValue(identifierTypesAndValuesFetcher.defer(idType -> idValue))
+      .map { case (_, identifier) => identifier }
   }
 
   def allById(depositId: DepositId)(implicit ctx: DataContext): DeferredValue[DataContext, Seq[Identifier]] = {
@@ -52,8 +52,8 @@ object IdentifierResolver {
       .map { case (_, identifiers) => identifiers }
   }
 
-  def depositByIdentifierId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
-    DeferredValue(depositByIdentifierIdFetcher.deferOpt(id))
-      .map(_.map { case (_, deposit) => deposit })
+  def depositByIdentifierId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Deposit] = {
+    DeferredValue(depositByIdentifierIdFetcher.defer(id))
+      .map { case (_, deposit) => deposit }
   }
 }

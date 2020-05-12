@@ -44,9 +44,9 @@ class GraphQLCurationPerformed(curationPerformed: IsCurationPerformed) extends N
 
   @GraphQLField
   @GraphQLDescription("Returns the deposit that is associated with this particular IsCurationPerformedEvent")
-  def deposit(implicit ctx: Context[DataContext, GraphQLCurationPerformed]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+  def deposit(implicit ctx: Context[DataContext, GraphQLCurationPerformed]): DeferredValue[DataContext, GraphQLDeposit] = {
     IsCurationPerformedResolver.depositByIsCurationPerformedId(id)
-      .map(_.map(new GraphQLDeposit(_)))
+      .map(new GraphQLDeposit(_))
   }
 
   @GraphQLField

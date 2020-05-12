@@ -41,8 +41,8 @@ object IsNewVersionResolver {
       .map { case (_, isNewVersions) => isNewVersions }
   }
 
-  def depositByIsNewVersionId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
-    DeferredValue(depositByIsNewVersionIdFetcher.deferOpt(id))
-      .map(_.map { case (_, deposit) => deposit })
+  def depositByIsNewVersionId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Deposit] = {
+    DeferredValue(depositByIsNewVersionIdFetcher.defer(id))
+      .map { case (_, deposit) => deposit }
   }
 }

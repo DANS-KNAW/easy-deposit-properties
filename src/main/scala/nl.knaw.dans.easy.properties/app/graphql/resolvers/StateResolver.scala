@@ -41,8 +41,8 @@ object StateResolver {
       .map { case (_, states) => states }
   }
 
-  def depositByStateId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Option[Deposit]] = {
-    DeferredValue(depositByStateIdFetcher.deferOpt(id))
-      .map(_.map { case (_, deposit) => deposit })
+  def depositByStateId(id: String)(implicit ctx: DataContext): DeferredValue[DataContext, Deposit] = {
+    DeferredValue(depositByStateIdFetcher.defer(id))
+      .map { case (_, deposit) => deposit }
   }
 }

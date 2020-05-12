@@ -44,9 +44,9 @@ class GraphQLContentType(contentType: ContentType) extends Node {
 
   @GraphQLField
   @GraphQLDescription("Returns the deposit that is associated with this particular content type.")
-  def deposit(implicit ctx: Context[DataContext, GraphQLContentType]): DeferredValue[DataContext, Option[GraphQLDeposit]] = {
+  def deposit(implicit ctx: Context[DataContext, GraphQLContentType]): DeferredValue[DataContext, GraphQLDeposit] = {
     ContentTypeResolver.depositByContentTypeId(id)
-      .map(_.map(new GraphQLDeposit(_)))
+      .map(new GraphQLDeposit(_))
   }
 
   @GraphQLField
