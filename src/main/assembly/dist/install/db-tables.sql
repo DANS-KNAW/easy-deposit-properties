@@ -59,10 +59,24 @@ CREATE TABLE IF NOT EXISTS SimpleProperties (
     UNIQUE (depositId, key, timestamp)
 );
 
+CREATE OR REPLACE VIEW LastModified AS (
+  SELECT depositId, MAX(max) AS max_timestamp
+  FROM (
+    (SELECT depositId, MAX(creationTimestamp) AS max FROM Deposit GROUP BY depositId) UNION ALL
+    (SELECT depositId, MAX(timestamp) AS max FROM State GROUP BY depositId) UNION ALL
+    (SELECT depositId, MAX(timestamp) AS max FROM Identifier GROUP BY depositId) UNION ALL
+    (SELECT depositId, MAX(timestamp) AS max FROM Curator GROUP BY depositId) UNION ALL
+    (SELECT depositId, MAX(timestamp) AS max FROM Springfield GROUP BY depositId) UNION ALL
+    (SELECT depositId, MAX(timestamp) AS max FROM SimpleProperties GROUP BY depositId)
+  ) AS max_timestamps
+  GROUP BY depositId
+);
+
 GRANT INSERT, SELECT, DELETE, UPDATE ON Deposit TO easy_deposit_properties;
 GRANT INSERT, SELECT, DELETE ON State TO easy_deposit_properties;
 GRANT INSERT, SELECT, DELETE ON Identifier TO easy_deposit_properties;
 GRANT INSERT, SELECT, DELETE ON Curator TO easy_deposit_properties;
 GRANT INSERT, SELECT, DELETE ON Springfield TO easy_deposit_properties;
 GRANT INSERT, SELECT, DELETE ON SimpleProperties TO easy_deposit_properties;
+GRANT SELECT ON LastModified TO easy_deposit_properties;
 GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO easy_deposit_properties;

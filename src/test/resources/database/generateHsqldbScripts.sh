@@ -31,6 +31,7 @@ echo 'url jdbc:hsqldb:file:'$ROOT'/db;shutdown=true' >> $RC
 echo 'generating database scripts'
 # generate new database files
 java -jar $SQLTOOLJAR --rcFile=$RC pidgen $ROOT/database.sql
+java -jar $SQLTOOLJAR --rcFile=$RC pidgen $ROOT/views.sql
 
 if [[ $? -eq 0 ]]; then
     # remove lib directory and the original files that now have been replaced

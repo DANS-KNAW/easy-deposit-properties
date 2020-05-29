@@ -109,10 +109,10 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     values shouldBe empty
   }
 
-  it should "render a query that selects all deposits earlier than the given timestamp" in {
+  it should "render a query that selects all deposits created earlier than the given timestamp" in {
     val dt = DateTime.parse("2019-03-03T00:00:00+01:00")
     val filter = DepositFilters(
-      timeFilter = Some(EarlierThan(dt))
+      creationTimeFilter = Some(EarlierThan(dt))
     )
     val (query, values) = QueryGenerator.searchDeposits(filter)
 
@@ -129,11 +129,83 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     }
   }
 
-  it should "render a query that searches for deposits of a certain depositor and later than the given timestamp and sorts the deposits in ascending order on bagName" in {
+  it should "render a query that selects all deposits last modified earlier than the given timestamp" in {
+    val dt = DateTime.parse("2019-03-03T00:00:00+01:00")
+    val filter = DepositFilters(
+      lastModifiedTimeFilter = Some(EarlierThan(dt))
+    )
+    val (query, values) = QueryGenerator.searchDeposits(filter)
+
+    val expectedQuery =
+      """SELECT *
+        |FROM Deposit
+        |INNER JOIN LastModified
+        |ON Deposit.depositId = LastModified.depositId
+        |WHERE max_timestamp < ?::timestamp with time zone;""".stripMargin
+    val expectedValues = List(dt)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValues.size
+    forEvery(values zip expectedValues) { case (value, expectedValue) =>
+      setTimestampMock(value, expectedValue)
+    }
+  }
+
+  it should "render a query that selects all deposits last modified between the given timestamps" in {
+    val dt1 = DateTime.parse("2019-03-03T00:00:00+01:00")
+    val dt2 = DateTime.parse("2019-04-04T00:00:00+01:00")
+    val filter = DepositFilters(
+      lastModifiedTimeFilter = Some(Between(dt1, dt2))
+    )
+    val (query, values) = QueryGenerator.searchDeposits(filter)
+
+    val expectedQuery =
+      """SELECT *
+        |FROM Deposit
+        |INNER JOIN LastModified
+        |ON Deposit.depositId = LastModified.depositId
+        |WHERE max_timestamp < ?::timestamp with time zone
+        |AND max_timestamp > ?::timestamp with time zone;""".stripMargin
+    val expectedValues = List(dt1, dt2)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValues.size
+    forEvery(values zip expectedValues) { case (value, expectedValue) =>
+      setTimestampMock(value, expectedValue)
+    }
+  }
+
+  it should "render a query that selects all deposits last modified not between the given timestamps" in {
+    val dt1 = DateTime.parse("2019-03-03T00:00:00+01:00")
+    val dt2 = DateTime.parse("2019-04-04T00:00:00+01:00")
+    val filter = DepositFilters(
+      lastModifiedTimeFilter = Some(NotBetween(dt1, dt2))
+    )
+    val (query, values) = QueryGenerator.searchDeposits(filter)
+
+    val expectedQuery =
+      """SELECT *
+        |FROM Deposit
+        |INNER JOIN LastModified
+        |ON Deposit.depositId = LastModified.depositId
+        |WHERE (max_timestamp > ?::timestamp with time zone OR max_timestamp < ?::timestamp with time zone);""".stripMargin
+    val expectedValues = List(dt2, dt1)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValues.size
+    forEvery(values zip expectedValues) { case (value, expectedValue) =>
+      setTimestampMock(value, expectedValue)
+    }
+  }
+
+  it should
+    """render a query that searches for deposits of a certain depositor
+      |and created later than the given timestamp
+      |and sorts the deposits in ascending order on bagName""".stripMargin in {
     val dt = DateTime.parse("2019-03-03T00:00:00+01:00")
     val filter = DepositFilters(
       depositorId = Some("user001"),
-      timeFilter = Some(LaterThan(dt)),
+      creationTimeFilter = Some(LaterThan(dt)),
       sort = Some(DepositOrder(DepositOrderField.BAG_NAME, OrderDirection.ASC))
     )
     val (query, values) = QueryGenerator.searchDeposits(filter)
@@ -143,6 +215,37 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
         |FROM Deposit
         |WHERE depositorId = ?
         |AND creationTimestamp > ?::timestamp with time zone
+        |ORDER BY bagName ASC;""".stripMargin
+    val expectedValues = List("user001", dt)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValues.size
+    forEvery(values zip expectedValues) {
+      case (value, expectedValue: String) => setStringMock(value, expectedValue)
+      case (value, expectedValue: DateTime) => setTimestampMock(value, expectedValue)
+      case fallback => fail(s"unexpected values $fallback")
+    }
+  }
+
+  it should
+    """render a query that searches for deposits of a certain depositor
+      |and last modified later than the given timestamp
+      |and sorts the deposits in ascending order on bagName""".stripMargin in {
+    val dt = DateTime.parse("2019-03-03T00:00:00+01:00")
+    val filter = DepositFilters(
+      depositorId = Some("user001"),
+      lastModifiedTimeFilter = Some(LaterThan(dt)),
+      sort = Some(DepositOrder(DepositOrderField.BAG_NAME, OrderDirection.ASC))
+    )
+    val (query, values) = QueryGenerator.searchDeposits(filter)
+
+    val expectedQuery =
+      """SELECT *
+        |FROM Deposit
+        |INNER JOIN LastModified
+        |ON Deposit.depositId = LastModified.depositId
+        |WHERE max_timestamp > ?::timestamp with time zone
+        |AND depositorId = ?
         |ORDER BY bagName ASC;""".stripMargin
     val expectedValues = List("user001", dt)
 
@@ -322,11 +425,11 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     }
   }
 
-  it should "render a query that searches for deposits that sometime had this certain ingest step and at the given timestamp" in {
+  it should "render a query that searches for deposits that sometime had this certain ingest step and created at the given timestamp" in {
     val dt = DateTime.parse("2019-03-03T00:00:00+01:00")
     val filter = DepositFilters(
       ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)),
-      timeFilter = Some(AtTime(dt)),
+      creationTimeFilter = Some(AtTime(dt)),
     )
     val (query, values) = QueryGenerator.searchDeposits(filter)
 
@@ -345,6 +448,38 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
         |) AS SimplePropertiesSearchResult
         |ON SelectedDeposits.depositId = SimplePropertiesSearchResult.depositId;""".stripMargin
     val expectedValue = List(dt, "ingest-step", IngestStepLabel.FEDORA.toString)
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValue.size
+    forEvery(values zip expectedValue) {
+      case (value, expectedValue: String) => setStringMock(value, expectedValue)
+      case (value, expectedValue: DateTime) => setTimestampMock(value, expectedValue)
+      case fallback => fail(s"unexpected values $fallback")
+    }
+  }
+
+  it should "render a query that searches for deposits that sometime had this certain ingest step and last modified at the given timestamp" in {
+    val dt = DateTime.parse("2019-03-03T00:00:00+01:00")
+    val filter = DepositFilters(
+      ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)),
+      lastModifiedTimeFilter = Some(AtTime(dt)),
+    )
+    val (query, values) = QueryGenerator.searchDeposits(filter)
+
+    val expectedQuery =
+      """SELECT *
+        |FROM Deposit
+        |INNER JOIN (
+        |  SELECT DISTINCT depositId
+        |  FROM SimpleProperties
+        |  WHERE key = ?
+        |  AND value = ?
+        |) AS SimplePropertiesSearchResult
+        |ON Deposit.depositId = SimplePropertiesSearchResult.depositId
+        |INNER JOIN LastModified
+        |ON Deposit.depositId = LastModified.depositId
+        |WHERE max_timestamp = ?::timestamp with time zone;""".stripMargin
+    val expectedValue = List("ingest-step", IngestStepLabel.FEDORA.toString, dt)
 
     query should equal(expectedQuery)(after being whiteSpaceNormalised)
     values should have size expectedValue.size
@@ -479,7 +614,7 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
       bagName = Some("my-bag"),
       stateFilter = Some(DepositStateFilter(StateLabel.SUBMITTED, SeriesFilter.LATEST)),
       ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)),
-      timeFilter = Some(Between(dt1, dt2)),
+      creationTimeFilter = Some(Between(dt1, dt2)),
       sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.DESC)),
     )
     val (query, values) = QueryGenerator.searchDeposits(filter)
@@ -538,6 +673,76 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
       |with a certain bagName,
       |with a certain 'latest state',
       |that sometime had this certain ingest step,
+      |was last modified between two given timestamps
+      |and sorted in descending order of depositId""".stripMargin in {
+    val dt1 = DateTime.parse("2019-03-03T00:00:00+01:00")
+    val dt2 = DateTime.parse("2019-04-04T00:00:00+01:00")
+    val filter = DepositFilters(
+      depositorId = Some("user001"),
+      bagName = Some("my-bag"),
+      stateFilter = Some(DepositStateFilter(StateLabel.SUBMITTED, SeriesFilter.LATEST)),
+      ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)),
+      lastModifiedTimeFilter = Some(Between(dt1, dt2)),
+      sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.DESC)),
+    )
+    val (query, values) = QueryGenerator.searchDeposits(filter)
+
+    val expectedQuery =
+      """SELECT *
+        |FROM (
+        |  SELECT *
+        |  FROM Deposit
+        |  WHERE depositorId = ?
+        |  AND bagName = ?
+        |) AS SelectedDeposits
+        |INNER JOIN (
+        |  SELECT State.depositId
+        |  FROM State
+        |  INNER JOIN (
+        |    SELECT depositId, max(timestamp) AS max_timestamp
+        |    FROM State
+        |    GROUP BY depositId
+        |  ) AS StateWithMaxTimestamp
+        |  ON State.timestamp = StateWithMaxTimestamp.max_timestamp
+        |  WHERE label = ?
+        |) AS StateSearchResult
+        |ON SelectedDeposits.depositId = StateSearchResult.depositId
+        |INNER JOIN (
+        |  SELECT DISTINCT depositId
+        |  FROM SimpleProperties
+        |  WHERE key = ?
+        |  AND value = ?
+        |) AS SimplePropertiesSearchResult
+        |ON SelectedDeposits.depositId = SimplePropertiesSearchResult.depositId
+        |INNER JOIN LastModified
+        |ON SelectedDeposits.depositId = LastModified.depositId
+        |WHERE max_timestamp < ?::timestamp with time zone
+        |AND max_timestamp > ?::timestamp with time zone
+        |ORDER BY depositId DESC;""".stripMargin
+    val expectedValue = List(
+      "user001",
+      "my-bag",
+      StateLabel.SUBMITTED.toString,
+      "ingest-step",
+      IngestStepLabel.FEDORA.toString,
+      dt1,
+      dt2,
+    )
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValue.size
+    forEvery(values zip expectedValue) {
+      case (value, expectedValue: String) => setStringMock(value, expectedValue)
+      case (value, expectedValue: DateTime) => setTimestampMock(value, expectedValue)
+      case fallback => fail(s"unexpected values $fallback")
+    }
+  }
+
+  it should
+    """render a query that searches for deposits of a certain depositor,
+      |with a certain bagName,
+      |with a certain 'latest state',
+      |that sometime had this certain ingest step,
       |was created before and after two given timestamps
       |and sorted in descending order of depositId""".stripMargin in {
     val dt1 = DateTime.parse("2019-03-03T00:00:00+01:00")
@@ -547,7 +752,7 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
       bagName = Some("my-bag"),
       stateFilter = Some(DepositStateFilter(StateLabel.SUBMITTED, SeriesFilter.LATEST)),
       ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)),
-      timeFilter = Some(NotBetween(dt1, dt2)),
+      creationTimeFilter = Some(NotBetween(dt1, dt2)),
       sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.DESC)),
     )
     val (query, values) = QueryGenerator.searchDeposits(filter)
@@ -589,6 +794,151 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
       StateLabel.SUBMITTED.toString,
       "ingest-step",
       IngestStepLabel.FEDORA.toString,
+    )
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValue.size
+    forEvery(values zip expectedValue) {
+      case (value, expectedValue: String) => setStringMock(value, expectedValue)
+      case (value, expectedValue: DateTime) => setTimestampMock(value, expectedValue)
+      case fallback => fail(s"unexpected values $fallback")
+    }
+  }
+
+  it should
+    """render a query that searches for deposits of a certain depositor,
+      |with a certain bagName,
+      |with a certain 'latest state',
+      |that sometime had this certain ingest step,
+      |was last modified before and after two given timestamps
+      |and sorted in descending order of depositId""".stripMargin in {
+    val dt1 = DateTime.parse("2019-03-03T00:00:00+01:00")
+    val dt2 = DateTime.parse("2019-04-04T00:00:00+01:00")
+    val filter = DepositFilters(
+      depositorId = Some("user001"),
+      bagName = Some("my-bag"),
+      stateFilter = Some(DepositStateFilter(StateLabel.SUBMITTED, SeriesFilter.LATEST)),
+      ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)),
+      lastModifiedTimeFilter = Some(NotBetween(dt1, dt2)),
+      sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.DESC)),
+    )
+    val (query, values) = QueryGenerator.searchDeposits(filter)
+
+    val expectedQuery =
+      """SELECT *
+        |FROM (
+        |  SELECT *
+        |  FROM Deposit
+        |  WHERE depositorId = ?
+        |  AND bagName = ?
+        |) AS SelectedDeposits
+        |INNER JOIN (
+        |  SELECT State.depositId
+        |  FROM State
+        |  INNER JOIN (
+        |    SELECT depositId, max(timestamp) AS max_timestamp
+        |    FROM State
+        |    GROUP BY depositId
+        |  ) AS StateWithMaxTimestamp
+        |  ON State.timestamp = StateWithMaxTimestamp.max_timestamp
+        |  WHERE label = ?
+        |) AS StateSearchResult
+        |ON SelectedDeposits.depositId = StateSearchResult.depositId
+        |INNER JOIN (
+        |  SELECT DISTINCT depositId
+        |  FROM SimpleProperties
+        |  WHERE key = ?
+        |  AND value = ?
+        |) AS SimplePropertiesSearchResult
+        |ON SelectedDeposits.depositId = SimplePropertiesSearchResult.depositId
+        |INNER JOIN LastModified
+        |ON SelectedDeposits.depositId = LastModified.depositId
+        |WHERE (max_timestamp > ?::timestamp with time zone OR max_timestamp < ?::timestamp with time zone)
+        |ORDER BY depositId DESC;""".stripMargin
+    val expectedValue = List(
+      "user001",
+      "my-bag",
+      StateLabel.SUBMITTED.toString,
+      "ingest-step",
+      IngestStepLabel.FEDORA.toString,
+      dt2,
+      dt1,
+    )
+
+    query should equal(expectedQuery)(after being whiteSpaceNormalised)
+    values should have size expectedValue.size
+    forEvery(values zip expectedValue) {
+      case (value, expectedValue: String) => setStringMock(value, expectedValue)
+      case (value, expectedValue: DateTime) => setTimestampMock(value, expectedValue)
+      case fallback => fail(s"unexpected values $fallback")
+    }
+  }
+
+  it should
+    """render a query that searches for deposits of a certain depositor,
+      |with a certain bagName,
+      |with a certain 'latest state',
+      |that sometime had this certain ingest step,
+      |was created before and after two given timestamps
+      |was last modified before and after two given timestamps
+      |and sorted in descending order of depositId""".stripMargin in {
+    val dt1 = DateTime.parse("2019-03-03T00:00:00+01:00")
+    val dt2 = DateTime.parse("2019-04-04T00:00:00+01:00")
+    val dt3 = DateTime.parse("2019-05-05T00:00:00+01:00")
+    val dt4 = DateTime.parse("2019-06-06T00:00:00+01:00")
+    val filter = DepositFilters(
+      depositorId = Some("user001"),
+      bagName = Some("my-bag"),
+      stateFilter = Some(DepositStateFilter(StateLabel.SUBMITTED, SeriesFilter.LATEST)),
+      ingestStepFilter = Some(DepositIngestStepFilter(IngestStepLabel.FEDORA, SeriesFilter.ALL)),
+      creationTimeFilter = Some(NotBetween(dt1, dt2)),
+      lastModifiedTimeFilter = Some(NotBetween(dt3, dt4)),
+      sort = Option(DepositOrder(DepositOrderField.DEPOSIT_ID, OrderDirection.DESC)),
+    )
+    val (query, values) = QueryGenerator.searchDeposits(filter)
+
+    val expectedQuery =
+      """SELECT *
+        |FROM (
+        |  SELECT *
+        |  FROM Deposit
+        |  WHERE depositorId = ?
+        |  AND bagName = ?
+        |  AND (creationTimestamp > ?::timestamp with time zone OR creationTimestamp < ?::timestamp with time zone)
+        |) AS SelectedDeposits
+        |INNER JOIN (
+        |  SELECT State.depositId
+        |  FROM State
+        |  INNER JOIN (
+        |    SELECT depositId, max(timestamp) AS max_timestamp
+        |    FROM State
+        |    GROUP BY depositId
+        |  ) AS StateWithMaxTimestamp
+        |  ON State.timestamp = StateWithMaxTimestamp.max_timestamp
+        |  WHERE label = ?
+        |) AS StateSearchResult
+        |ON SelectedDeposits.depositId = StateSearchResult.depositId
+        |INNER JOIN (
+        |  SELECT DISTINCT depositId
+        |  FROM SimpleProperties
+        |  WHERE key = ?
+        |  AND value = ?
+        |) AS SimplePropertiesSearchResult
+        |ON SelectedDeposits.depositId = SimplePropertiesSearchResult.depositId
+        |INNER JOIN LastModified
+        |ON SelectedDeposits.depositId = LastModified.depositId
+        |WHERE (max_timestamp > ?::timestamp with time zone OR max_timestamp < ?::timestamp with time zone)
+        |ORDER BY depositId DESC;""".stripMargin
+    val expectedValue = List(
+      "user001",
+      "my-bag",
+      dt2,
+      dt1,
+      StateLabel.SUBMITTED.toString,
+      "ingest-step",
+      IngestStepLabel.FEDORA.toString,
+      dt4,
+      dt3,
     )
 
     query should equal(expectedQuery)(after being whiteSpaceNormalised)
@@ -848,21 +1198,13 @@ class QueryGeneratorSpec extends TestSupportFixture with MockFactory {
     val (query, values) = QueryGenerator.getLastModifiedDate(depositIds)
 
     val expectedQuery =
-      s"""SELECT depositId, MAX(max) AS max_timestamp
-         |FROM (
-         |  (SELECT depositId, MAX(creationTimestamp) AS max FROM Deposit WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
-         |  (SELECT depositId, MAX(timestamp) AS max FROM State WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
-         |  (SELECT depositId, MAX(timestamp) AS max FROM Identifier WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
-         |  (SELECT depositId, MAX(timestamp) AS max FROM Curator WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
-         |  (SELECT depositId, MAX(timestamp) AS max FROM Springfield WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId) UNION ALL
-         |  (SELECT depositId, MAX(timestamp) AS max FROM SimpleProperties WHERE depositId IN (?, ?, ?, ?, ?) GROUP BY depositId)
-         |) AS max_timestamps
-         |GROUP BY depositId;""".stripMargin
-    val expectedValue = Seq.fill(6)(depositIds.map(_.toString).toList).flatten
+      s"""SELECT *
+         |FROM LastModified
+         |WHERE depositId IN (?, ?, ?, ?, ?);""".stripMargin
 
     query should equal(expectedQuery)(after being whiteSpaceNormalised)
-    values should have size expectedValue.size
-    forEvery(values zip expectedValue) { case (value, expectedValue) =>
+    values should have size depositIds.size
+    forEvery(values zip depositIds.map(_.toString).toList) { case (value, expectedValue) =>
       setStringMock(value, expectedValue)
     }
   }

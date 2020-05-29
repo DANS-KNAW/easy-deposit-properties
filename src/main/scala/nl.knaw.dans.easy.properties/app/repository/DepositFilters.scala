@@ -38,7 +38,8 @@ case class DepositFilters(depositorId: Option[DepositorId] = Option.empty,
                           curationPerformedFilter: Option[DepositIsCurationPerformedFilter] = Option.empty,
                           contentTypeFilter: Option[DepositContentTypeFilter] = Option.empty,
                           originFilter: Option[Origin] = Option.empty,
-                          timeFilter: Option[TimeFilter] = Option.empty,
+                          creationTimeFilter: Option[TimeFilter] = Option.empty,
+                          lastModifiedTimeFilter: Option[TimeFilter] = Option.empty,
                           sort: Option[DepositOrder] = Option.empty,
                          ) {
   override def toString: String = {
@@ -55,7 +56,8 @@ case class DepositFilters(depositorId: Option[DepositorId] = Option.empty,
       curationPerformedFilter,
       contentTypeFilter,
       originFilter,
-      timeFilter,
+      creationTimeFilter,
+      lastModifiedTimeFilter,
       sort,
     )
       .collect { case Some(x) => x }

@@ -18,7 +18,7 @@ package nl.knaw.dans.easy.properties.app.repository.sql
 import cats.data.NonEmptyList
 import nl.knaw.dans.easy.properties.app.model.identifier.IdentifierType.IdentifierType
 import nl.knaw.dans.easy.properties.app.model.sort.DepositOrder
-import nl.knaw.dans.easy.properties.app.model.{ AtTime, Between, DepositFilter, DepositId, EarlierThan, LaterThan, NotBetween, SeriesFilter }
+import nl.knaw.dans.easy.properties.app.model.{ AtTime, Between, DepositFilter, DepositId, EarlierThan, LaterThan, NotBetween, SeriesFilter, TimeFilter }
 import nl.knaw.dans.easy.properties.app.repository.{ DepositFilters, DepositorIdFilters }
 import org.apache.commons.lang.BooleanUtils
 
@@ -60,6 +60,25 @@ object QueryGenerator {
     }
   }
 
+  private def createTimeFilter(columnName: String): TimeFilter => List[(String, List[PrepStatementResolver])] = {
+    case EarlierThan(timestamp) => List(s"$columnName < ?::timestamp with time zone" -> List(setTimestamp(timestamp)))
+    case LaterThan(timestamp) => List(s"$columnName > ?::timestamp with time zone" -> List(setTimestamp(timestamp)))
+    case AtTime(timestamp) => List(s"$columnName = ?::timestamp with time zone" -> List(setTimestamp(timestamp)))
+    case Between(earlier, later) => List(
+      s"$columnName < ?::timestamp with time zone" -> List(setTimestamp(earlier)),
+      s"$columnName > ?::timestamp with time zone" -> List(setTimestamp(later)),
+    )
+    case NotBetween(earlier, later) => List(
+      s"($columnName > ?::timestamp with time zone OR $columnName < ?::timestamp with time zone)" -> List(setTimestamp(earlier), setTimestamp(later)),
+    )
+  }
+
+  private def reduceOption[A, B](xs: List[(A, B)])(mergeL: (A, A) => A, mergeR: (B, B) => B): Option[(A, B)] = {
+    xs.reduceOption[(A, B)] {
+      case ((q, vs), (subQuery, values)) => mergeL(q, subQuery) -> mergeR(values, vs)
+    }
+  }
+
   def searchDeposits(filters: DepositFilters): (String, Seq[PrepStatementResolver]) = {
     val whereClauses = List(
       filters.depositorId.map("depositorId" -> _),
@@ -70,31 +89,17 @@ object QueryGenerator {
         case Some((labelName, null)) => s"$labelName IS NULL" -> Nil
         case Some((labelName, value)) => s"$labelName = ?" -> List(setString(value))
       }
-    val timeClause = filters.timeFilter.toList.flatMap {
-      case EarlierThan(timestamp) => List(
-        "creationTimestamp < ?::timestamp with time zone" -> List(setTimestamp(timestamp)),
-      )
-      case LaterThan(timestamp) => List(
-        "creationTimestamp > ?::timestamp with time zone" -> List(setTimestamp(timestamp)),
-      )
-      case AtTime(timestamp) => List(
-        "creationTimestamp = ?::timestamp with time zone" -> List(setTimestamp(timestamp)),
-      )
-      case Between(earlier, later) => List(
-        "creationTimestamp < ?::timestamp with time zone" -> List(setTimestamp(earlier)),
-        "creationTimestamp > ?::timestamp with time zone" -> List(setTimestamp(later)),
-      )
-      case NotBetween(earlier, later) => List(
-        "(creationTimestamp > ?::timestamp with time zone OR creationTimestamp < ?::timestamp with time zone)" -> List(setTimestamp(earlier), setTimestamp(later)),
-      )
-    }
-    val (queryWherePart, whereValues) = (whereClauses ::: timeClause)
-      .foldLeft(("", List.empty[PrepStatementResolver])) {
-        case (("", vs), (subQuery, values)) => subQuery -> (values ::: vs)
-        case ((q, vs), (subQuery, values)) => s"$q AND $subQuery" -> (values ::: vs)
+    val creationTimeClause = filters.creationTimeFilter.toList.flatMap(createTimeFilter("creationTimestamp"))
+    val maybeWherePart = reduceOption(whereClauses ::: creationTimeClause)(_ + " AND " + _, _ ::: _)
+
+    val lastModifiedTimeClause = filters.lastModifiedTimeFilter.toList.flatMap(createTimeFilter("max_timestamp"))
+    val maybeLastModifiedPart = reduceOption(lastModifiedTimeClause)(_ + " AND " + _, _ ::: _)
+      .map {
+        case (queryWherePart, resolvers) =>
+          (depositTableName: String) => s"INNER JOIN LastModified ON $depositTableName.depositId = LastModified.depositId WHERE $queryWherePart" -> resolvers
       }
 
-    val (queryJoinPart, joinValues) = List(
+    val maybeJoinPart = List(
       filters.stateFilter.map(createSearchSubQuery(_)("State", "label", _.label.toString)),
       filters.ingestStepFilter.map(createSearchSimplePropertiesSubQuery(_)("ingest-step", _.label.toString)),
       filters.doiRegisteredFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
@@ -103,30 +108,54 @@ object QueryGenerator {
       filters.isNewVersionFilter.map(createSearchSimplePropertiesSubQuery(_)("is-new-version", filter => BooleanUtils.toStringTrueFalse(filter.isNewVersion))),
       filters.curationRequiredFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-required", filter => BooleanUtils.toStringTrueFalse(filter.curationRequired))),
       filters.curationPerformedFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-performed", filter => BooleanUtils.toStringTrueFalse(filter.curationPerformed))),
-      filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
+      filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value)),
     )
       .collect {
-        case Some((tableName, q, values)) if queryWherePart.isEmpty => s"INNER JOIN ($q) AS ${ tableName }SearchResult ON Deposit.depositId = ${ tableName }SearchResult.depositId" -> values
-        case Some((tableName, q, values)) => s"INNER JOIN ($q) AS ${ tableName }SearchResult ON SelectedDeposits.depositId = ${ tableName }SearchResult.depositId" -> values
+        case Some((tableName, q, resolvers)) =>
+          (depositTableName: String) => s"INNER JOIN ($q) AS ${ tableName }SearchResult ON $depositTableName.depositId = ${ tableName }SearchResult.depositId" -> resolvers
       }
-      .foldLeft(("", List.empty[PrepStatementResolver])) {
-        case (("", vs), (subQuery, values)) => subQuery -> (values ::: vs)
-        case ((q, vs), (subQuery, values)) => s"$q $subQuery" -> (values ::: vs)
-      }
+      .reduceOption((f, g) => (depositTableName: String) => {
+        val (queryWherePartF, valuesF) = f(depositTableName)
+        val (queryWherePartG, valuesG) = g(depositTableName)
 
-    val (query, resolvers) = (queryJoinPart, queryWherePart) match {
-      case ("", "") =>
-        val query = s"SELECT * FROM Deposit"
-        query -> Nil
-      case ("", _) =>
-        val query = s"SELECT * FROM Deposit WHERE $queryWherePart"
-        query -> whereValues.reverse
-      case (_, "") =>
-        val query = s"SELECT * FROM Deposit $queryJoinPart"
-        query -> joinValues.reverse
-      case (_, _) =>
-        val query = s"SELECT * FROM (SELECT * FROM Deposit WHERE $queryWherePart) AS SelectedDeposits $queryJoinPart"
-        query -> (whereValues.reverse ::: joinValues.reverse)
+        s"$queryWherePartF $queryWherePartG" -> (valuesG ::: valuesF)
+      })
+
+    val baseQuery = "SELECT * FROM Deposit"
+    val (query, resolvers) = (maybeJoinPart, maybeLastModifiedPart, maybeWherePart) match {
+      case (None, None, None) =>
+        baseQuery -> Nil
+      case (None, None, Some((queryWherePart, whereResolvers))) =>
+        val query = s"$baseQuery WHERE $queryWherePart"
+        query -> whereResolvers.reverse
+      case (None, Some(lastModifiedF), None) =>
+        val (lastModifiedQuery, lastModifiedResolvers) = lastModifiedF("Deposit")
+        val query = s"$baseQuery $lastModifiedQuery"
+        query -> lastModifiedResolvers.reverse
+      case (None, Some(lastModifiedF), Some((queryWherePart, whereResolvers))) =>
+        val (lastModifiedQuery, lastModifiedResolvers) = lastModifiedF("Deposit")
+        val query = s"$baseQuery $lastModifiedQuery AND $queryWherePart"
+        query -> (whereResolvers.reverse ::: lastModifiedResolvers.reverse)
+      case (Some(queryJoinF), None, None) =>
+        val (queryJoinPart, joinResolvers) = queryJoinF("Deposit")
+        val query = s"$baseQuery $queryJoinPart"
+        query -> joinResolvers.reverse
+      case (Some(queryJoinF), None, Some((queryWherePart, whereResolvers))) =>
+        val tableName = "SelectedDeposits"
+        val (queryJoinPart, joinResolvers) = queryJoinF(tableName)
+        val query = s"SELECT * FROM ($baseQuery WHERE $queryWherePart) AS $tableName $queryJoinPart"
+        query -> (whereResolvers.reverse ::: joinResolvers.reverse)
+      case (Some(queryJoinF), Some(lastModifiedF), None) =>
+        val (queryJoinPart, joinResolvers) = queryJoinF("Deposit")
+        val (lastModifiedQuery, lastModifiedResolvers) = lastModifiedF("Deposit")
+        val query = s"$baseQuery $queryJoinPart $lastModifiedQuery"
+        query -> (joinResolvers.reverse ::: lastModifiedResolvers.reverse)
+      case (Some(queryJoinF), Some(lastModifiedF), Some((queryWherePart, whereResolvers))) =>
+        val tableName = "SelectedDeposits"
+        val (queryJoinPart, joinResolvers) = queryJoinF(tableName)
+        val (lastModifiedQuery, lastModifiedResolvers) = lastModifiedF(tableName)
+        val query = s"SELECT * FROM ($baseQuery WHERE $queryWherePart) AS $tableName $queryJoinPart $lastModifiedQuery"
+        query -> (whereResolvers.reverse ::: joinResolvers.reverse ::: lastModifiedResolvers.reverse)
     }
 
     filters.sort.fold(s"$query;") {
@@ -135,18 +164,16 @@ object QueryGenerator {
   }
 
   def searchDepositors(filters: DepositorIdFilters): (String, Seq[PrepStatementResolver]) = {
-    val (queryWherePart, whereValues) = List(
+    val whereClauses = List(
       filters.originFilter.map("origin" -> _.toString),
     )
       .collect {
         case Some((labelName, null)) => s"$labelName IS NULL" -> Nil
         case Some((labelName, value)) => s"$labelName = ?" -> List(setString(value))
       }
-      .foldLeft(("", List.empty[PrepStatementResolver])) {
-        case (("", vs), (subQuery, values)) => subQuery -> (values ::: vs)
-        case ((q, vs), (subQuery, values)) => s"$q AND $subQuery" -> (values ::: vs)
-      }
-    val (queryJoinPart, joinValues) = List(
+    val maybeWherePart = reduceOption(whereClauses)(_ + " AND " + _, _ ::: _)
+
+    val maybeJoinPart = List(
       filters.stateFilter.map(createSearchSubQuery(_)("State", "label", _.label.toString)),
       filters.ingestStepFilter.map(createSearchSimplePropertiesSubQuery(_)("ingest-step", _.label.toString)),
       filters.doiRegisteredFilter.map(createSearchSimplePropertiesSubQuery(_)("doi-registered", _.value.toString)),
@@ -155,51 +182,43 @@ object QueryGenerator {
       filters.isNewVersionFilter.map(createSearchSimplePropertiesSubQuery(_)("is-new-version", filter => BooleanUtils.toStringTrueFalse(filter.isNewVersion))),
       filters.curationRequiredFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-required", filter => BooleanUtils.toStringTrueFalse(filter.curationRequired))),
       filters.curationPerformedFilter.map(createSearchSimplePropertiesSubQuery(_)("is-curation-performed", filter => BooleanUtils.toStringTrueFalse(filter.curationPerformed))),
-      filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value.toString)),
+      filters.contentTypeFilter.map(createSearchSimplePropertiesSubQuery(_)("content-type", _.value)),
     )
       .collect {
-        case Some((tableName, q, values)) if queryWherePart.isEmpty => s"INNER JOIN ($q) AS ${ tableName }SearchResult ON Deposit.depositId = ${ tableName }SearchResult.depositId" -> values
-        case Some((tableName, q, values)) => s"INNER JOIN ($q) AS ${ tableName }SearchResult ON SelectedDeposits.depositId = ${ tableName }SearchResult.depositId" -> values
+        case Some((tableName, q, resolvers)) =>
+          (depositTableName: String) => s"INNER JOIN ($q) AS ${ tableName }SearchResult ON $depositTableName.depositId = ${ tableName }SearchResult.depositId" -> resolvers
       }
-      .foldLeft(("", List.empty[PrepStatementResolver])) {
-        case (("", vs), (subQuery, values)) => subQuery -> (values ::: vs)
-        case ((q, vs), (subQuery, values)) => s"$q $subQuery" -> (values ::: vs)
-      }
+      .reduceOption((f, g) => (depositTableName: String) => {
+        val (queryWherePartF, valuesF) = f(depositTableName)
+        val (queryWherePartG, valuesG) = g(depositTableName)
 
-    (queryJoinPart, queryWherePart) match {
-      case ("", "") =>
-        val query = "SELECT DISTINCT depositorId FROM Deposit;"
-        query -> Nil
-      case ("", _) =>
-        val query = s"SELECT DISTINCT depositorId FROM Deposit WHERE $queryWherePart;"
-        query -> whereValues.reverse
-      case (_, "") =>
-        val query = s"SELECT DISTINCT depositorId FROM Deposit $queryJoinPart;"
-        query -> joinValues.reverse
-      case (_, _) =>
-        val query = s"SELECT DISTINCT depositorId FROM (SELECT depositId, depositorId FROM Deposit WHERE $queryWherePart) AS SelectedDeposits $queryJoinPart;"
-        query -> (whereValues.reverse ::: joinValues.reverse)
+        s"$queryWherePartF $queryWherePartG" -> (valuesG ::: valuesF)
+      })
+
+    val select = "SELECT DISTINCT depositorId"
+    (maybeJoinPart, maybeWherePart) match {
+      case (None, None) =>
+        s"$select FROM Deposit;" -> Nil
+      case (None, Some((queryWherePart, whereResolvers))) =>
+        val query = s"$select FROM Deposit WHERE $queryWherePart;"
+        query -> whereResolvers.reverse
+      case (Some(queryJoinF), None) =>
+        val (queryJoinPart, joinResolvers) = queryJoinF("Deposit")
+        val query = s"$select FROM Deposit $queryJoinPart;"
+        query -> joinResolvers.reverse
+      case (Some(queryJoinF), Some((queryWherePart, whereResolvers))) =>
+        val tableName = "SelectedDeposits"
+        val (queryJoinPart, joinResolvers) = queryJoinF(tableName)
+        val query = s"$select FROM (SELECT depositId, depositorId FROM Deposit WHERE $queryWherePart) AS $tableName $queryJoinPart;"
+        query -> (whereResolvers.reverse ::: joinResolvers.reverse)
     }
   }
 
   def getLastModifiedDate(ids: NonEmptyList[DepositId]): (String, Seq[PrepStatementResolver]) = {
     val whereClause = ids.toList.map(_ => "?").mkString("WHERE depositId IN (", ", ", ")")
-    val tablesAndMaxFields = List(
-      "Deposit" -> "creationTimestamp",
-      "State" -> "timestamp",
-      "Identifier" -> "timestamp",
-      "Curator" -> "timestamp",
-      "Springfield" -> "timestamp",
-      "SimpleProperties" -> "timestamp",
-    )
-    val query = tablesAndMaxFields
-      .map { case (table, maxField) => s"(SELECT depositId, MAX($maxField) AS max FROM $table $whereClause GROUP BY depositId)" }
-      .mkString("SELECT depositId, MAX(max) AS max_timestamp FROM (", " UNION ALL ", ") AS max_timestamps GROUP BY depositId;")
+    val query = s"SELECT * FROM LastModified $whereClause;"
 
-    val stringIds = ids.map(setDepositId)
-    val values = tablesAndMaxFields.map(_ => stringIds).reduce(_ ::: _).toList
-
-    query -> values
+    query -> ids.map(setDepositId).toList
   }
 
   def getElementsById(tableName: String, idColumnName: String)(ids: NonEmptyList[String]): (String, Seq[PrepStatementResolver]) = {

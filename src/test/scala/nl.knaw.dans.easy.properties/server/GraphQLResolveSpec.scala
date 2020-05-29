@@ -1530,7 +1530,7 @@ class GraphQLResolveSpec extends TestSupportFixture
         depositId2 -> step2,
         depositId3 -> step3,
       ).asRight
-      depositDao.search _ expects Seq(filters3, filters2, filters4) once() returning Seq(
+      depositDao.search _ expects Seq(filters2, filters3, filters4) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
         filters4 -> Seq(deposit1, deposit3),
@@ -1557,7 +1557,7 @@ class GraphQLResolveSpec extends TestSupportFixture
         depositId2 -> Seq(step3, step1),
         depositId3 -> Seq.empty,
       ).asRight
-      depositDao.search _ expects Seq(filters3, filters2, filters4) once() returning Seq(
+      depositDao.search _ expects Seq(filters2, filters3, filters4) once() returning Seq(
         filters2 -> Seq(deposit2, deposit3),
         filters3 -> Seq(deposit1, deposit2),
         filters4 -> Seq(deposit1, deposit3),

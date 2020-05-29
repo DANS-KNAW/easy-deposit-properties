@@ -24,8 +24,6 @@ import nl.knaw.dans.easy.properties.app.repository.sql.SQLRepo
 import org.scalatest.BeforeAndAfterEach
 import resource.{ constant, managed }
 
-import scala.util.Success
-
 trait DatabaseFixture extends BeforeAndAfterEach {
   this: TestSupportFixture with FileSystemSupport =>
 
@@ -41,12 +39,15 @@ trait DatabaseFixture extends BeforeAndAfterEach {
     override protected def createConnectionPool: ConnectionPool = {
       val pool = super.createConnectionPool
 
-      managed(pool.getConnection)
-        .flatMap(connection => managed(connection.createStatement))
-        .and(constant(File(getClass.getClassLoader.getResource("database/database.sql").toURI).contentAsString))
-        .map { case (statement, query) => statement.executeUpdate(query) }
-        .tried
-        .recover { case e => println(e.getMessage); fail("could not create database for testing", e) } shouldBe a[Success[_]]
+      val scripts = List("database/database.sql", "database/views.sql")
+      for (script <- scripts) {
+        managed(pool.getConnection)
+          .flatMap(connection => managed(connection.createStatement))
+          .and(constant(File(getClass.getClassLoader.getResource(script).toURI).contentAsString))
+          .map { case (statement, query) => statement.executeUpdate(query) }
+          .tried
+          .recover { case e => println(e.getMessage); fail(s"could not create database for testing from script $script", e) }
+      }
 
       connection = pool.getConnection
 

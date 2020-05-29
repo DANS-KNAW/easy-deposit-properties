@@ -91,19 +91,34 @@ type ContentType implements Node {
     orderBy: DepositOrder
 
     """
-    List only those elements that have a timestamp earlier than this given timestamp.
+    List only those deposits that have a creation timestamp earlier than this given timestamp.
     """
-    earlierThan: DateTime
+    createdEarlierThan: DateTime
 
     """
-    List only those elements that have a timestamp later than this given timestamp.
+    List only those deposits that have a creation timestamp later than this given timestamp.
     """
-    laterThan: DateTime
+    createdLaterThan: DateTime
 
     """
-    List only those elements that have a timestamp equal to the given timestamp.
+    List only those deposits that have a creation timestamp equal to the given timestamp.
     """
-    atTimestamp: DateTime
+    createdAtTimestamp: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp earlier than this given timestamp.
+    """
+    lastModifiedEarlierThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp later than this given timestamp.
+    """
+    lastModifiedLaterThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp equal to the given timestamp.
+    """
+    lastModifiedAtTimestamp: DateTime
     before: String
     after: String
     first: Int
@@ -200,19 +215,34 @@ type Curator implements Node {
     orderBy: DepositOrder
 
     """
-    List only those elements that have a timestamp earlier than this given timestamp.
+    List only those deposits that have a creation timestamp earlier than this given timestamp.
     """
-    earlierThan: DateTime
+    createdEarlierThan: DateTime
 
     """
-    List only those elements that have a timestamp later than this given timestamp.
+    List only those deposits that have a creation timestamp later than this given timestamp.
     """
-    laterThan: DateTime
+    createdLaterThan: DateTime
 
     """
-    List only those elements that have a timestamp equal to the given timestamp.
+    List only those deposits that have a creation timestamp equal to the given timestamp.
     """
-    atTimestamp: DateTime
+    createdAtTimestamp: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp earlier than this given timestamp.
+    """
+    lastModifiedEarlierThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp later than this given timestamp.
+    """
+    lastModifiedLaterThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp equal to the given timestamp.
+    """
+    lastModifiedAtTimestamp: DateTime
     before: String
     after: String
     first: Int
@@ -668,19 +698,34 @@ type Depositor {
     orderBy: DepositOrder
 
     """
-    List only those elements that have a timestamp earlier than this given timestamp.
+    List only those deposits that have a creation timestamp earlier than this given timestamp.
     """
-    earlierThan: DateTime
+    createdEarlierThan: DateTime
 
     """
-    List only those elements that have a timestamp later than this given timestamp.
+    List only those deposits that have a creation timestamp later than this given timestamp.
     """
-    laterThan: DateTime
+    createdLaterThan: DateTime
 
     """
-    List only those elements that have a timestamp equal to the given timestamp.
+    List only those deposits that have a creation timestamp equal to the given timestamp.
     """
-    atTimestamp: DateTime
+    createdAtTimestamp: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp earlier than this given timestamp.
+    """
+    lastModifiedEarlierThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp later than this given timestamp.
+    """
+    lastModifiedLaterThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp equal to the given timestamp.
+    """
+    lastModifiedAtTimestamp: DateTime
     before: String
     after: String
     first: Int
@@ -837,19 +882,34 @@ type IngestStep implements Node {
     orderBy: DepositOrder
 
     """
-    List only those elements that have a timestamp earlier than this given timestamp.
+    List only those deposits that have a creation timestamp earlier than this given timestamp.
     """
-    earlierThan: DateTime
+    createdEarlierThan: DateTime
 
     """
-    List only those elements that have a timestamp later than this given timestamp.
+    List only those deposits that have a creation timestamp later than this given timestamp.
     """
-    laterThan: DateTime
+    createdLaterThan: DateTime
 
     """
-    List only those elements that have a timestamp equal to the given timestamp.
+    List only those deposits that have a creation timestamp equal to the given timestamp.
     """
-    atTimestamp: DateTime
+    createdAtTimestamp: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp earlier than this given timestamp.
+    """
+    lastModifiedEarlierThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp later than this given timestamp.
+    """
+    lastModifiedLaterThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp equal to the given timestamp.
+    """
+    lastModifiedAtTimestamp: DateTime
     before: String
     after: String
     first: Int
@@ -952,19 +1012,34 @@ type IsCurationPerformed implements Node {
     orderBy: DepositOrder
 
     """
-    List only those elements that have a timestamp earlier than this given timestamp.
+    List only those deposits that have a creation timestamp earlier than this given timestamp.
     """
-    earlierThan: DateTime
+    createdEarlierThan: DateTime
 
     """
-    List only those elements that have a timestamp later than this given timestamp.
+    List only those deposits that have a creation timestamp later than this given timestamp.
     """
-    laterThan: DateTime
+    createdLaterThan: DateTime
 
     """
-    List only those elements that have a timestamp equal to the given timestamp.
+    List only those deposits that have a creation timestamp equal to the given timestamp.
     """
-    atTimestamp: DateTime
+    createdAtTimestamp: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp earlier than this given timestamp.
+    """
+    lastModifiedEarlierThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp later than this given timestamp.
+    """
+    lastModifiedLaterThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp equal to the given timestamp.
+    """
+    lastModifiedAtTimestamp: DateTime
     before: String
     after: String
     first: Int
@@ -1002,19 +1077,34 @@ type IsCurationRequired implements Node {
     orderBy: DepositOrder
 
     """
-    List only those elements that have a timestamp earlier than this given timestamp.
+    List only those deposits that have a creation timestamp earlier than this given timestamp.
     """
-    earlierThan: DateTime
+    createdEarlierThan: DateTime
 
     """
-    List only those elements that have a timestamp later than this given timestamp.
+    List only those deposits that have a creation timestamp later than this given timestamp.
     """
-    laterThan: DateTime
+    createdLaterThan: DateTime
 
     """
-    List only those elements that have a timestamp equal to the given timestamp.
+    List only those deposits that have a creation timestamp equal to the given timestamp.
     """
-    atTimestamp: DateTime
+    createdAtTimestamp: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp earlier than this given timestamp.
+    """
+    lastModifiedEarlierThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp later than this given timestamp.
+    """
+    lastModifiedLaterThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp equal to the given timestamp.
+    """
+    lastModifiedAtTimestamp: DateTime
     before: String
     after: String
     first: Int
@@ -1052,19 +1142,34 @@ type IsNewVersion implements Node {
     orderBy: DepositOrder
 
     """
-    List only those elements that have a timestamp earlier than this given timestamp.
+    List only those deposits that have a creation timestamp earlier than this given timestamp.
     """
-    earlierThan: DateTime
+    createdEarlierThan: DateTime
 
     """
-    List only those elements that have a timestamp later than this given timestamp.
+    List only those deposits that have a creation timestamp later than this given timestamp.
     """
-    laterThan: DateTime
+    createdLaterThan: DateTime
 
     """
-    List only those elements that have a timestamp equal to the given timestamp.
+    List only those deposits that have a creation timestamp equal to the given timestamp.
     """
-    atTimestamp: DateTime
+    createdAtTimestamp: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp earlier than this given timestamp.
+    """
+    lastModifiedEarlierThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp later than this given timestamp.
+    """
+    lastModifiedLaterThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp equal to the given timestamp.
+    """
+    lastModifiedAtTimestamp: DateTime
     before: String
     after: String
     first: Int
@@ -1230,19 +1335,34 @@ type Query {
     orderBy: DepositOrder
 
     """
-    List only those elements that have a timestamp earlier than this given timestamp.
+    List only those deposits that have a creation timestamp earlier than this given timestamp.
     """
-    earlierThan: DateTime
+    createdEarlierThan: DateTime
 
     """
-    List only those elements that have a timestamp later than this given timestamp.
+    List only those deposits that have a creation timestamp later than this given timestamp.
     """
-    laterThan: DateTime
+    createdLaterThan: DateTime
 
     """
-    List only those elements that have a timestamp equal to the given timestamp.
+    List only those deposits that have a creation timestamp equal to the given timestamp.
     """
-    atTimestamp: DateTime
+    createdAtTimestamp: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp earlier than this given timestamp.
+    """
+    lastModifiedEarlierThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp later than this given timestamp.
+    """
+    lastModifiedLaterThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp equal to the given timestamp.
+    """
+    lastModifiedAtTimestamp: DateTime
     before: String
     after: String
     first: Int
@@ -1603,19 +1723,34 @@ type State implements Node {
     orderBy: DepositOrder
 
     """
-    List only those elements that have a timestamp earlier than this given timestamp.
+    List only those deposits that have a creation timestamp earlier than this given timestamp.
     """
-    earlierThan: DateTime
+    createdEarlierThan: DateTime
 
     """
-    List only those elements that have a timestamp later than this given timestamp.
+    List only those deposits that have a creation timestamp later than this given timestamp.
     """
-    laterThan: DateTime
+    createdLaterThan: DateTime
 
     """
-    List only those elements that have a timestamp equal to the given timestamp.
+    List only those deposits that have a creation timestamp equal to the given timestamp.
     """
-    atTimestamp: DateTime
+    createdAtTimestamp: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp earlier than this given timestamp.
+    """
+    lastModifiedEarlierThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp later than this given timestamp.
+    """
+    lastModifiedLaterThan: DateTime
+
+    """
+    List only those deposits that have a last modified timestamp equal to the given timestamp.
+    """
+    lastModifiedAtTimestamp: DateTime
     before: String
     after: String
     first: Int

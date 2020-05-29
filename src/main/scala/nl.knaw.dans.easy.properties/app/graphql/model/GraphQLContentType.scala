@@ -53,9 +53,12 @@ class GraphQLContentType(contentType: ContentType) extends Node {
   @GraphQLDescription("List all deposits with the same current content type.")
   def deposits(@GraphQLDescription("Determine whether to search in current content types (`LATEST`, default) or all current and past content types (`ALL`).") @GraphQLDefault(SeriesFilter.LATEST) contentTypeFilter: SeriesFilter,
                @GraphQLDescription("Ordering options for the returned deposits.") orderBy: Option[DepositOrder] = None,
-               @GraphQLDescription("List only those elements that have a timestamp earlier than this given timestamp.") earlierThan: Option[DateTime] = None,
-               @GraphQLDescription("List only those elements that have a timestamp later than this given timestamp.") laterThan: Option[DateTime] = None,
-               @GraphQLDescription("List only those elements that have a timestamp equal to the given timestamp.") atTimestamp: Option[DateTime] = None,
+               @GraphQLDescription("List only those deposits that have a creation timestamp earlier than this given timestamp.") createdEarlierThan: Option[DateTime] = None,
+               @GraphQLDescription("List only those deposits that have a creation timestamp later than this given timestamp.") createdLaterThan: Option[DateTime] = None,
+               @GraphQLDescription("List only those deposits that have a creation timestamp equal to the given timestamp.") createdAtTimestamp: Option[DateTime] = None,
+               @GraphQLDescription("List only those deposits that have a last modified timestamp earlier than this given timestamp.") lastModifiedEarlierThan: Option[DateTime] = None,
+               @GraphQLDescription("List only those deposits that have a last modified timestamp later than this given timestamp.") lastModifiedLaterThan: Option[DateTime] = None,
+               @GraphQLDescription("List only those deposits that have a last modified timestamp equal to the given timestamp.") lastModifiedAtTimestamp: Option[DateTime] = None,
                before: Option[String] = None,
                after: Option[String] = None,
                first: Option[Int] = None,
@@ -63,7 +66,8 @@ class GraphQLContentType(contentType: ContentType) extends Node {
               )(implicit ctx: Context[DataContext, GraphQLContentType]): DeferredValue[DataContext, ExtendedConnection[GraphQLDeposit]] = {
     DepositResolver.findDeposit(DepositFilters(
       contentTypeFilter = Some(DepositContentTypeFilter(contentType.value, contentTypeFilter)),
-      timeFilter = TimeFilter(earlierThan, laterThan, atTimestamp),
+      creationTimeFilter = TimeFilter(createdEarlierThan, createdLaterThan, createdAtTimestamp),
+      lastModifiedTimeFilter = TimeFilter(lastModifiedEarlierThan, lastModifiedLaterThan, lastModifiedAtTimestamp),
       sort = orderBy,
     ))
       .map(deposits => ExtendedConnection.connectionFromSeq(
